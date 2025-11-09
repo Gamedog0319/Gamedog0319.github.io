@@ -14,7 +14,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rithvik Mandya — Personal Portfolio</title>
-  <meta name="description" content="Game developer focused on AI/ML, Unreal Engine and Unity. Projects, experience, skills, and contact info for Rithvik Mandya." />
+  <meta name="description" content="Game developer focused on AI/ML, Unreal Engine and Unity. Projects, experience, skills, publications, and contact info for Rithvik Mandya." />
   <link rel="icon" type="image/png" href="/favicon.png" />
 
   <!-- Performance: Google Fonts -->
@@ -55,7 +55,8 @@
           <li><a href="#experience"><span>Experience</span></a></li>
           <li><a href="#portfolio"><span>Projects</span></a></li>
           <li><a href="#skills"><span>Skills</span></a></li>
-          <li><a href="https://drive.google.com/file/d/1hNcdCWAl2kOpXm9lXt7woZm6ShobjXbp/view?usp=sharing" target="_blank" rel="noopener noreferrer"><span>Resume</span></a></li>
+          <li><a href="#publications"><span>Publications</span></a></li>
+          <li><a href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing" target="_blank" rel="noopener noreferrer"><span>Resume</span></a></li>
           <li><a href="#contacts"><span>Contact</span></a></li>
         </ul>
       </nav>
@@ -170,18 +171,18 @@
       <div class="row">
         <div class="col-lg-12" data-aos="fade-up">
 
-          <!-- NEW: Research Assistant -->
+          <!-- Research Assistant -->
           <div class="col-md-12 mt-4 mt-md-0 icon-box" data-aos="fade-up" data-aos-delay="60">
             <h4 style="text-align:left;">Robotics Center and School of Computing, University of Utah</h4>
             <h5 style="text-align:left;">Sep 2025 – Present</h5>
             <p style="text-align:left;color:#fff"><em>Research Assistant</em></p>
             <ul style="text-align:left;">
               <li>Designed and prototyped a wearable neck exoskeleton for VR, implementing a <strong>UCB1 multi-armed bandit</strong> to learn user preferences and switch among <strong>MLP, LSTM, and parameter-vector</strong> controllers; co-designed the evaluation simulation.</li>
-              <li>Built a <strong>baseline DQN</strong> in Microsoft <strong>Project Malmo</strong> for navigation and resource collection (<strong>replay buffer</strong>, <strong>target network</strong>, <strong>ε-greedy</strong> exploration), and created datasets and training pipelines for <strong>imitation learning</strong> with neural networks.</li>
+              <li>Built a <strong>baseline DQN</strong> in Microsoft <strong>Project Malmo</strong> for navigation and resource collection (<strong>replay buffer</strong>, <strong>target network</strong>, <strong>ε-greedy</strong>), and created datasets and training pipelines for <strong>imitation learning</strong>.</li>
             </ul>
           </div>
 
-          <!-- NEW: Teaching Assistant -->
+          <!-- Teaching Assistant -->
           <div class="col-md-12 mt-4 mt-md-0 icon-box" data-aos="fade-up" data-aos-delay="80">
             <h4 style="text-align:left;">David Eccles School of Business, University of Utah</h4>
             <h5 style="text-align:left;">Aug 18 2025 – Sep 2025</h5>
@@ -252,307 +253,291 @@
   <!-- End Experience Section -->
 
   <!-- ======= Projects Section ======= -->
-<section id="portfolio" class="portfolio">
-  <div class="container">
-    <div class="section-title"><h2>Projects</h2></div>
+  <section id="portfolio" class="portfolio">
+    <div class="container">
+      <div class="section-title"><h2>Projects</h2></div>
 
-    <div class="row">
-      <div class="col-lg-12 d-flex justify-content-center">
-        <ul id="portfolio-flters">
-          <li data-filter="*" class="filter-active">All</li>
-          <li data-filter=".filter-app">GameDev</li>
-          <li data-filter=".filter-project">ML and other</li>
-        </ul>
+      <div class="row">
+        <div class="col-lg-12 d-flex justify-content-center">
+          <ul id="portfolio-flters">
+            <li data-filter="*" class="filter-active">All</li>
+            <li data-filter=".filter-app">GameDev</li>
+            <li data-filter=".filter-project">ML and other</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row portfolio-container">
+
+        <!-- Minecraft Malmo -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-project">
+          <center><h4>Human-in-the-Loop RL for Minecraft (Project Malmo)</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/Minecraft.png" class="img-fluid" alt="Human-in-the-Loop RL for Minecraft (Project Malmo)" />
+            <div class="portfolio-info">
+              <h4>September 2025 – Present</h4>
+              <ul>
+                <li>Baseline DQN with replay buffer, target network, and ε-greedy for navigation/resource missions.</li>
+                <li>Lightweight human feedback for reward shaping.</li>
+                <li>Built datasets and pipelines for imitation learning; logged learning curves.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/ImitationLearning" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+
+        <!-- VR Neck Exoskeleton -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+          <center><h4>VR Neck Exoskeleton (Posture Support &amp; Haptics)</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/VR%20NECK.png" class="img-fluid" alt="VR Neck Exoskeleton project" />
+            <div class="portfolio-info">
+              <h4>May 2025 – Present</h4>
+              <ul>
+                <li>Wearable neck assist with posture cues and gentle support; Unity↔firmware telemetry/control.</li>
+                <li>UCB1 bandit to switch among MLP/LSTM/parameter-vector controllers from user preference.</li>
+                <li>Calibration, ROM safety guards, low-latency haptics.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://github.com/aria-lab-code/vr-exoskeleton/tree/master/vr_exoskeleton" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+
+        <!-- Indonesian VR History Shop Sim -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+          <center><h4>Indonesian VR History Shop Sim</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/SHOP.jpg" class="img-fluid" alt="Indonesian VR History Shop Sim" />
+            <div class="portfolio-info">
+              <h4>August 2025 – September 2025</h4>
+              <ul>
+                <li>Interactive VR “history shop” with artifacts, bartering, and context-aware dialogue.</li>
+                <li>Smooth locomotion, grab/physics, scene streaming; steady 90 FPS standalone VR.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/ShopSim" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+
+        <!-- HellBert -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+          <center><h4>HellBert</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/HELLBERT.jpg" class="img-fluid" alt="HellBert game" />
+            <div class="portfolio-info">
+              <h4>August 2025</h4>
+              <ul>
+                <li>Character controller + platform-flipping with buffered input and tweened jumps.</li>
+                <li>Physics collisions, audio/animation triggers, platform state transitions; PC + Android.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/HellBert" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+
+        <!-- Pompeii (Fast-Paced FPS) -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+          <center><h4>Pompeii (Fast-Paced FPS)</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/pompeii.jpg" class="img-fluid" alt="Pompeii fast-paced FPS" />
+            <div class="portfolio-info">
+              <h4>Epic Games Jam 2025</h4>
+              <ul>
+                <li>Unreal Engine (C++ &amp; Blueprints), Blender, Maya.</li>
+                <li>Contributions: weapon mechanics, health/damage system, animation setup.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://github.com/Gamedogstudios/Pompeii" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+
+        <!-- Howzzat -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+          <center><h4>Howzat! (CV Cricket Simulator)</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/Howzzatt.jpg" class="img-fluid" alt="Computer vision cricket simulator" />
+            <div class="portfolio-info">
+              <h4>Aug 2024 – Oct 2024</h4>
+              <ul>
+                <li>Unity cricket with real-time gesture batting via Python CVZone.</li>
+                <li>Blender stadiums/animations; physics-based ball dynamics.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/Howzzat" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+
+        <!-- Driving Cars RL -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+          <center><h4>Driving Cars Using Reinforcement Learning</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/RLDrivers.png" class="img-fluid" alt="Reinforcement learning for driving project" />
+            <div class="portfolio-info">
+              <ul>
+                <li>UE 5.3 Learning Agents + Blueprints to train autonomous behaviors.</li>
+                <li>Reward shaping, curriculum tasks, evaluation scenarios.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/RLAgentDrivers-Unreal" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+
+        <!-- Flappy Bird Q-Learning -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+          <center><h4>Flappy Bird Q-Learning</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/flaappy.jpg" class="img-fluid" alt="Flappy Bird Q-Learning" />
+            <div class="portfolio-info">
+              <ul>
+                <li>Tabular Q-learning; ε-greedy and reward tuning.</li>
+                <li>Metrics logging to compare exploration schedules.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/flappy-bird-gym" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+
+        <!-- Lunar Lander DQN -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-project">
+          <center><h4>Lunar Lander DQN</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/Lunar_Lander.png" class="img-fluid" alt="Lunar Lander DQN" />
+            <div class="portfolio-info">
+              <ul>
+                <li>DQN with experience replay &amp; target networks on Gym LunarLander.</li>
+                <li>Reward shaping for soft landings; return vs. episodes plots.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://github.com/bmaxdk/OpenAI-Gym-LunarLander-v2-Double-Dueling-DQN" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+
+        <!-- Book: Level Up -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+          <center><h4>Book: Level Up!</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/levelup.jpg" class="img-fluid" alt="Level Up! book notes" />
+            <div class="portfolio-info">
+              <ul>
+                <li>Condensed design patterns, loops, and balancing into a practical playbook.</li>
+                <li>Applied to prototypes to tighten game feel and pacing.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://a.co/d/j8x7zGY" target="_blank" rel="noopener noreferrer">
+              <i class="bx bx-cart" aria-hidden="true"></i> Buy Now
+            </a>
+          </div>
+        </div>
+
+        <!-- VR/AR Molecular Simulation -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+          <center><h4>VR/AR Molecular Simulation</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/todo.jpg" class="img-fluid" alt="VR/AR molecular simulation" />
+            <div class="portfolio-info">
+              <ul>
+                <li>Unity + C# app for interactive molecular visualization and orientation prediction.</li>
+                <li>Optimized rendering and VR controls for smooth exploration.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/VR-AR-For-Molecular-Simulation" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+
+        <!-- Smart Emergency Response -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-project">
+          <center><h4>Smart Emergency Response System (ESP32)</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/IOT.jpg" class="img-fluid" alt="IoT emergency response system" />
+            <div class="portfolio-info">
+              <ul>
+                <li>ESP32 sensor fusion and event triggers; real-time alerts over Wi-Fi.</li>
+                <li>Modular firmware and cloud hooks for rapid prototyping.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/Exploring-the-Integration-of-A9G-and-ESP32-for-Smart-Emergency-Response-System" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+
+        <!-- Startup Success Prediction -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-project">
+          <center><h4>Startup Success Prediction</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/STARTUP.jpg" class="img-fluid" alt="Startup success prediction ML project" />
+            <div class="portfolio-info">
+              <ul>
+                <li>Classifiers over funding, team, and market features; feature importance and ROC analysis.</li>
+                <li>Simple API for inference and experiment tracking.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/Startup-Success-Prediction" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+
+        <!-- Snow Boarder -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+          <center><h4>Snow Boarder</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/snowboarder.jpg" class="img-fluid" alt="Snow Boarder game" />
+            <div class="portfolio-info">
+              <ul>
+                <li>Arcade physics with responsive input and ramp/rail interactions.</li>
+                <li>Level scripting and camera tuning for flow and visibility.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/Snow-Boarder" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+
+        <!-- RL Agents -->
+        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+          <center><h4>Reinforcement Learning Agents</h4></center>
+          <div class="portfolio-wrap">
+            <img src="assets/img/project/rlagents.jpg" class="img-fluid" alt="Reinforcement learning agents project" />
+            <div class="portfolio-info">
+              <ul>
+                <li>Sandbox of RL experiments for NPC behavior and control policies.</li>
+                <li>Metrics dashboard for reward curves and ablation studies.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="portfolio-cta text-center mt-2">
+            <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/RL-AGENTS-" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+
       </div>
     </div>
-
-    <div class="row portfolio-container">
-
-      <!-- NEW Projects (added first) -->
-      <div class="col-lg-4 col-md-6 portfolio-item filter-project">
-        <center><h4>Human-in-the-Loop RL for Minecraft (Project Malmo)</h4></center>
-        <div class="portfolio-wrap">
-          <img src="assets/img/project/Minecraft.png" class="img-fluid" alt="Human-in-the-Loop RL for Minecraft (Project Malmo)" />
-          <div class="portfolio-info">
-            <h4>September 2025 – Present</h4>
-            <ul>
-              <li>Baseline DQN with replay buffer, target network, and ε-greedy for navigation/resource missions.</li>
-              <li>Lightweight human feedback for reward shaping.</li>
-              <li>Built datasets and training pipelines for imitation learning with neural networks; logged learning curves.</li>
-            </ul>
-          </div>
-        </div>
-        <div class="portfolio-cta text-center mt-2">
-          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/ImitationLearning" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-        <center><h4>VR Neck Exoskeleton (Posture Support &amp; Haptics)</h4></center>
-        <div class="portfolio-wrap">
-          <img src="assets/img/project/VR%20NECK.png" class="img-fluid" alt="VR Neck Exoskeleton project" />
-          <div class="portfolio-info">
-            <h4>May 2024 – June 2025</h4>
-            <ul>
-              <li>Wearable neck assist with posture cues and gentle support; Unity↔firmware telemetry/control.</li>
-              <li>Improved comfort and fewer neck-strain events.</li>
-              <li>UCB1 bandit to switch among MLP/LSTM/parameter-vector controllers based on user preference.</li>
-            </ul>
-          </div>
-        </div>
-        <div class="portfolio-cta text-center mt-2">
-          <a class="btn btn-sm btn-success" href="https://github.com/aria-lab-code/vr-exoskeleton/tree/master/vr_exoskeleton" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-        <center><h4>Indonesian VR History Shop Sim</h4></center>
-        <div class="portfolio-wrap">
-          <img src="assets/img/project/SHOP.jpg" class="img-fluid" alt="Indonesian VR History Shop Sim" />
-          <div class="portfolio-info">
-            <h4>October 2024 – January 2025</h4>
-            <ul>
-              <li>Interactive VR “history shop” with artifacts, bartering, and context-aware dialogue/narration.</li>
-              <li>Smooth locomotion, grab/physics, scene streaming; optimized for steady 90 FPS standalone VR.</li>
-            </ul>
-          </div>
-        </div>
-        <div class="portfolio-cta text-center mt-2">
-          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/ShopSim" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-        <center><h4>HellBert</h4></center>
-        <div class="portfolio-wrap">
-          <img src="assets/img/project/HELLBERT.jpg" class="img-fluid" alt="HellBert game" />
-          <div class="portfolio-info">
-            <h4>August 2025</h4>
-            <ul>
-              <li>Character controller + platform-flipping with buffered input and tweened jumps.</li>
-              <li>Physics collisions, audio/animation triggers, platform state transitions; PC + Android.</li>
-            </ul>
-          </div>
-        </div>
-        <div class="portfolio-cta text-center mt-2">
-          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/HellBert" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </div>
-
-      <!-- NEW: Pompeii FPS -->
-      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-        <center><h4>Pompeii (Fast-Paced FPS)</h4></center>
-        <div class="portfolio-wrap">
-          <img src="assets/img/project/pompeii.jpg" class="img-fluid" alt="Pompeii FPS project" />
-          <div class="portfolio-info">
-            <ul>
-              <li>First-person shooter built in Unreal Engine using C++ and Blueprints.</li>
-              <li>Contributed gun mechanics, health/damage system, and animation state machines.</li>
-              <li>Asset pipeline with Blender &amp; Maya for props and character animation.</li>
-            </ul>
-          </div>
-        </div>
-        <div class="portfolio-cta text-center mt-2">
-          <a class="btn btn-sm btn-success" href="https://github.com/Gamedogstudios/Pompeii" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </div>
-
-      <!-- Existing tiles (now with overlays) -->
-      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-        <center><h4>Howzat! (CV Cricket Simulator)</h4></center>
-        <div class="portfolio-wrap">
-          <img src="assets/img/project/Howzzatt.jpg" class="img-fluid" alt="Computer vision cricket simulator" />
-          <div class="portfolio-info">
-            <h4>Aug 2024 – Oct 2024</h4>
-            <ul>
-              <li>Unity 3D cricket with real-time gesture-controlled batting via Python CVZone.</li>
-              <li>Blender stadiums/animations; physics-based ball dynamics for engaging play.</li>
-            </ul>
-          </div>
-        </div>
-        <div class="portfolio-cta text-center mt-2">
-          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/Howzzat" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-        <center><h4>Driving Cars Using Reinforcement Learning</h4></center>
-        <div class="portfolio-wrap">
-          <img src="assets/img/project/RLDrivers.png" class="img-fluid" alt="Reinforcement learning for driving project" />
-          <div class="portfolio-info">
-            <ul>
-              <li>UE 5.3 Learning Agents + Blueprints to train autonomous driving behaviors.</li>
-              <li>Reward shaping, curriculum tasks, and evaluation scenarios for stability.</li>
-            </ul>
-            <div class="portfolio-links">
-              <a href="projects/DriversUnreal.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-cta text-center mt-2">
-          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/RLAgentDrivers-Unreal" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-        <center><h4>Flappy Bird Q-Learning</h4></center>
-        <div class="portfolio-wrap">
-          <img src="assets/img/project/flaappy.jpg" class="img-fluid" alt="Flappy Bird Q-Learning" />
-          <div class="portfolio-info">
-            <ul>
-              <li>Tabular Q-learning for obstacle navigation; ε-greedy and reward tuning.</li>
-              <li>Metrics logging to compare exploration schedules and convergence.</li>
-            </ul>
-          </div>
-        </div>
-        <div class="portfolio-cta text-center mt-2">
-          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/flappy-bird-gym" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </div>
-
-      <!-- NEW: Lunar Lander DQN (after Flappy Bird) -->
-      <div class="col-lg-4 col-md-6 portfolio-item filter-project">
-        <center><h4>Lunar Lander DQN</h4></center>
-        <div class="portfolio-wrap">
-          <img src="assets/img/project/Lunar_Lander.png" class="img-fluid" alt="Lunar Lander DQN" />
-          <div class="portfolio-info">
-            <ul>
-              <li>DQN with experience replay and target networks on OpenAI Gym LunarLander.</li>
-              <li>Reward shaping for soft landings; plots of return vs. episodes.</li>
-            </ul>
-          </div>
-        </div>
-        <div class="portfolio-cta text-center mt-2">
-          <a class="btn btn-sm btn-success" href="https://github.com/bmaxdk/OpenAI-Gym-LunarLander-v2-Double-Dueling-DQN" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </div>
-
-<div class="col-lg-4 col-md-6 portfolio-item filter-app">
-  <center><h4>Book: Level Up!</h4></center>
-  <div class="portfolio-wrap">
-    <img src="assets/img/project/levelup.jpg" class="img-fluid" alt="Level Up! book notes" />
-    <div class="portfolio-info">
-      <ul>
-        <li>Condensed design patterns, loops, and balancing techniques into a practical playbook.</li>
-        <li>Applied to prototypes to tighten game feel and pacing.</li>
-      </ul>
-      <div class="portfolio-links">
-        <a href="projects/levelup.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details">
-          <i class="bx bx-info-circle" aria-hidden="true"></i>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div class="portfolio-cta text-center mt-2">
-    <a class="btn btn-sm btn-success" href="https://a.co/d/j8x7zGY" target="_blank" rel="noopener noreferrer">
-      <i class="bx bx-cart" aria-hidden="true"></i>
-      Buy Now
-    </a>
-  </div>
-</div>
-
-
-      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-        <center><h4>VR/AR Molecular Simulation</h4></center>
-        <div class="portfolio-wrap">
-          <img src="assets/img/project/todo.jpg" class="img-fluid" alt="VR/AR molecular simulation" />
-          <div class="portfolio-info">
-            <ul>
-              <li>Unity + C# app for interactive molecular visualization and orientation prediction.</li>
-              <li>Optimized rendering and VR controls for smooth exploration of complex structures.</li>
-            </ul>
-            <div class="portfolio-links">
-              <a href="projects/VRAR.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-cta text-center mt-2">
-          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/VR-AR-For-Molecular-Simulation" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6 portfolio-item filter-project">
-        <center><h4>Smart Emergency Response System (ESP32)</h4></center>
-        <div class="portfolio-wrap">
-          <img src="assets/img/project/IOT.jpg" class="img-fluid" alt="IoT emergency response system" />
-          <div class="portfolio-info">
-            <ul>
-              <li>ESP32 sensor fusion and event triggers; real-time alerts over Wi-Fi.</li>
-              <li>Modular firmware and cloud hooks for rapid prototyping.</li>
-            </ul>
-            <div class="portfolio-links">
-              <a href="projects/IOT.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-cta text-center mt-2">
-          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/Exploring-the-Integration-of-A9G-and-ESP32-for-Smart-Emergency-Response-System" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6 portfolio-item filter-project">
-        <center><h4>Startup Success Prediction</h4></center>
-        <div class="portfolio-wrap">
-          <img src="assets/img/project/STARTUP.jpg" class="img-fluid" alt="Startup success prediction ML project" />
-          <div class="portfolio-info">
-            <ul>
-              <li>Classifiers over funding, team, and market features; feature importance and ROC analysis.</li>
-              <li>Simple API for inference and experiment tracking.</li>
-            </ul>
-            <div class="portfolio-links">
-              <a href="projects/Startup.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-cta text-center mt-2">
-          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/Startup-Success-Prediction" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-        <center><h4>Snow Boarder</h4></center>
-        <div class="portfolio-wrap">
-          <img src="assets/img/project/snowboarder.jpg" class="img-fluid" alt="Snow Boarder game" />
-          <div class="portfolio-info">
-            <ul>
-              <li>Arcade physics with responsive input and ramp/rail interactions.</li>
-              <li>Level scripting and camera tuning for flow and visibility.</li>
-            </ul>
-            <div class="portfolio-links">
-              <a href="projects/Snow.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-cta text-center mt-2">
-          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/Snow-Boarder" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </div>
-
-      <!-- Reinforcement Learning Agents (kept, now with info) -->
-      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-        <center><h4>Reinforcement Learning Agents</h4></center>
-        <div class="portfolio-wrap">
-          <img src="assets/img/project/rlagents.jpg" class="img-fluid" alt="Reinforcement learning agents project" />
-          <div class="portfolio-info">
-            <ul>
-              <li>Sandbox of RL experiments for NPC behavior and control policies.</li>
-              <li>Metrics dashboard for reward curves and ablation studies.</li>
-            </ul>
-            <div class="portfolio-links">
-              <a href="projects/RLAgents.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-cta text-center mt-2">
-          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/RL-AGENTS-" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-<!-- End Projects Section -->
-
+  </section>
+  <!-- End Projects Section -->
 
   <!-- ======= Skills Section ======= -->
   <section id="skills" class="services">
@@ -568,6 +553,7 @@
               <img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/CSS3_logo_and_wordmark.svg" alt="CSS3" height="60" width="90" />
               <img src="https://www.vectorlogo.zone/logos/isocpp/isocpp-icon.svg" alt="C++" height="60" width="90" />
               <img src="https://upload.wikimedia.org/wikipedia/commons/b/bd/Logo_C_sharp.svg" alt="C#" height="60" width="90" />
+              <img src="https://www.vectorlogo.zone/logos/python/python-horizontal.svg" alt="Python" />
             </p>
           </div>
 
@@ -589,6 +575,8 @@
               <img src="https://www.vectorlogo.zone/logos/unity3d/unity3d-ar21.svg" alt="Unity" />
               <img src="https://www.vectorlogo.zone/logos/arduino/arduino-ar21.svg" alt="Arduino" />
               <img src="https://www.vectorlogo.zone/logos/jupyter/jupyter-ar21.svg" alt="Jupyter" />
+              <img src="assets/img/project/Anaconda-Dark.svg" alt="Anaconda" height="60" />
+              <img src="https://www.vectorlogo.zone/logos/salesforce/salesforce-ar21.svg" alt="Salesforce" />
               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Logo_Blender.svg/768px-Logo_Blender.svg.png" alt="Blender" width="90" height="70" />
               <img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/Unreal_Engine_Logo_%28new_typeface%29.svg" alt="Unreal Engine" width="90" height="70" />
             </p>
@@ -599,14 +587,83 @@
   </section>
   <!-- End Skills Section -->
 
+  <!-- ======= Publications & Achievements Section ======= -->
+  <section id="publications" class="services">
+    <div class="container">
+      <div class="section-title"><h2>Publications &amp; Achievements</h2></div>
+
+      <div class="row">
+
+        <!-- Level Up book -->
+        <div class="col-md-12 mt-4 mt-md-0 icon-box" data-aos="fade-up" data-aos-delay="60">
+          <div class="icon"><i class="bx bx-book-open" aria-hidden="true"></i></div>
+          <h4 style="text-align:left;">Level Up (Book on Game Development with Unity)</h4>
+          <h5 style="text-align:left;">2023</h5>
+          <p style="text-align:left;color:#fff">
+            Authored <em>Level Up</em>, a practical guide to game development in Unity.
+            <a href="https://a.co/d/j8x7zGY" target="_blank" rel="noopener noreferrer">Buy on Amazon</a>
+          </p>
+        </div>
+
+        <!-- Flappy Bird paper -->
+        <div class="col-md-12 mt-4 mt-md-0 icon-box" data-aos="fade-up" data-aos-delay="80">
+          <div class="icon"><i class="bx bx-analyse" aria-hidden="true"></i></div>
+          <h4 style="text-align:left;">Evaluating Deep Q-Networks Based Agents in Game Environments</h4>
+          <h5 style="text-align:left;">2024 — Under Publication</h5>
+          <p style="text-align:left;color:#fff">
+            <strong>RamKumar, M.</strong> &amp; <strong>Rithvik, M.</strong>
+            Reinforcement learning for Flappy Bird: DQN agent evaluation in a constrained game setting.
+          </p>
+        </div>
+
+        <!-- Lunar Lander paper -->
+        <div class="col-md-12 mt-4 mt-md-0 icon-box" data-aos="fade-up" data-aos-delay="100">
+          <div class="icon"><i class="bx bx-planet" aria-hidden="true"></i></div>
+          <h4 style="text-align:left;">Optimizing Lunar Lander Performance Using Dueling DQN</h4>
+          <h5 style="text-align:left;">2023 — Under Publication</h5>
+          <p style="text-align:left;color:#fff">
+            <strong>Poornima, S.</strong> &amp; <strong>Rithvik, M.</strong>
+            Empirical study of Dueling Deep Q-Networks for landing control.
+          </p>
+        </div>
+
+        <!-- MCDM chapter -->
+        <div class="col-md-12 mt-4 mt-md-0 icon-box" data-aos="fade-up" data-aos-delay="120">
+          <div class="icon"><i class="bx bx-layer" aria-hidden="true"></i></div>
+          <h4 style="text-align:left;">Book Chapter: “Sustainable Applications of MCDM in the Digital Age”</h4>
+          <h5 style="text-align:left;">2023 — Under Publication</h5>
+          <p style="text-align:left;color:#fff">
+            <strong>Sundari, S.</strong> &amp; <strong>Rithvik, M.</strong>
+            In <em>Multi-Criteria Decision Making Methods and Sustainable Applications in the Digital Age</em>.
+          </p>
+        </div>
+
+        <!-- TEDx achievement -->
+        <div class="col-md-12 mt-4 mt-md-0 icon-box" data-aos="fade-up" data-aos-delay="140">
+          <div class="icon"><i class="bx bx-group" aria-hidden="true"></i></div>
+          <h4 style="text-align:left;">TEDx GRIET — Sponsorship Lead</h4>
+          <p style="text-align:left;color:#fff">
+            Led sponsorship initiatives and partnerships to support event goals and attendee experience.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  <!-- End Publications & Achievements Section -->
+
   <!-- ======= Links Section ======= -->
   <section id="links" class="services">
     <div class="container">
       <div class="section-title"><h2>Resume &amp; Links</h2></div>
       <div class="row">
         <div class="col-md-3 mt-4 mt-md-0 icon-box" data-aos="fade-up" data-aos-delay="100">
-          <a href="https://drive.google.com/file/d/1iHBNV2UkH5LkhAP-1hYRZ2Ez_BQ6g4S7/view?usp=sharing" target="_blank" rel="noopener noreferrer"><div class="icon"><i class="icofont-page" aria-hidden="true"></i></div></a>
-          <h4 class="title"><a href="https://drive.google.com/file/d/1iHBNV2UkH5LkhAP-1hYRZ2Ez_BQ6g4S7/view?usp=sharing" target="_blank" rel="noopener noreferrer">Resume</a></h4>
+          <a href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+            <div class="icon"><i class="icofont-page" aria-hidden="true"></i></div>
+          </a>
+          <h4 class="title">
+            <a href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing" target="_blank" rel="noopener noreferrer">Resume</a>
+          </h4>
           <p class="description" style="color:#fff;">Downloadable resume</p>
         </div>
         <div class="col-md-3 mt-4 mt-md-0 icon-box" data-aos="fade-up">
@@ -677,19 +734,155 @@
   <script src="assets/vendor/typed.js/typed.min.js"></script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      if (window.Typed && document.querySelector('.typing')) {
-        new Typed('.typing', {
-          strings: ['Game AI Programmer', 'AI Enthusiast'],
-          loop: true,
-          typeSpeed: 65,
-          backSpeed: 65
-        });
+    (function($) {
+      "use strict";
+
+      // Nav Menu
+      $(document).on('click', '.nav-menu a, .mobile-nav a', function(e) {
+        if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') && location.hostname == this.hostname) {
+          var hash = this.hash;
+          var target = $(hash);
+          if (target.length) {
+            e.preventDefault();
+
+            if ($(this).parents('.nav-menu, .mobile-nav').length) {
+              $('.nav-menu .active, .mobile-nav .active').removeClass('active');
+              $(this).closest('li').addClass('active');
+            }
+
+            if (hash == '#header') {
+              $('#header').removeClass('header-top');
+              $("section").removeClass('section-show');
+              return;
+            }
+
+            if (!$('#header').hasClass('header-top')) {
+              $('#header').addClass('header-top');
+              setTimeout(function() {
+                $("section").removeClass('section-show');
+                $(hash).addClass('section-show');
+              }, 350);
+            } else {
+              $("section").removeClass('section-show');
+              $(hash).addClass('section-show');
+            }
+
+            if ($('body').hasClass('mobile-nav-active')) {
+              $('body').removeClass('mobile-nav-active');
+              $('.mobile-nav-toggle i').toggleClass('icofont-navigation-menu icofont-close');
+              $('.mobile-nav-overly').fadeOut();
+            }
+
+            return false;
+          }
+        }
+      });
+
+      // Activate/show sections on load with hash links
+      if (window.location.hash) {
+        var initial_nav = window.location.hash;
+        if ($(initial_nav).length) {
+          $('#header').addClass('header-top');
+          $('.nav-menu .active, .mobile-nav .active').removeClass('active');
+          $('.nav-menu, .mobile-nav').find('a[href="' + initial_nav + '"]').parent('li').addClass('active');
+          setTimeout(function() {
+            $("section").removeClass('section-show');
+            $(initial_nav).addClass('section-show');
+          }, 350);
+        }
       }
-    });
+
+      // Mobile Navigation
+      if ($('.nav-menu').length) {
+        var $mobile_nav = $('.nav-menu').clone().prop({
+          class: 'mobile-nav d-lg-none'
+        });
+        $('body').append($mobile_nav);
+        $('body').prepend('<button type="button" class="mobile-nav-toggle d-lg-none"><i class="icofont-navigation-menu"></i></button>');
+        $('body').append('<div class="mobile-nav-overly"></div>');
+
+        $(document).on('click', '.mobile-nav-toggle', function(e) {
+          $('body').toggleClass('mobile-nav-active');
+          $('.mobile-nav-toggle i').toggleClass('icofont-navigation-menu icofont-close');
+          $('.mobile-nav-overly').toggle();
+        });
+
+        $(document).click(function(e) {
+          var container = $(".mobile-nav, .mobile-nav-toggle");
+          if (!container.is(e.target) && container.has(e.target).length === 0) {
+            if ($('body').hasClass('mobile-nav-active')) {
+              $('body').removeClass('mobile-nav-active');
+              $('.mobile-nav-toggle i').toggleClass('icofont-navigation-menu icofont-close');
+              $('.mobile-nav-overly').fadeOut();
+            }
+          }
+        });
+      } else if ($(".mobile-nav, .mobile-nav-toggle").length) {
+        $(".mobile-nav, .mobile-nav-toggle").hide();
+      }
+
+      // jQuery counterUp
+      $('[data-toggle="counter-up"]').counterUp({
+        delay: 10,
+        time: 1000
+      });
+
+      // Skills section
+      $('.skills-content').waypoint(function() {
+        $('.progress .progress-bar').each(function() {
+          $(this).css("width", $(this).attr("aria-valuenow") + '%');
+        });
+      }, {
+        offset: '80%'
+      });
+
+      // Testimonials carousel (uses the Owl Carousel library)
+      $(".testimonials-carousel").owlCarousel({
+        autoplay: true,
+        dots: true,
+        loop: true,
+        responsive: {
+          0: { items: 1 },
+          768: { items: 2 },
+          900: { items: 3 }
+        }
+      });
+
+      // Portfolio isotope and filter
+      $(window).on('load', function() {
+        var portfolioIsotope = $('.portfolio-container').isotope({
+          itemSelector: '.portfolio-item',
+          layoutMode: 'fitRows'
+        });
+
+        $('#portfolio-flters li').on('click', function() {
+          $("#portfolio-flters li").removeClass('filter-active');
+          $(this).addClass('filter-active');
+          portfolioIsotope.isotope({ filter: $(this).data('filter') });
+        });
+      });
+
+      // Initiate venobox (lightbox) — kept included but no info buttons used
+      $(document).ready(function() {
+        $('.venobox').venobox();
+      });
+
+      // Typed.js init
+      document.addEventListener('DOMContentLoaded', function () {
+        if (window.Typed && document.querySelector('.typing')) {
+          new Typed('.typing', {
+            strings: ['Game AI Programmer', 'AI Enthusiast'],
+            loop: true,
+            typeSpeed: 65,
+            backSpeed: 65
+          });
+        }
+      });
+
+    })(jQuery);
   </script>
 
-  <!-- Template Main JS File -->
+  <!-- Template Main JS File (optional if you keep your existing main.js) -->
   <script src="assets/js/main.js?v=20251108"></script>
 
   <!-- =======================================================
