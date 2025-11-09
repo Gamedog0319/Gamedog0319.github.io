@@ -85,8 +85,8 @@
             Game AI programmer and gameplay engineer focused on turning ML research into playable experiences. I build
             learning agents (DQN/Project Malmo, UE5 Learning Agents) and systems that feel responsive on real hardware.
             At the University of Utah I’m exploring human-in-the-loop RL for Minecraft and prototyping a wearable neck
-            exoskeleton that delivers haptic posture cues for VR. Previously I shipped Unity/Unreal prototypes—from
-            2D RPGs and a CV-driven sports sim to VR/AR molecular visualization—and contributed ML tooling in
+            exoskeleton that delivers haptic posture cues for VR. Previously I shipped Unity/Unreal prototypes from
+            2D RPGs and a CV-driven sports sim to VR/AR molecular visualization and contributed ML tooling in
             drug-discovery workflows. I care about tight feel, clean, readable code, and performance.
           </p>
           <div class="row">
@@ -252,246 +252,283 @@
   <!-- End Experience Section -->
 
   <!-- ======= Projects Section ======= -->
-  <section id="portfolio" class="portfolio">
-    <div class="container">
-      <div class="section-title"><h2>Projects</h2></div>
+<section id="portfolio" class="portfolio">
+  <div class="container">
+    <div class="section-title"><h2>Projects</h2></div>
 
-      <div class="row">
-        <div class="col-lg-12 d-flex justify-content-center">
-          <ul id="portfolio-flters">
-            <li data-filter="*" class="filter-active">All</li>
-            <li data-filter=".filter-app">GameDev</li>
-            <li data-filter=".filter-project">ML and other</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="row portfolio-container">
-
-        <!-- NEW Projects (added first) -->
-        <div class="col-lg-4 col-md-6 portfolio-item filter-project">
-          <center><h4>Human-in-the-Loop RL for Minecraft (Project Malmo)</h4></center>
-          <div class="portfolio-wrap">
-            <img src="assets/img/project/Minecraft.png" class="img-fluid" alt="Human-in-the-Loop RL for Minecraft (Project Malmo)" />
-            <div class="portfolio-info">
-              <h4>September 2025 – Present</h4>
-              <ul>
-                <li>Baseline DQN with replay buffer, target network, and ε-greedy for navigation/resource missions.</li>
-                <li>Reusable Malmo mission XMLs and Python wrappers; lightweight human feedback for reward shaping.</li>
-                <li>Built datasets and training pipelines for imitation learning with neural networks; logged learning curves.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-          <center><h4>VR Neck Exoskeleton (Posture Support &amp; Haptics)</h4></center>
-          <div class="portfolio-wrap">
-            <img src="assets/img/project/VR%20NECK.png" class="img-fluid" alt="VR Neck Exoskeleton project" />
-            <div class="portfolio-info">
-              <h4>May 2024 – June 2025</h4>
-              <ul>
-                <li>Wearable neck assist with posture cues and gentle support; Unity↔firmware telemetry/control.</li>
-                <li>Calibration, ROM safety guards, low-latency haptics; improved comfort and fewer neck-strain events.</li>
-                <li>UCB1 bandit to switch among MLP/LSTM/parameter-vector controllers based on user preference.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-          <center><h4>Indonesian VR History Shop Sim</h4></center>
-          <div class="portfolio-wrap">
-            <img src="assets/img/project/SHOP.jpg" class="img-fluid" alt="Indonesian VR History Shop Sim" />
-            <div class="portfolio-info">
-              <h4>October 2024 – January 2025</h4>
-              <ul>
-                <li>Interactive VR “history shop” with artifacts, bartering, and context-aware dialogue/narration.</li>
-                <li>Smooth locomotion, grab/physics, scene streaming; optimized for steady 90 FPS standalone VR.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-          <center><h4>HellBert</h4></center>
-          <div class="portfolio-wrap">
-            <img src="assets/img/project/HELLBERT.jpg" class="img-fluid" alt="HellBert game" />
-            <div class="portfolio-info">
-              <h4>August 2025</h4>
-              <ul>
-                <li>Character controller + platform-flipping with buffered input and tweened jumps.</li>
-                <li>Physics collisions, audio/animation triggers, platform state transitions; PC + Android.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- Existing tiles (now with overlays) -->
-        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-          <center><h4>Howzat! (CV Cricket Simulator)</h4></center>
-          <div class="portfolio-wrap">
-            <img src="assets/img/project/Howzzatt.jpg" class="img-fluid" alt="Computer vision cricket simulator" />
-            <div class="portfolio-info">
-              <h4>Aug 2024 – Oct 2024</h4>
-              <ul>
-                <li>Unity 3D cricket with real-time gesture-controlled batting via Python CVZone.</li>
-                <li>Blender stadiums/animations; physics-based ball dynamics for engaging play.</li>
-              </ul>
-              <div class="portfolio-links">
-                <a href="projects/Howzzatt.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-          <center><h4>Driving Cars Using Reinforcement Learning</h4></center>
-          <div class="portfolio-wrap">
-            <img src="assets/img/project/RLDrivers.png" class="img-fluid" alt="Reinforcement learning for driving project" />
-            <div class="portfolio-info">
-              <ul>
-                <li>UE 5.3 Learning Agents + Blueprints to train autonomous driving behaviors.</li>
-                <li>Reward shaping, curriculum tasks, and evaluation scenarios for stability.</li>
-              </ul>
-              <div class="portfolio-links">
-                <a href="projects/DriversUnreal.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-          <center><h4>Flappy Bird Q-Learning</h4></center>
-          <div class="portfolio-wrap">
-            <img src="assets/img/project/flaappy.jpg" class="img-fluid" alt="Flappy Bird Q-Learning" />
-            <div class="portfolio-info">
-              <ul>
-                <li>Tabular Q-learning for obstacle navigation; ε-greedy and reward tuning.</li>
-                <li>Metrics logging to compare exploration schedules and convergence.</li>
-              </ul>
-              <div class="portfolio-links">
-                <a href="projects/Flappy.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- NEW: Lunar Lander DQN (after Flappy Bird) -->
-        <div class="col-lg-4 col-md-6 portfolio-item filter-project">
-          <center><h4>Lunar Lander DQN</h4></center>
-          <div class="portfolio-wrap">
-            <img src="assets/img/project/LUMAR.jpg" class="img-fluid" alt="Lunar Lander DQN" />
-            <div class="portfolio-info">
-              <ul>
-                <li>DQN with experience replay and target networks on OpenAI Gym LunarLander.</li>
-                <li>Reward shaping for soft landings; plots of return vs. episodes.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-          <center><h4>Book: Level Up!</h4></center>
-          <div class="portfolio-wrap">
-            <img src="assets/img/project/levelup.jpg" class="img-fluid" alt="Level Up! book notes" />
-            <div class="portfolio-info">
-              <ul>
-                <li>Condensed design patterns, loops, and balancing techniques into a practical playbook.</li>
-                <li>Applied to prototypes to tighten game feel and pacing.</li>
-              </ul>
-              <div class="portfolio-links">
-                <a href="projects/levelup.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-          <center><h4>VR/AR Molecular Simulation</h4></center>
-          <div class="portfolio-wrap">
-            <img src="assets/img/project/todo.jpg" class="img-fluid" alt="VR/AR molecular simulation" />
-            <div class="portfolio-info">
-              <ul>
-                <li>Unity + C# app for interactive molecular visualization and orientation prediction.</li>
-                <li>Optimized rendering and VR controls for smooth exploration of complex structures.</li>
-              </ul>
-              <div class="portfolio-links">
-                <a href="projects/VRAR.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6 portfolio-item filter-project">
-          <center><h4>Smart Emergency Response System (ESP32)</h4></center>
-          <div class="portfolio-wrap">
-            <img src="assets/img/project/IOT.jpg" class="img-fluid" alt="IoT emergency response system" />
-            <div class="portfolio-info">
-              <ul>
-                <li>ESP32 sensor fusion and event triggers; real-time alerts over Wi-Fi.</li>
-                <li>Modular firmware and cloud hooks for rapid prototyping.</li>
-              </ul>
-              <div class="portfolio-links">
-                <a href="projects/IOT.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6 portfolio-item filter-project">
-          <center><h4>Startup Success Prediction</h4></center>
-          <div class="portfolio-wrap">
-            <img src="assets/img/project/STARTUP.jpg" class="img-fluid" alt="Startup success prediction ML project" />
-            <div class="portfolio-info">
-              <ul>
-                <li>Classifiers over funding, team, and market features; feature importance and ROC analysis.</li>
-                <li>Simple API for inference and experiment tracking.</li>
-              </ul>
-              <div class="portfolio-links">
-                <a href="projects/Startup.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-          <center><h4>Snow Boarder</h4></center>
-          <div class="portfolio-wrap">
-            <img src="assets/img/project/snowboarder.jpg" class="img-fluid" alt="Snow Boarder game" />
-            <div class="portfolio-info">
-              <ul>
-                <li>Arcade physics with responsive input and ramp/rail interactions.</li>
-                <li>Level scripting and camera tuning for flow and visibility.</li>
-              </ul>
-              <div class="portfolio-links">
-                <a href="projects/Snow.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Reinforcement Learning Agents (kept, now with info) -->
-        <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-          <center><h4>Reinforcement Learning Agents</h4></center>
-          <div class="portfolio-wrap">
-            <img src="assets/img/project/rlagents.jpg" class="img-fluid" alt="Reinforcement learning agents project" />
-            <div class="portfolio-info">
-              <ul>
-                <li>Sandbox of RL experiments for NPC behavior and control policies.</li>
-                <li>Metrics dashboard for reward curves and ablation studies.</li>
-              </ul>
-              <div class="portfolio-links">
-                <a href="projects/RLAgents.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-
+    <div class="row">
+      <div class="col-lg-12 d-flex justify-content-center">
+        <ul id="portfolio-flters">
+          <li data-filter="*" class="filter-active">All</li>
+          <li data-filter=".filter-app">GameDev</li>
+          <li data-filter=".filter-project">ML and other</li>
+        </ul>
       </div>
     </div>
-  </section>
-  <!-- End Projects Section -->
+
+    <div class="row portfolio-container">
+
+      <!-- NEW Projects (added first) -->
+      <div class="col-lg-4 col-md-6 portfolio-item filter-project">
+        <center><h4>Human-in-the-Loop RL for Minecraft (Project Malmo)</h4></center>
+        <div class="portfolio-wrap">
+          <img src="assets/img/project/Minecraft.png" class="img-fluid" alt="Human-in-the-Loop RL for Minecraft (Project Malmo)" />
+          <div class="portfolio-info">
+            <h4>September 2025 – Present</h4>
+            <ul>
+              <li>Baseline DQN with replay buffer, target network, and ε-greedy for navigation/resource missions.</li>
+              <li>Lightweight human feedback for reward shaping.</li>
+              <li>Built datasets and training pipelines for imitation learning with neural networks; logged learning curves.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="portfolio-cta text-center mt-2">
+          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/ImitationLearning" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+        <center><h4>VR Neck Exoskeleton (Posture Support &amp; Haptics)</h4></center>
+        <div class="portfolio-wrap">
+          <img src="assets/img/project/VR%20NECK.png" class="img-fluid" alt="VR Neck Exoskeleton project" />
+          <div class="portfolio-info">
+            <h4>May 2024 – June 2025</h4>
+            <ul>
+              <li>Wearable neck assist with posture cues and gentle support; Unity↔firmware telemetry/control.</li>
+              <li>Improved comfort and fewer neck-strain events.</li>
+              <li>UCB1 bandit to switch among MLP/LSTM/parameter-vector controllers based on user preference.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="portfolio-cta text-center mt-2">
+          <a class="btn btn-sm btn-success" href="https://github.com/aria-lab-code/vr-exoskeleton/tree/master/vr_exoskeleton" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+        <center><h4>Indonesian VR History Shop Sim</h4></center>
+        <div class="portfolio-wrap">
+          <img src="assets/img/project/SHOP.jpg" class="img-fluid" alt="Indonesian VR History Shop Sim" />
+          <div class="portfolio-info">
+            <h4>October 2024 – January 2025</h4>
+            <ul>
+              <li>Interactive VR “history shop” with artifacts, bartering, and context-aware dialogue/narration.</li>
+              <li>Smooth locomotion, grab/physics, scene streaming; optimized for steady 90 FPS standalone VR.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="portfolio-cta text-center mt-2">
+          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/ShopSim" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+        <center><h4>HellBert</h4></center>
+        <div class="portfolio-wrap">
+          <img src="assets/img/project/HELLBERT.jpg" class="img-fluid" alt="HellBert game" />
+          <div class="portfolio-info">
+            <h4>August 2025</h4>
+            <ul>
+              <li>Character controller + platform-flipping with buffered input and tweened jumps.</li>
+              <li>Physics collisions, audio/animation triggers, platform state transitions; PC + Android.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="portfolio-cta text-center mt-2">
+          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/HellBert" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+
+      <!-- Existing tiles (now with overlays) -->
+      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+        <center><h4>Howzat! (CV Cricket Simulator)</h4></center>
+        <div class="portfolio-wrap">
+          <img src="assets/img/project/Howzzatt.jpg" class="img-fluid" alt="Computer vision cricket simulator" />
+          <div class="portfolio-info">
+            <h4>Aug 2024 – Oct 2024</h4>
+            <ul>
+              <li>Unity 3D cricket with real-time gesture-controlled batting via Python CVZone.</li>
+              <li>Blender stadiums/animations; physics-based ball dynamics for engaging play.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="portfolio-cta text-center mt-2">
+          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/Howzzat" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+        <center><h4>Driving Cars Using Reinforcement Learning</h4></center>
+        <div class="portfolio-wrap">
+          <img src="assets/img/project/RLDrivers.png" class="img-fluid" alt="Reinforcement learning for driving project" />
+          <div class="portfolio-info">
+            <ul>
+              <li>UE 5.3 Learning Agents + Blueprints to train autonomous driving behaviors.</li>
+              <li>Reward shaping, curriculum tasks, and evaluation scenarios for stability.</li>
+            </ul>
+            <div class="portfolio-links">
+              <a href="projects/DriversUnreal.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="portfolio-cta text-center mt-2">
+          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/RLAgentDrivers-Unreal" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+        <center><h4>Flappy Bird Q-Learning</h4></center>
+        <div class="portfolio-wrap">
+          <img src="assets/img/project/flaappy.jpg" class="img-fluid" alt="Flappy Bird Q-Learning" />
+          <div class="portfolio-info">
+            <ul>
+              <li>Tabular Q-learning for obstacle navigation; ε-greedy and reward tuning.</li>
+              <li>Metrics logging to compare exploration schedules and convergence.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="portfolio-cta text-center mt-2">
+          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/flappy-bird-gym" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+
+      <!-- NEW: Lunar Lander DQN (after Flappy Bird) -->
+      <div class="col-lg-4 col-md-6 portfolio-item filter-project">
+        <center><h4>Lunar Lander DQN</h4></center>
+        <div class="portfolio-wrap">
+          <img src="assets/img/project/Lunar_Lander.png" class="img-fluid" alt="Lunar Lander DQN" />
+          <div class="portfolio-info">
+            <ul>
+              <li>DQN with experience replay and target networks on OpenAI Gym LunarLander.</li>
+              <li>Reward shaping for soft landings; plots of return vs. episodes.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="portfolio-cta text-center mt-2">
+          <a class="btn btn-sm btn-success" href="https://github.com/bmaxdk/OpenAI-Gym-LunarLander-v2-Double-Dueling-DQN" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+        <center><h4>Book: Level Up!</h4></center>
+        <div class="portfolio-wrap">
+          <img src="assets/img/project/levelup.jpg" class="img-fluid" alt="Level Up! book notes" />
+          <div class="portfolio-info">
+            <ul>
+              <li>Condensed design patterns, loops, and balancing techniques into a practical playbook.</li>
+              <li>Applied to prototypes to tighten game feel and pacing.</li>
+            </ul>
+            <div class="portfolio-links">
+              <a href="projects/levelup.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="portfolio-cta text-center mt-2">
+          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+        <center><h4>VR/AR Molecular Simulation</h4></center>
+        <div class="portfolio-wrap">
+          <img src="assets/img/project/todo.jpg" class="img-fluid" alt="VR/AR molecular simulation" />
+          <div class="portfolio-info">
+            <ul>
+              <li>Unity + C# app for interactive molecular visualization and orientation prediction.</li>
+              <li>Optimized rendering and VR controls for smooth exploration of complex structures.</li>
+            </ul>
+            <div class="portfolio-links">
+              <a href="projects/VRAR.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="portfolio-cta text-center mt-2">
+          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/VR-AR-For-Molecular-Simulation" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 portfolio-item filter-project">
+        <center><h4>Smart Emergency Response System (ESP32)</h4></center>
+        <div class="portfolio-wrap">
+          <img src="assets/img/project/IOT.jpg" class="img-fluid" alt="IoT emergency response system" />
+          <div class="portfolio-info">
+            <ul>
+              <li>ESP32 sensor fusion and event triggers; real-time alerts over Wi-Fi.</li>
+              <li>Modular firmware and cloud hooks for rapid prototyping.</li>
+            </ul>
+            <div class="portfolio-links">
+              <a href="projects/IOT.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="portfolio-cta text-center mt-2">
+          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/Exploring-the-Integration-of-A9G-and-ESP32-for-Smart-Emergency-Response-System" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 portfolio-item filter-project">
+        <center><h4>Startup Success Prediction</h4></center>
+        <div class="portfolio-wrap">
+          <img src="assets/img/project/STARTUP.jpg" class="img-fluid" alt="Startup success prediction ML project" />
+          <div class="portfolio-info">
+            <ul>
+              <li>Classifiers over funding, team, and market features; feature importance and ROC analysis.</li>
+              <li>Simple API for inference and experiment tracking.</li>
+            </ul>
+            <div class="portfolio-links">
+              <a href="projects/Startup.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="portfolio-cta text-center mt-2">
+          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/Startup-Success-Prediction" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+        <center><h4>Snow Boarder</h4></center>
+        <div class="portfolio-wrap">
+          <img src="assets/img/project/snowboarder.jpg" class="img-fluid" alt="Snow Boarder game" />
+          <div class="portfolio-info">
+            <ul>
+              <li>Arcade physics with responsive input and ramp/rail interactions.</li>
+              <li>Level scripting and camera tuning for flow and visibility.</li>
+            </ul>
+            <div class="portfolio-links">
+              <a href="projects/Snow.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="portfolio-cta text-center mt-2">
+          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/Snow-Boarder" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+
+      <!-- Reinforcement Learning Agents (kept, now with info) -->
+      <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+        <center><h4>Reinforcement Learning Agents</h4></center>
+        <div class="portfolio-wrap">
+          <img src="assets/img/project/rlagents.jpg" class="img-fluid" alt="Reinforcement learning agents project" />
+          <div class="portfolio-info">
+            <ul>
+              <li>Sandbox of RL experiments for NPC behavior and control policies.</li>
+              <li>Metrics dashboard for reward curves and ablation studies.</li>
+            </ul>
+            <div class="portfolio-links">
+              <a href="projects/RLAgents.html" data-gall="portfolioDetailsGallery" data-vbtype="iframe" class="venobox" title="Project Details"><i class="bx bx-info-circle" aria-hidden="true"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="portfolio-cta text-center mt-2">
+          <a class="btn btn-sm btn-success" href="https://github.com/Gamedog0319/RL-AGENTS-" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- End Projects Section -->
+
 
   <!-- ======= Skills Section ======= -->
   <section id="skills" class="services">
