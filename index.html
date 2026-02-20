@@ -31,7 +31,7 @@
   <link href="assets/vendor/venobox/venobox.css" rel="stylesheet" />
 
   <!-- Template Main CSS File -->
-  <link href="assets/css/style.css?v=20251108" rel="stylesheet" />
+  <link href="assets/css/style.css?v=20260220" rel="stylesheet" />
 
   <!-- NOTE: Universal Analytics (UA-*) is sunset. Use GA4 via GTM instead. -->
 </head>
@@ -779,7 +779,8 @@
 
             if ($('body').hasClass('mobile-nav-active')) {
               $('body').removeClass('mobile-nav-active');
-              $('.mobile-nav-toggle i').toggleClass('icofont-navigation-menu icofont-close');
+                            $('.mobile-nav-toggle').attr('aria-expanded', 'false');
+$('.mobile-nav-toggle i').toggleClass('icofont-navigation-menu icofont-close');
               $('.mobile-nav-overly').fadeOut();
             }
 
@@ -808,21 +809,24 @@
           class: 'mobile-nav d-lg-none'
         });
         $('body').append($mobile_nav);
-        $('body').prepend('<button type="button" class="mobile-nav-toggle d-lg-none"><i class="icofont-navigation-menu"></i></button>');
+        $('body').prepend('<button type="button" class="mobile-nav-toggle d-lg-none" aria-label="Toggle navigation" aria-expanded="false"><i class="icofont-navigation-menu" aria-hidden="true"></i></button>');
         $('body').append('<div class="mobile-nav-overly"></div>');
 
         $(document).on('click', '.mobile-nav-toggle', function(e) {
-          $('body').toggleClass('mobile-nav-active');
-          $('.mobile-nav-toggle i').toggleClass('icofont-navigation-menu icofont-close');
-          $('.mobile-nav-overly').toggle();
-        });
+  $('body').toggleClass('mobile-nav-active');
+  var isActive = $('body').hasClass('mobile-nav-active');
+  $(this).attr('aria-expanded', isActive ? 'true' : 'false');
+  $('.mobile-nav-toggle i').toggleClass('icofont-navigation-menu icofont-close');
+  $('.mobile-nav-overly').toggle();
+});
 
-        $(document).click(function(e) {
+$(document).click(function(e) {
           var container = $(".mobile-nav, .mobile-nav-toggle");
           if (!container.is(e.target) && container.has(e.target).length === 0) {
             if ($('body').hasClass('mobile-nav-active')) {
               $('body').removeClass('mobile-nav-active');
-              $('.mobile-nav-toggle i').toggleClass('icofont-navigation-menu icofont-close');
+                            $('.mobile-nav-toggle').attr('aria-expanded', 'false');
+$('.mobile-nav-toggle i').toggleClass('icofont-navigation-menu icofont-close');
               $('.mobile-nav-overly').fadeOut();
             }
           }
@@ -891,9 +895,6 @@
 
     })(jQuery);
   </script>
-
-  <!-- Template Main JS File (optional if you keep your existing main.js) -->
-  <script src="assets/js/main.js?v=20251108"></script>
 
   <!-- =======================================================
   * Template Name: Personal - v2.1.0
