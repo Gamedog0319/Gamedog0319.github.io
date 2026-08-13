@@ -25,18 +25,11 @@
   <section class="loading-screen" id="loadingScreen" aria-label="Loading portfolio">
     <div class="loading-grid"></div>
     <div class="loading-sun"></div>
-    <div class="loading-inner">
-      <p class="loading-kicker">PORTFOLIO CITY // RM-0319</p>
+    <div class="loading-inner loading-minimal">
       <h1 class="loading-logo welcome-only"><span>WELCOME</span></h1>
-      <p class="loading-description">WELCOME TO MY INTERACTIVE PORTFOLIO • GAME AI • VR • GAMEPLAY • SIMULATION</p>
-      <div class="loading-progress-layout">
+      <div class="loading-progress-layout loading-progress-only">
         <div class="loading-track"><span id="loadingFill"></span></div>
-        <span id="loadingPercent">0%</span>
       </div>
-      <p class="loading-status" id="loadingStatus">Preparing daylight simulation...</p>
-      <button class="enter-city-button" id="enterCityButton" type="button" disabled>
-        ENTER CITY <span>→</span>
-      </button>
     </div>
   </section>
 
@@ -58,13 +51,38 @@
     </div>
 
     <div class="hud-actions">
+      <button class="hud-button sound-button" id="soundToggle" type="button" aria-pressed="true" title="Toggle ambient music and interface sounds">
+        <span class="sound-dot"></span>
+        <span id="soundToggleLabel">SOUND ON</span>
+      </button>
       <button class="hud-button" id="homeViewButton" type="button" title="Reset camera">HOME VIEW</button>
-      <button class="hud-button" id="directoryToggle" type="button">DISTRICTS</button>
+      <button class="hud-button hidden-directory-toggle" id="directoryToggle" type="button" aria-hidden="true" tabindex="-1">DISTRICTS</button>
       <a class="hud-button hud-button-primary"
          href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing"
          target="_blank" rel="noopener noreferrer">RESUME ↗</a>
     </div>
   </header>
+
+  <aside class="section-sidebar" id="sectionSidebar" aria-label="Portfolio sections">
+    <div class="section-sidebar-head">
+      <span>EXPLORE</span>
+      <strong>SECTIONS</strong>
+    </div>
+    <nav class="section-sidebar-nav">
+      <button class="section-sidebar-item" type="button" data-open-section="projects"><span class="sidebar-index">01</span><span class="sidebar-name">Projects</span></button>
+      <button class="section-sidebar-item" type="button" data-open-section="featured"><span class="sidebar-index">02</span><span class="sidebar-name">Featured Work</span></button>
+      <button class="section-sidebar-item" type="button" data-open-section="experience"><span class="sidebar-index">03</span><span class="sidebar-name">Experience</span></button>
+      <button class="section-sidebar-item" type="button" data-open-section="education"><span class="sidebar-index">04</span><span class="sidebar-name">Education</span></button>
+      <button class="section-sidebar-item" type="button" data-open-section="skills"><span class="sidebar-index">05</span><span class="sidebar-name">Skills</span></button>
+      <button class="section-sidebar-item" type="button" data-open-section="research"><span class="sidebar-index">06</span><span class="sidebar-name">Research</span></button>
+      <button class="section-sidebar-item" type="button" data-open-section="about"><span class="sidebar-index">07</span><span class="sidebar-name">About</span></button>
+      <button class="section-sidebar-item" type="button" data-open-section="contact"><span class="sidebar-index">08</span><span class="sidebar-name">Contact</span></button>
+    </nav>
+    <div class="section-sidebar-foot">
+      <span>HOVER MAP</span>
+      <strong>CLICK TO OPEN</strong>
+    </div>
+  </aside>
 
   <div class="coordinate-hud">
     <div><span>SECTOR</span><strong id="sectorReadout">CENTRAL</strong></div>
@@ -76,7 +94,7 @@
     <span class="explore-icon">+</span>
     <div>
       <strong>EXPLORE</strong>
-      <p>Move the mouse to the screen edges to glide • click-drag to pan • wheel to zoom • hover any district to enter.</p>
+      <p>Move near the screen edge to glide • drag to pan • wheel to zoom • hover to identify • click a district to open.</p>
     </div>
   </div>
 
@@ -101,10 +119,10 @@
     <span class="hover-index" id="hoverIndex">DISTRICT 01</span>
     <h2 id="hoverTitle">PROJECT DISTRICT</h2>
     <p id="hoverDescription">Games • AI • VR • Simulation</p>
-    <button id="enterSectionButton" type="button">ENTER <span>→</span></button>
+    <span class="hover-click-hint">CLICK DISTRICT TO OPEN</span>
   </div>
 
-  <section class="section-modal" id="sectionModal" aria-hidden="true">
+  <section class="section-modal" id="sectionModal" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="section-backdrop" id="sectionBackdrop"></div>
     <article class="section-panel">
       <header class="section-panel-header">
@@ -133,7 +151,7 @@
 
   <footer class="bottom-hud">
     <div><span>NAVIGATION</span><strong>MOUSE ONLY • EDGE PAN • DRAG • WHEEL</strong></div>
-    <div class="bottom-hud-center">MOVE TO EDGE // GLIDE CITY // HOVER LANDMARK // ENTER</div>
+    <div class="bottom-hud-center">MOVE TO EDGE // HOVER DISTRICT // CLICK TO OPEN</div>
     <div><span>MODE</span><strong>DAYLIGHT / OPTIMIZED</strong></div>
   </footer>
 

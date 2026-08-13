@@ -7,8 +7,9 @@
   "use strict";
 
   if (!window.THREE) {
-    document.getElementById("loadingStatus").textContent =
-      "Three.js could not be loaded. Check your internet connection.";
+    const screen = document.getElementById("loadingScreen");
+    if (screen) screen.innerHTML = '<div class="loading-inner loading-minimal"><h1 class="loading-logo welcome-only"><span>WELCOME</span></h1></div>';
+    console.error("Three.js could not be loaded.");
     return;
   }
 
@@ -17,15 +18,11 @@
   const threeContainer = $("threeContainer");
   const loadingScreen = $("loadingScreen");
   const loadingFill = $("loadingFill");
-  const loadingPercent = $("loadingPercent");
-  const loadingStatus = $("loadingStatus");
-  const enterCityButton = $("enterCityButton");
 
   const districtHoverCard = $("districtHoverCard");
   const hoverIndex = $("hoverIndex");
   const hoverTitle = $("hoverTitle");
   const hoverDescription = $("hoverDescription");
-  const enterSectionButton = $("enterSectionButton");
   const customCursor = $("customCursor");
   const exploreHint = $("exploreHint");
   const sectorReadout = $("sectorReadout");
@@ -48,6 +45,152 @@
   const sliderLabel = $("sliderLabel");
   const previousItem = $("previousItem");
   const nextItem = $("nextItem");
+  const soundToggle = $("soundToggle");
+  const soundToggleLabel = $("soundToggleLabel");
+  const sectionSidebar = $("sectionSidebar");
+
+  /* =========================================================
+     LIGHTWEIGHT PROCEDURAL AUDIO
+     No MP3 files required. Audio starts after the first click/tap because
+     modern browsers block audible autoplay before a user gesture.
+  ========================================================= */
+
+  let audioCtx = null;
+  let masterGain = null;
+  let bgmGain = null;
+  let sfxGain = null;
+  let audioEnabled = true;
+  let bgmStarted = false;
+  let bgmTimer = null;
+  let bgmStep = 0;
+  let ambienceOscillators = [];
+
+  function createAudioContext(){
+    if(audioCtx) return audioCtx;
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if(!AudioContext) return null;
+
+    audioCtx = new AudioContext();
+    masterGain = audioCtx.createGain();
+    bgmGain = audioCtx.createGain();
+    sfxGain = audioCtx.createGain();
+
+    masterGain.gain.value = audioEnabled ? .72 : 0;
+    bgmGain.gain.value = .22;
+    sfxGain.gain.value = .38;
+
+    bgmGain.connect(masterGain);
+    sfxGain.connect(masterGain);
+    masterGain.connect(audioCtx.destination);
+    return audioCtx;
+  }
+
+  async function ensureAudio(){
+    if(!audioEnabled) return;
+    const ctx=createAudioContext();
+    if(!ctx) return;
+    if(ctx.state==="suspended"){
+      try{await ctx.resume()}catch(_e){}
+    }
+    if(!bgmStarted) startBgm();
+  }
+
+  function startBgm(){
+    if(!audioCtx || bgmStarted || !audioEnabled) return;
+    bgmStarted=true;
+
+    // A quiet, airy city pad. Only three continuous oscillators are used.
+    const padFilter=audioCtx.createBiquadFilter();
+    padFilter.type="lowpass";
+    padFilter.frequency.value=900;
+    padFilter.Q.value=.3;
+    padFilter.connect(bgmGain);
+
+    [110,164.81,220].forEach((freq,index)=>{
+      const osc=audioCtx.createOscillator();
+      const gain=audioCtx.createGain();
+      osc.type=index===1?"triangle":"sine";
+      osc.frequency.value=freq;
+      osc.detune.value=index===1?4:index===2?-5:0;
+      gain.gain.value=index===0?.032:.018;
+      osc.connect(gain); gain.connect(padFilter); osc.start();
+      ambienceOscillators.push({osc,gain});
+    });
+
+    scheduleMusicPhrase();
+    bgmTimer=window.setInterval(scheduleMusicPhrase,4200);
+  }
+
+  function scheduleMusicPhrase(){
+    if(!audioCtx || !audioEnabled || audioCtx.state!=="running") return;
+    const chords=[
+      [329.63,392.00,493.88,659.25],
+      [293.66,369.99,440.00,587.33],
+      [261.63,329.63,392.00,523.25],
+      [293.66,349.23,440.00,587.33]
+    ];
+    const chord=chords[bgmStep%chords.length];
+    const now=audioCtx.currentTime+.05;
+    chord.forEach((freq,i)=>{
+      const osc=audioCtx.createOscillator();
+      const gain=audioCtx.createGain();
+      const filter=audioCtx.createBiquadFilter();
+      osc.type="sine";
+      osc.frequency.value=freq;
+      filter.type="lowpass";
+      filter.frequency.value=1700;
+      gain.gain.setValueAtTime(.0001,now+i*.34);
+      gain.gain.exponentialRampToValueAtTime(.018,now+i*.34+.08);
+      gain.gain.exponentialRampToValueAtTime(.0001,now+i*.34+1.15);
+      osc.connect(filter); filter.connect(gain); gain.connect(bgmGain);
+      osc.start(now+i*.34); osc.stop(now+i*.34+1.25);
+    });
+    bgmStep++;
+  }
+
+  function playTone(startFreq,endFreq,duration=.075,volume=.12,type="sine"){
+    if(!audioEnabled) return;
+    const ctx=createAudioContext();
+    if(!ctx || ctx.state!=="running") return;
+    const now=ctx.currentTime;
+    const osc=ctx.createOscillator();
+    const gain=ctx.createGain();
+    osc.type=type;
+    osc.frequency.setValueAtTime(startFreq,now);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(30,endFreq),now+duration);
+    gain.gain.setValueAtTime(.0001,now);
+    gain.gain.exponentialRampToValueAtTime(volume,now+.008);
+    gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+    osc.connect(gain); gain.connect(sfxGain);
+    osc.start(now); osc.stop(now+duration+.02);
+  }
+
+  function playClick(){ playTone(620,410,.055,.11,"triangle"); }
+  function playOpenSound(){
+    playTone(420,690,.085,.10,"sine");
+    window.setTimeout(()=>playTone(610,910,.09,.075,"sine"),42);
+  }
+  function playCloseSound(){ playTone(520,270,.09,.09,"triangle"); }
+  function playHoverTick(){ playTone(880,760,.035,.035,"sine"); }
+
+  async function setAudioEnabled(enabled){
+    audioEnabled=enabled;
+    soundToggle?.classList.toggle("sound-off",!enabled);
+    soundToggle?.setAttribute("aria-pressed",enabled?"true":"false");
+    if(soundToggleLabel) soundToggleLabel.textContent=enabled?"SOUND ON":"SOUND OFF";
+
+    if(enabled){
+      await ensureAudio();
+      if(masterGain && audioCtx){
+        masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+        masterGain.gain.setTargetAtTime(.72,audioCtx.currentTime,.04);
+      }
+      playClick();
+    }else if(masterGain && audioCtx){
+      masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+      masterGain.gain.setTargetAtTime(0,audioCtx.currentTime,.035);
+    }
+  }
 
   const portfolioSections = {
     projects: {
@@ -371,7 +514,6 @@
   let activeHoverKey = null;
   let currentSectionKey = null;
   let currentItemIndex = 0;
-  let hoverCardLocked = false;
   let worldEntered = false;
   let pageVisible = true;
   let raycastDirty = false;
@@ -394,7 +536,7 @@
   let pointerOverUi = false;
   const cameraRight = new THREE.Vector3();
   const cameraForward = new THREE.Vector3();
-  const EDGE_ZONE = mobile ? .075 : .11;
+  const EDGE_ZONE = mobile ? .12 : .19;
 
   const shared = {};
   const movingCars = [];
@@ -594,12 +736,25 @@
       const border = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:config.accent,transparent:true,opacity:0}));
       district.add(border);
 
-      district.add(createDistrictArchitecture(config.key,config.accent));
+      const hoverPlate = new THREE.Mesh(
+        new THREE.PlaneGeometry(config.width * .96, config.depth * .96),
+        new THREE.MeshBasicMaterial({color:config.accent,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide})
+      );
+      hoverPlate.rotation.x=-Math.PI/2;hoverPlate.position.y=.115;district.add(hoverPlate);
 
-      const hitbox = new THREE.Mesh(new THREE.BoxGeometry(config.width,24,config.depth),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+      const hoverRing = new THREE.Mesh(
+        new THREE.RingGeometry(Math.min(config.width,config.depth)*.18,Math.min(config.width,config.depth)*.25,32),
+        new THREE.MeshBasicMaterial({color:config.accent,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide})
+      );
+      hoverRing.rotation.x=-Math.PI/2;hoverRing.position.y=.16;district.add(hoverRing);
+
+      const architecture = createDistrictArchitecture(config.key,config.accent);
+      district.add(architecture);
+
+      const hitbox = new THREE.Mesh(new THREE.BoxGeometry(config.width*1.08,24,config.depth*1.08),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
       hitbox.position.y=12;hitbox.userData.section=config.key;district.add(hitbox);interactiveDistricts.push(hitbox);
 
-      districtVisuals.set(config.key,{root:district,pad,border,config,targetLift:0});
+      districtVisuals.set(config.key,{root:district,architecture,pad,border,hoverPlate,hoverRing,config,targetLift:0,targetScale:1});
     });
   }
 
@@ -1208,25 +1363,37 @@
      DISTRICT HOVER / RAYCAST
   ========================================================= */
 
-  function updateRaycast(clientX,clientY){
+  function getDistrictAt(clientX,clientY){
     pointer.x=(clientX/window.innerWidth)*2-1;
     pointer.y=-(clientY/window.innerHeight)*2+1;
     raycaster.setFromCamera(pointer,camera);
     const hits=raycaster.intersectObjects(interactiveDistricts,false);
-    if(hits.length)showDistrictHover(hits[0].object.userData.section,clientX,clientY);
-    else if(!hoverCardLocked)clearDistrictHover();
+    return hits.length ? hits[0].object.userData.section : null;
+  }
+
+  function updateRaycast(clientX,clientY){
+    const key=getDistrictAt(clientX,clientY);
+    if(key)showDistrictHover(key,clientX,clientY);
+    else clearDistrictHover();
   }
 
   function showDistrictHover(key,mouseX,mouseY){
     const data=portfolioSections[key];if(!data)return;
-    if(activeHoverKey!==key){highlightDistrict(activeHoverKey,false);highlightDistrict(key,true);activeHoverKey=key}
+    if(activeHoverKey!==key){
+      highlightDistrict(activeHoverKey,false);
+      document.querySelectorAll(".section-sidebar-item.is-map-hover").forEach(el=>el.classList.remove("is-map-hover"));
+      highlightDistrict(key,true);
+      document.querySelector(`.section-sidebar-item[data-open-section="${key}"]`)?.classList.add("is-map-hover");
+      activeHoverKey=key;
+      if(audioCtx?.state==="running") playHoverTick();
+    }
     hoverIndex.textContent=data.cityIndex;hoverTitle.textContent=data.cityName;hoverDescription.textContent=data.cityDescription;sectorReadout.textContent=data.cityName;
     positionHoverCard(mouseX,mouseY);districtHoverCard.classList.add("visible");districtHoverCard.setAttribute("aria-hidden","false");customCursor.classList.add("active");exploreHint.classList.add("hidden");
   }
 
   function positionHoverCard(x,y){
     if(window.innerWidth<=720)return;
-    const width=285,height=165;let left=x+26,top=y-32;
+    const width=290,height=140;let left=x+30,top=y-38;
     if(left+width>window.innerWidth-18)left=x-width-26;
     if(top+height>window.innerHeight-18)top=window.innerHeight-height-18;
     if(top<88)top=88;
@@ -1236,15 +1403,34 @@
   function clearDistrictHover(){
     if(activeHoverKey)highlightDistrict(activeHoverKey,false);
     activeHoverKey=null;districtHoverCard.classList.remove("visible");districtHoverCard.setAttribute("aria-hidden","true");sectorReadout.textContent="CENTRAL";customCursor.classList.remove("active");
+    document.querySelectorAll(".section-sidebar-item.is-map-hover").forEach(el=>el.classList.remove("is-map-hover"));
   }
 
   function highlightDistrict(key,active){
     if(!key||!districtVisuals.has(key))return;
-    const v=districtVisuals.get(key);v.pad.material.opacity=active?.13:0;v.border.material.opacity=active?.9:0;v.targetLift=active?.18:0;
+    const v=districtVisuals.get(key);
+    v.pad.material.opacity=active?.18:0;
+    v.border.material.opacity=active?1:0;
+    v.hoverPlate.material.opacity=active?.16:0;
+    v.hoverRing.material.opacity=active?.82:0;
+    v.targetLift=active?.32:0;
+    v.targetScale=active?1.035:1;
   }
 
   function updateDistrictHoverMotion(){
-    districtVisuals.forEach(v=>{v.root.position.y=THREE.MathUtils.lerp(v.root.position.y,v.targetLift,.12)});
+    const pulse=(Math.sin(clock.elapsedTime*4)+1)/2;
+    districtVisuals.forEach(v=>{
+      v.root.position.y=THREE.MathUtils.lerp(v.root.position.y,v.targetLift,.18);
+      const nextScale=THREE.MathUtils.lerp(v.architecture.scale.x,v.targetScale,.16);
+      v.architecture.scale.setScalar(nextScale);
+      if(v.hoverRing.material.opacity>0){
+        const ringScale=.94+pulse*.16;
+        v.hoverRing.scale.setScalar(ringScale);
+        v.hoverRing.material.opacity=.55+pulse*.35;
+      }else{
+        v.hoverRing.scale.setScalar(1);
+      }
+    });
   }
 
   /* =========================================================
@@ -1253,15 +1439,25 @@
 
   function openSection(key){
     const data=portfolioSections[key];if(!data)return;
+    ensureAudio();
+    playOpenSound();
     currentSectionKey=key;currentItemIndex=0;modalSectionIndex.textContent=data.cityIndex;modalSectionTitle.textContent=data.panelTitle;modalSectionSubtitle.textContent=data.panelSubtitle;sliderLabel.textContent=data.panelTitle;
     sectionSlider.min=0;sectionSlider.max=Math.max(0,data.items.length-1);sectionSlider.value=0;sliderTotal.textContent=formatNumber(data.items.length);
-    sectionModal.classList.add("open");sectionModal.setAttribute("aria-hidden","false");districtDirectory.classList.remove("open");districtDirectory.setAttribute("aria-hidden","true");renderCurrentItem();
+    sectionModal.classList.add("open");sectionModal.setAttribute("aria-hidden","false");document.body.classList.add("modal-open");
+    districtDirectory.classList.remove("open");districtDirectory.setAttribute("aria-hidden","true");
+    document.querySelectorAll(".section-sidebar-item").forEach(el=>el.classList.toggle("is-active",el.dataset.openSection===key));
+    renderCurrentItem();
   }
 
-  function closeSection(){sectionModal.classList.remove("open");sectionModal.setAttribute("aria-hidden","true")}
+  function closeSection(){
+    if(!sectionModal.classList.contains("open"))return;
+    playCloseSound();
+    sectionModal.classList.remove("open");sectionModal.setAttribute("aria-hidden","true");document.body.classList.remove("modal-open");
+    document.querySelectorAll(".section-sidebar-item.is-active").forEach(el=>el.classList.remove("is-active"));
+  }
 
   function navigateItem(direction){
-    if(!currentSectionKey)return;const data=portfolioSections[currentSectionKey];currentItemIndex=(currentItemIndex+direction+data.items.length)%data.items.length;sectionSlider.value=currentItemIndex;renderCurrentItem();
+    if(!currentSectionKey)return;playClick();const data=portfolioSections[currentSectionKey];currentItemIndex=(currentItemIndex+direction+data.items.length)%data.items.length;sectionSlider.value=currentItemIndex;renderCurrentItem();
   }
 
   function renderCurrentItem(){
@@ -1306,7 +1502,7 @@
       if(Math.abs(edgeX)>.01 || Math.abs(edgeY)>.01){
         cameraRight.set(1,0,0).applyQuaternion(camera.quaternion);cameraRight.y=0;cameraRight.normalize();
         cameraForward.set(0,0,-1).applyQuaternion(camera.quaternion);cameraForward.y=0;cameraForward.normalize();
-        const speed=(mobile?7.2:10.5)*delta/Math.max(.82,cameraZoom);
+        const speed=(mobile?10.5:16.5)*delta/Math.max(.82,cameraZoom);
         cameraPanTarget.x += (cameraRight.x*edgeX + cameraForward.x*(-edgeY))*speed;
         cameraPanTarget.y += (cameraRight.z*edgeX + cameraForward.z*(-edgeY))*speed;
         clampPan();
@@ -1314,10 +1510,10 @@
       }
     }
 
-    pointer.x=THREE.MathUtils.lerp(pointer.x,pointerTarget.x,.055);
-    pointer.y=THREE.MathUtils.lerp(pointer.y,pointerTarget.y,.055);
-    cameraPan.lerp(cameraPanTarget,.105);
-    cameraZoom=THREE.MathUtils.lerp(cameraZoom,cameraZoomTarget,.12);
+    pointer.x=THREE.MathUtils.lerp(pointer.x,pointerTarget.x,.13);
+    pointer.y=THREE.MathUtils.lerp(pointer.y,pointerTarget.y,.13);
+    cameraPan.lerp(cameraPanTarget,.18);
+    cameraZoom=THREE.MathUtils.lerp(cameraZoom,cameraZoomTarget,.16);
     camera.zoom=cameraZoom;camera.updateProjectionMatrix();
 
     // Very small parallax keeps the city feeling alive without fighting hover.
@@ -1354,11 +1550,24 @@
      LOADING
   ========================================================= */
 
-  const loadingPhases=[
-    [14,"Preparing welcome screen..."],[28,"Building compact city layout..."],[43,"Designing parks and public spaces..."],[59,"Adding pedestrians and traffic..."],[74,"Starting ambient city animation..."],[90,"Calibrating mouse navigation..."],[100,"Welcome — city ready."]
-  ];
   function runLoadingSequence(){
-    let progress=0;const tick=()=>{progress+=progress<70?Math.random()*9:Math.random()*4;progress=Math.min(100,progress);const rounded=Math.floor(progress);loadingFill.style.width=`${rounded}%`;loadingPercent.textContent=`${rounded}%`;const phase=loadingPhases.find(([max])=>rounded<=max);if(phase)loadingStatus.textContent=phase[1];if(rounded<100)setTimeout(tick,72+Math.random()*90);else{loadingFill.style.width="100%";loadingPercent.textContent="100%";enterCityButton.disabled=false;enterCityButton.classList.add("ready")}};tick();
+    let progress=0;
+    const tick=()=>{
+      progress += progress < 72 ? Math.random()*10 : Math.random()*4.5;
+      progress=Math.min(100,progress);
+      loadingFill.style.width=`${Math.floor(progress)}%`;
+      if(progress<100){
+        setTimeout(tick,58+Math.random()*72);
+      }else{
+        loadingFill.style.width="100%";
+        setTimeout(()=>{
+          worldEntered=true;
+          loadingScreen.classList.add("is-hidden");
+          setTimeout(()=>exploreHint.classList.remove("hidden"),250);
+        },280);
+      }
+    };
+    tick();
   }
 
   function formatNumber(n){return String(n).padStart(2,"0")}
@@ -1384,7 +1593,7 @@
       return;
     }
 
-    pointerOverUi=!!event.target.closest(".district-hover-card,.game-hud,.district-directory,.section-modal,.explore-hint");
+    pointerOverUi=!!event.target.closest(".game-hud,.district-directory,.section-sidebar,.section-modal,.explore-hint");
     if(!worldEntered||sectionModal.classList.contains("open"))return;
     if(pointerOverUi)return;
     raycastDirty=true;
@@ -1395,8 +1604,9 @@
   rendererEventSetup();
   function rendererEventSetup(){
     document.addEventListener("pointerdown",event=>{
+      if(worldEntered && audioEnabled) ensureAudio();
       if(!worldEntered||sectionModal.classList.contains("open"))return;
-      if(event.target.closest("button,a,.district-directory,.section-modal"))return;
+      if(event.target.closest("button,a,.district-directory,.section-sidebar,.section-modal"))return;
       if(!event.target.closest("#threeContainer"))return;
       dragPointerId=event.pointerId;dragStartScreenX=event.clientX;dragStartScreenY=event.clientY;dragMoved=false;dragPanStart.copy(cameraPanTarget);
       screenToGround(event.clientX,event.clientY,dragStartWorld);
@@ -1405,7 +1615,15 @@
 
     document.addEventListener("pointerup",event=>{
       if(dragPointerId!==event.pointerId)return;
-      if(!dragMoved)updateRaycast(event.clientX,event.clientY);
+      if(!dragMoved){
+        const key=getDistrictAt(event.clientX,event.clientY);
+        if(key){
+          showDistrictHover(key,event.clientX,event.clientY);
+          openSection(key);
+        }else{
+          clearDistrictHover();
+        }
+      }
       dragPointerId=null;customCursor.classList.remove("dragging");
       setTimeout(()=>{dragMoved=false},0);
     });
@@ -1429,21 +1647,54 @@
     }
   });
 
-  districtHoverCard.addEventListener("mouseenter",()=>hoverCardLocked=true);
-  districtHoverCard.addEventListener("mouseleave",()=>hoverCardLocked=false);
-  enterSectionButton.addEventListener("click",()=>{if(activeHoverKey)openSection(activeHoverKey)});
   sectionClose.addEventListener("click",closeSection);sectionBackdrop.addEventListener("click",closeSection);
   previousItem.addEventListener("click",()=>navigateItem(-1));nextItem.addEventListener("click",()=>navigateItem(1));
-  sectionSlider.addEventListener("input",()=>{currentItemIndex=Number(sectionSlider.value);renderCurrentItem()});
+  sectionSlider.addEventListener("input",()=>{currentItemIndex=Number(sectionSlider.value);playClick();renderCurrentItem()});
+
+  if(soundToggle){
+    soundToggle.addEventListener("click",async event=>{
+      event.stopPropagation();
+      await setAudioEnabled(!audioEnabled);
+    });
+  }
+
+  document.querySelectorAll(".section-sidebar-item").forEach(button=>{
+    button.addEventListener("mouseenter",()=>{
+      if(sectionModal.classList.contains("open"))return;
+      const key=button.dataset.openSection;
+      if(activeHoverKey && activeHoverKey!==key)highlightDistrict(activeHoverKey,false);
+      activeHoverKey=key;
+      highlightDistrict(key,true);
+      button.classList.add("is-map-hover");
+      sectorReadout.textContent=portfolioSections[key]?.cityName||"CENTRAL";
+      if(audioCtx?.state==="running")playHoverTick();
+    });
+    button.addEventListener("mouseleave",()=>{
+      if(sectionModal.classList.contains("open"))return;
+      const key=button.dataset.openSection;
+      highlightDistrict(key,false);
+      button.classList.remove("is-map-hover");
+      activeHoverKey=null;
+      sectorReadout.textContent="CENTRAL";
+    });
+  });
+
+  document.addEventListener("click",event=>{
+    const target=event.target.closest("button,a.archive-link");
+    if(!target || target===soundToggle || target===sectionClose || target===previousItem || target===nextItem)return;
+    if(audioCtx?.state==="running")playClick();
+  });
 
   directoryToggle.addEventListener("click",()=>{const open=districtDirectory.classList.toggle("open");districtDirectory.setAttribute("aria-hidden",open?"false":"true")});
   directoryClose.addEventListener("click",()=>{districtDirectory.classList.remove("open");districtDirectory.setAttribute("aria-hidden","true")});
   document.querySelectorAll("[data-open-section]").forEach(button=>button.addEventListener("click",()=>openSection(button.dataset.openSection)));
   homeViewButton.addEventListener("click",resetCamera);
 
-  enterCityButton.addEventListener("click",()=>{worldEntered=true;loadingScreen.classList.add("is-hidden");setTimeout(()=>exploreHint.classList.remove("hidden"),350)});
-
-  document.addEventListener("visibilitychange",()=>{pageVisible=!document.hidden;if(pageVisible)clock.getDelta()});
+  document.addEventListener("visibilitychange",()=>{
+    pageVisible=!document.hidden;
+    if(pageVisible){clock.getDelta();if(audioEnabled&&audioCtx?.state==="suspended")audioCtx.resume().catch(()=>{});}
+    else if(audioCtx?.state==="running")audioCtx.suspend().catch(()=>{});
+  });
   window.addEventListener("resize",resizeRenderer);
 
   initWorld();
