@@ -120,9 +120,40 @@
   let cinematicMode = false;
   let projectReplayTimer = null;
   let projectReplayStep = -1;
+  let mobileMenuReturnFocus = null;
+  let mobileMenuView = "explore";
+  let mobileHintTimer = null;
+  let mobileSectionSwipeStart = null;
+
+  function setMobileMenuView(view="explore"){
+    mobileMenuView=view;
+    document.querySelectorAll("[data-mobile-menu-tab]").forEach(button=>{
+      const active=button.dataset.mobileMenuTab===view;
+      button.classList.toggle("is-active",active);
+      button.setAttribute("aria-selected",active?"true":"false");
+    });
+    document.querySelectorAll("[data-mobile-menu-view]").forEach(panel=>{
+      panel.hidden=panel.dataset.mobileMenuView!==view;
+    });
+    if(mobileMenuPanel){
+      const scroll=mobileMenuPanel.querySelector(".mobile-menu-scroll");
+      if(scroll)scroll.scrollTop=0;
+    }
+  }
+
+  function dismissMobileHint(){
+    if(!mobile||!exploreHint)return;
+    exploreHint.classList.add("hidden");
+    if(mobileHintTimer){clearTimeout(mobileHintTimer);mobileHintTimer=null;}
+  }
 
   function setMobileMenu(open,withSound=true){
     if(!mobileMenuPanel||!mobileMenuToggle)return;
+    if(open){
+      mobileMenuReturnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
+      dismissMobileHint();
+      setMobileMenuView(mobileMenuView||"explore");
+    }
     mobileMenuPanel.classList.toggle("open",open);
     mobileMenuBackdrop?.classList.toggle("open",open);
     mobileMenuPanel.setAttribute("aria-hidden",open?"false":"true");
@@ -130,6 +161,12 @@
     mobileMenuToggle.setAttribute("aria-expanded",open?"true":"false");
     document.body.classList.toggle("mobile-menu-open",open);
     if(open&&typeof clearDistrictHover==="function")clearDistrictHover();
+    if(open){
+      window.setTimeout(()=>mobileMenuClose?.focus({preventScroll:true}),80);
+    }else if(mobileMenuReturnFocus){
+      window.setTimeout(()=>mobileMenuReturnFocus?.focus?.({preventScroll:true}),40);
+      mobileMenuReturnFocus=null;
+    }
     if(withSound&&audioCtx?.state==="running")playClick();
   }
 
@@ -354,7 +391,7 @@
     const cfg=getDistrictConfig(key);if(!cfg)return;
     cameraPanTarget.x=THREE.MathUtils.clamp(cfg.x*.58,-15,15);
     cameraPanTarget.y=THREE.MathUtils.clamp(cfg.z*.48,-10,10);
-    cameraZoomTarget=zoom;
+    cameraZoomTarget=mobile?Math.min(zoom,1.09):zoom;
     clampPan();
   }
 
@@ -790,31 +827,35 @@
   ];
 
   const coarsePointer = window.matchMedia("(pointer: coarse)").matches || (navigator.maxTouchPoints || 0) > 0;
-  const mobile = window.matchMedia("(max-width: 820px)").matches || coarsePointer;
+  const mobileViewport = window.matchMedia("(max-width: 820px)").matches;
+  const tabletViewport = coarsePointer && window.matchMedia("(max-width: 1024px)").matches;
+  const mobile = mobileViewport || tabletViewport;
   const cpuCores = navigator.hardwareConcurrency || 8;
   const deviceMemory = navigator.deviceMemory || 8;
-  const lowCpu = cpuCores <= 4 || deviceMemory <= 4;
-  const veryLowEnd = cpuCores <= 2 || deviceMemory <= 2;
+  const saveData = !!navigator.connection?.saveData;
+  const lowCpu = cpuCores <= 4 || deviceMemory <= 4 || saveData;
+  const veryLowEnd = cpuCores <= 2 || deviceMemory <= 2 || (saveData && cpuCores <= 4);
+  const largeMobile = mobile && Math.min(window.innerWidth,window.innerHeight) >= 600;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   document.body.classList.toggle("touch-mode", coarsePointer);
   document.body.classList.toggle("mobile-mode", mobile);
 
   const PERF = {
-    pixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? (veryLowEnd ? .80 : .96) : lowCpu ? 1.16 : 1.35),
-    minPixelRatio: mobile ? .68 : .95,
+    pixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? (veryLowEnd ? .72 : largeMobile ? 1.0 : .90) : lowCpu ? 1.16 : 1.35),
+    minPixelRatio: mobile ? (veryLowEnd ? .56 : .62) : .95,
     antialias: !mobile && !lowCpu,
     shadows: !mobile && !lowCpu,
     shadowMap: lowCpu ? 512 : 1024,
-    people: reducedMotion ? 5 : mobile ? (veryLowEnd ? 6 : 9) : lowCpu ? 16 : 28,
-    movingCars: reducedMotion ? 4 : mobile ? (veryLowEnd ? 4 : 6) : lowCpu ? 9 : 14,
-    parkedCars: mobile ? 6 : 12,
-    trees: mobile ? (veryLowEnd ? 22 : 30) : lowCpu ? 44 : 62,
-    lamps: mobile ? 20 : 42,
-    benches: mobile ? 5 : 13,
+    people: reducedMotion ? 4 : mobile ? (veryLowEnd ? 5 : largeMobile ? 10 : 8) : lowCpu ? 16 : 28,
+    movingCars: reducedMotion ? 3 : mobile ? (veryLowEnd ? 3 : largeMobile ? 6 : 5) : lowCpu ? 9 : 14,
+    parkedCars: mobile ? (largeMobile ? 6 : 5) : 12,
+    trees: mobile ? (veryLowEnd ? 18 : largeMobile ? 30 : 26) : lowCpu ? 44 : 62,
+    lamps: mobile ? (largeMobile ? 20 : 17) : 42,
+    benches: mobile ? 4 : 13,
     birds: reducedMotion ? 0 : mobile ? 1 : 6,
-    clouds: mobile ? 2 : lowCpu ? 3 : 5,
-    targetFps: mobile ? (veryLowEnd ? 32 : 42) : 60,
+    clouds: mobile ? 1 : lowCpu ? 3 : 5,
+    targetFps: mobile ? (veryLowEnd ? 30 : 40) : 60,
     animate: !reducedMotion
   };
 
@@ -1147,7 +1188,7 @@
       const architecture = createDistrictArchitecture(config.key,config.accent);
       district.add(architecture);
 
-      const hitbox = new THREE.Mesh(new THREE.BoxGeometry(config.width*1.08,24,config.depth*1.08),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+      const hitbox = new THREE.Mesh(new THREE.BoxGeometry(config.width*(mobile?1.18:1.08),24,config.depth*(mobile?1.18:1.08)),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
       hitbox.position.y=12;hitbox.userData.section=config.key;district.add(hitbox);interactiveDistricts.push(hitbox);
 
       districtVisuals.set(config.key,{root:district,architecture,pad,border,hoverPlate,hoverRing,districtGlow,hoverBeacon,beaconBeam,beaconGem,beaconHalo,config,targetLift:0,targetScale:1});
@@ -1923,7 +1964,9 @@
   }
 
   function renderCurrentItem(){
-    if(!currentSectionKey)return;const data=portfolioSections[currentSectionKey],item=data.items[currentItemIndex];sliderCurrent.textContent=formatNumber(currentItemIndex+1);
+    if(!currentSectionKey)return;
+    if(mobile && sectionContent) sectionContent.scrollTop=0;
+    const data=portfolioSections[currentSectionKey],item=data.items[currentItemIndex];sliderCurrent.textContent=formatNumber(currentItemIndex+1);
     if(data.type==="showcase")return renderShowcase(item);if(data.type==="experience")return renderExperience(item);if(data.type==="education")return renderEducation(item);if(data.type==="skills")return renderSkills(item);if(data.type==="research")return renderResearch(item);if(data.type==="about")return renderAbout(item);if(data.type==="contact")return renderContact(item);
   }
 
@@ -2059,8 +2102,9 @@
     const aspect=width/height;
 
     let viewHeight;
-    if(width <= 480) viewHeight = aspect < .65 ? 116 : 105;
-    else if(width <= 820) viewHeight = aspect < .82 ? 102 : 94;
+    if(width <= 390) viewHeight = aspect < .62 ? 112 : 102;
+    else if(width <= 480) viewHeight = aspect < .68 ? 108 : 99;
+    else if(width <= 820) viewHeight = aspect < .82 ? 98 : 91;
     else viewHeight = 78;
 
     let viewWidth=viewHeight*aspect;
@@ -2087,11 +2131,11 @@
     perfFrames=0;
     perfWindowStart=now;
 
-    if(fps < 27 && renderPixelRatio > PERF.minPixelRatio){
-      renderPixelRatio=Math.max(PERF.minPixelRatio,renderPixelRatio-.07);
+    if(fps < 25 && renderPixelRatio > PERF.minPixelRatio){
+      renderPixelRatio=Math.max(PERF.minPixelRatio,renderPixelRatio-.06);
       renderer.setPixelRatio(renderPixelRatio);
-    }else if(fps > 39 && renderPixelRatio < PERF.pixelRatio){
-      renderPixelRatio=Math.min(PERF.pixelRatio,renderPixelRatio+.025);
+    }else if(fps > 38 && renderPixelRatio < PERF.pixelRatio){
+      renderPixelRatio=Math.min(PERF.pixelRatio,renderPixelRatio+.02);
       renderer.setPixelRatio(renderPixelRatio);
     }
   }
@@ -2108,7 +2152,7 @@
     const recruiterOpen=!!recruiterModal?.classList.contains("open");
     const mobileMenuOpen=!!mobileMenuPanel?.classList.contains("open");
     const uiOverlayOpen=sectionOpen||recruiterOpen||mobileMenuOpen;
-    const effectiveFps=(mobile&&uiOverlayOpen)?24:PERF.targetFps;
+    const effectiveFps=(mobile&&uiOverlayOpen)?20:PERF.targetFps;
     const minFrameMs=1000/effectiveFps;
     if(now-lastRenderStamp<minFrameMs)return;
     lastRenderStamp=now;
@@ -2154,7 +2198,13 @@
         setTimeout(()=>{
           worldEntered=true;
           loadingScreen.classList.add("is-hidden");
-          setTimeout(()=>exploreHint.classList.remove("hidden"),140);
+          setTimeout(()=>{
+            exploreHint.classList.remove("hidden");
+            if(mobile){
+              if(mobileHintTimer)clearTimeout(mobileHintTimer);
+              mobileHintTimer=setTimeout(dismissMobileHint,5200);
+            }
+          },140);
         },100);
       }
     };
@@ -2195,7 +2245,7 @@
 
     if(dragPointerId===event.pointerId){
       const dx=event.clientX-dragStartScreenX,dy=event.clientY-dragStartScreenY;
-      if(Math.hypot(dx,dy)>5)dragMoved=true;
+      if(Math.hypot(dx,dy)>(coarsePointer?9:5))dragMoved=true;
       if(screenToGround(event.clientX,event.clientY,dragCurrentWorld)){
         cameraPanTarget.x=dragPanStart.x+(dragStartWorld.x-dragCurrentWorld.x);
         cameraPanTarget.y=dragPanStart.y+(dragStartWorld.z-dragCurrentWorld.z);clampPan();
@@ -2216,6 +2266,7 @@
   function rendererEventSetup(){
     document.addEventListener("pointerdown",event=>{
       if(worldEntered && audioEnabled) ensureAudio();
+      if(mobile && event.target.closest("#threeContainer")) dismissMobileHint();
       if(!worldEntered||sectionModal.classList.contains("open"))return;
       if(event.target.closest("button,a,.district-directory,.section-sidebar,.mobile-menu-panel,.mobile-menu-toggle,.mobile-menu-backdrop,.city-minimap,.section-modal"))return;
       if(!event.target.closest("#threeContainer"))return;
@@ -2292,6 +2343,27 @@
     },{passive:true});
   }
 
+  if(sectionContent){
+    sectionContent.addEventListener("touchstart",event=>{
+      if(!mobile || event.touches.length!==1)return;
+      if(event.target.closest("button,a,input,.replay-track,.blueprint-flow"))return;
+      const touch=event.touches[0];
+      mobileSectionSwipeStart={x:touch.clientX,y:touch.clientY,time:performance.now()};
+    },{passive:true});
+    sectionContent.addEventListener("touchend",event=>{
+      if(!mobile || !mobileSectionSwipeStart || !sectionModal.classList.contains("open"))return;
+      const touch=event.changedTouches[0];
+      const dx=touch.clientX-mobileSectionSwipeStart.x;
+      const dy=touch.clientY-mobileSectionSwipeStart.y;
+      const elapsed=performance.now()-mobileSectionSwipeStart.time;
+      mobileSectionSwipeStart=null;
+      if(elapsed<700 && Math.abs(dx)>64 && Math.abs(dx)>Math.abs(dy)*1.35){
+        navigateItem(dx<0?1:-1);
+      }
+    },{passive:true});
+    sectionContent.addEventListener("touchcancel",()=>{mobileSectionSwipeStart=null},{passive:true});
+  }
+
   window.addEventListener("wheel",event=>{
     if(tourActive)stopGuidedTour();
     if(!worldEntered||sectionModal.classList.contains("open"))return;
@@ -2342,6 +2414,13 @@
   });
   mobileMenuClose?.addEventListener("click",event=>{event.stopPropagation();setMobileMenu(false)});
   mobileMenuBackdrop?.addEventListener("click",event=>{event.stopPropagation();setMobileMenu(false)});
+  document.querySelectorAll("[data-mobile-menu-tab]").forEach(button=>{
+    button.addEventListener("click",event=>{
+      event.stopPropagation();
+      setMobileMenuView(button.dataset.mobileMenuTab||"explore");
+      if(audioCtx?.state==="running")playClick();
+    });
+  });
 
   mobileSoundToggle?.addEventListener("click",async event=>{
     event.stopPropagation();
@@ -2436,7 +2515,7 @@
   window.addEventListener("orientationchange",()=>setTimeout(resizeRenderer,120),{passive:true});
   if(window.visualViewport) window.visualViewport.addEventListener("resize",resizeRenderer,{passive:true});
 
-  setMasterVolume(.88);updateExploredUi();syncMobileMenuUi();
+  setMasterVolume(.88);updateExploredUi();syncMobileMenuUi();setMobileMenuView("explore");
   initWorld();
   runLoadingSequence();
 })();
