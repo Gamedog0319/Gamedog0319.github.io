@@ -540,3 +540,180 @@ body.modal-open .section-modal input[type="range"]{
   .sound-dot{width:8px;height:8px}
   .section-modal{padding-bottom:74px}
 }
+
+/* ==========================================================
+   V5 — SHOWCASE POLISH
+========================================================== */
+.audio-control{
+  position:relative;
+  pointer-events:auto;
+}
+.volume-popover{
+  position:absolute;
+  top:calc(100% + 9px);
+  right:0;
+  width:210px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:9px;
+  padding:10px 11px;
+  border:1px solid rgba(37,61,87,.12);
+  border-radius:13px;
+  background:rgba(255,255,255,.96);
+  box-shadow:0 14px 36px rgba(54,82,112,.15);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(-5px) scale(.98);
+  transform-origin:top right;
+  transition:.16s ease;
+}
+.audio-control:hover .volume-popover,
+.audio-control:focus-within .volume-popover{
+  opacity:1;
+  visibility:visible;
+  transform:none;
+}
+.volume-popover span{
+  color:var(--muted-2);
+  font-size:.48rem;
+  font-weight:800;
+  letter-spacing:.12em;
+}
+.volume-popover strong{
+  min-width:34px;
+  text-align:right;
+  color:var(--text);
+  font-size:.54rem;
+}
+#volumeSlider{
+  width:100%;
+  accent-color:var(--red);
+  cursor:pointer;
+}
+.tour-button.is-active{
+  color:white;
+  border-color:#2f85ad;
+  background:#3b95ba;
+  box-shadow:0 8px 24px rgba(59,149,186,.2);
+}
+
+.section-sidebar-foot{
+  padding:10px 9px 7px;
+}
+.explored-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.section-sidebar-foot .explored-row strong{
+  margin:0;
+  color:var(--text);
+  font-size:.54rem;
+}
+.explored-track{
+  height:4px;
+  margin-top:7px;
+  overflow:hidden;
+  border-radius:999px;
+  background:rgba(37,61,87,.09);
+}
+.explored-track span{
+  display:block;
+  width:0;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,var(--red),#ff7d7d);
+  transition:width .35s ease;
+}
+.section-sidebar-foot small{
+  display:block;
+  margin-top:7px;
+  color:var(--muted-2);
+  font-size:.43rem;
+  font-weight:700;
+  letter-spacing:.07em;
+}
+.section-sidebar-item.is-visited .sidebar-index{
+  color:#2f9a67;
+}
+.section-sidebar-item.is-visited::before{
+  content:"✓";
+  position:absolute;
+  right:9px;
+  color:#2f9a67;
+  font-size:.55rem;
+  font-weight:900;
+}
+.section-sidebar-item.is-active::before,
+.section-sidebar-item.is-map-hover::before{
+  display:none;
+}
+
+/* Stronger, cleaner selected-district card */
+.district-hover-card{
+  border-color:rgba(232,62,69,.2);
+  box-shadow:0 18px 55px rgba(54,82,112,.18),0 0 0 1px rgba(255,255,255,.55) inset;
+}
+.hover-click-hint{
+  display:inline-flex;
+  margin-top:.62rem;
+  align-items:center;
+  gap:.4rem;
+}
+.hover-click-hint::before{
+  content:"";
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--red);
+  box-shadow:0 0 0 4px rgba(232,62,69,.09);
+  animation:v5Pulse 1.15s ease-in-out infinite;
+}
+@keyframes v5Pulse{50%{transform:scale(.65);opacity:.55}}
+
+/* Popup gets a subtle focus treatment and uses the native cursor. */
+body.modal-open .game-hud,
+body.modal-open .section-sidebar{
+  filter:saturate(.85);
+}
+body.modal-open .sound-button,
+body.modal-open .volume-popover,
+body.modal-open #volumeSlider{
+  cursor:pointer;
+}
+
+/* Soft animated skyline light streak for a little life without postprocessing. */
+#cityWorld::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:.15;
+  background:linear-gradient(112deg,transparent 35%,rgba(255,255,255,.26) 49%,transparent 61%);
+  transform:translateX(-80%);
+  animation:skySweep 18s linear infinite;
+  mix-blend-mode:soft-light;
+}
+@keyframes skySweep{to{transform:translateX(80%)}}
+
+@media (max-width:1040px){
+  .tour-button{display:none}
+}
+@media (max-width:820px){
+  .section-sidebar-item.is-visited::before{display:none}
+}
+@media (max-width:720px){
+  .volume-popover{
+    position:fixed;
+    top:68px;
+    right:8px;
+    width:190px;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  #cityWorld::after{animation:none}
+  .hover-click-hint::before{animation:none}
+}

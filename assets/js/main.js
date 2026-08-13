@@ -47,6 +47,12 @@
   const nextItem = $("nextItem");
   const soundToggle = $("soundToggle");
   const soundToggleLabel = $("soundToggleLabel");
+  const volumeSlider = $("volumeSlider");
+  const volumeValue = $("volumeValue");
+  const tourButton = $("tourButton");
+  const exploredCount = $("exploredCount");
+  const exploredFill = $("exploredFill");
+  const cityStatus = $("cityStatus");
   const sectionSidebar = $("sectionSidebar");
 
   /* =========================================================
@@ -64,6 +70,16 @@
   let bgmTimer = null;
   let bgmStep = 0;
   let ambienceOscillators = [];
+  let compressor = null;
+  let ambientNoiseSource = null;
+  let ambientNoiseGain = null;
+  let masterVolume = .88;
+
+  const visitedSections = new Set();
+  let tourActive = false;
+  let tourTimer = null;
+  let tourIndex = 0;
+  const tourOrder = ["about","featured","projects","experience","education","research","skills","contact"];
 
   function createAudioContext(){
     if(audioCtx) return audioCtx;
@@ -74,14 +90,22 @@
     masterGain = audioCtx.createGain();
     bgmGain = audioCtx.createGain();
     sfxGain = audioCtx.createGain();
+    compressor = audioCtx.createDynamicsCompressor();
 
-    masterGain.gain.value = audioEnabled ? .72 : 0;
-    bgmGain.gain.value = .22;
-    sfxGain.gain.value = .38;
+    masterGain.gain.value = audioEnabled ? masterVolume : 0;
+    bgmGain.gain.value = .38;
+    sfxGain.gain.value = .58;
+
+    compressor.threshold.value = -10;
+    compressor.knee.value = 18;
+    compressor.ratio.value = 3;
+    compressor.attack.value = .008;
+    compressor.release.value = .2;
 
     bgmGain.connect(masterGain);
     sfxGain.connect(masterGain);
-    masterGain.connect(audioCtx.destination);
+    masterGain.connect(compressor);
+    compressor.connect(audioCtx.destination);
     return audioCtx;
   }
 
@@ -106,16 +130,27 @@
     padFilter.Q.value=.3;
     padFilter.connect(bgmGain);
 
-    [110,164.81,220].forEach((freq,index)=>{
+    [82.41,110,164.81,220].forEach((freq,index)=>{
       const osc=audioCtx.createOscillator();
       const gain=audioCtx.createGain();
       osc.type=index===1?"triangle":"sine";
       osc.frequency.value=freq;
-      osc.detune.value=index===1?4:index===2?-5:0;
-      gain.gain.value=index===0?.032:.018;
+      osc.detune.value=index===2?4:index===3?-5:0;
+      gain.gain.value=index===0?.028:index===1?.035:.02;
       osc.connect(gain); gain.connect(padFilter); osc.start();
       ambienceOscillators.push({osc,gain});
     });
+
+    // Very quiet filtered city-air texture so the soundscape does not feel empty.
+    const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*2,audioCtx.sampleRate);
+    const channel=buffer.getChannelData(0);
+    for(let i=0;i<channel.length;i++) channel[i]=(Math.random()*2-1)*.18;
+    ambientNoiseSource=audioCtx.createBufferSource();
+    ambientNoiseSource.buffer=buffer;ambientNoiseSource.loop=true;
+    const noiseFilter=audioCtx.createBiquadFilter();
+    noiseFilter.type="lowpass";noiseFilter.frequency.value=430;
+    ambientNoiseGain=audioCtx.createGain();ambientNoiseGain.gain.value=.018;
+    ambientNoiseSource.connect(noiseFilter);noiseFilter.connect(ambientNoiseGain);ambientNoiseGain.connect(bgmGain);ambientNoiseSource.start();
 
     scheduleMusicPhrase();
     bgmTimer=window.setInterval(scheduleMusicPhrase,4200);
@@ -140,7 +175,7 @@
       filter.type="lowpass";
       filter.frequency.value=1700;
       gain.gain.setValueAtTime(.0001,now+i*.34);
-      gain.gain.exponentialRampToValueAtTime(.018,now+i*.34+.08);
+      gain.gain.exponentialRampToValueAtTime(.027,now+i*.34+.08);
       gain.gain.exponentialRampToValueAtTime(.0001,now+i*.34+1.15);
       osc.connect(filter); filter.connect(gain); gain.connect(bgmGain);
       osc.start(now+i*.34); osc.stop(now+i*.34+1.25);
@@ -165,13 +200,17 @@
     osc.start(now); osc.stop(now+duration+.02);
   }
 
-  function playClick(){ playTone(620,410,.055,.11,"triangle"); }
+  function playClick(){ playTone(650,390,.06,.16,"triangle"); }
   function playOpenSound(){
-    playTone(420,690,.085,.10,"sine");
-    window.setTimeout(()=>playTone(610,910,.09,.075,"sine"),42);
+    playTone(390,720,.095,.15,"sine");
+    window.setTimeout(()=>playTone(610,980,.11,.11,"triangle"),44);
   }
-  function playCloseSound(){ playTone(520,270,.09,.09,"triangle"); }
-  function playHoverTick(){ playTone(880,760,.035,.035,"sine"); }
+  function playCloseSound(){ playTone(540,250,.1,.13,"triangle"); }
+  function playHoverTick(){ playTone(930,790,.035,.052,"sine"); }
+  function playTourChime(){
+    playTone(520,780,.09,.09,"sine");
+    window.setTimeout(()=>playTone(780,1040,.12,.07,"sine"),70);
+  }
 
   async function setAudioEnabled(enabled){
     audioEnabled=enabled;
@@ -183,13 +222,79 @@
       await ensureAudio();
       if(masterGain && audioCtx){
         masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
-        masterGain.gain.setTargetAtTime(.72,audioCtx.currentTime,.04);
+        masterGain.gain.setTargetAtTime(masterVolume,audioCtx.currentTime,.04);
       }
       playClick();
     }else if(masterGain && audioCtx){
       masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
       masterGain.gain.setTargetAtTime(0,audioCtx.currentTime,.035);
     }
+  }
+
+  function setMasterVolume(value){
+    masterVolume=THREE.MathUtils.clamp(value,0,1);
+    if(volumeValue) volumeValue.textContent=`${Math.round(masterVolume*100)}%`;
+    if(masterGain&&audioCtx&&audioEnabled){
+      masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+      masterGain.gain.setTargetAtTime(masterVolume,audioCtx.currentTime,.035);
+    }
+  }
+
+  function duckMusic(ducked){
+    if(!bgmGain||!audioCtx)return;
+    bgmGain.gain.cancelScheduledValues(audioCtx.currentTime);
+    bgmGain.gain.setTargetAtTime(ducked?.25:.38,audioCtx.currentTime,.12);
+  }
+
+  function updateExploredUi(){
+    const count=visitedSections.size;
+    if(exploredCount) exploredCount.textContent=`${count} / ${tourOrder.length}`;
+    if(exploredFill) exploredFill.style.width=`${(count/tourOrder.length)*100}%`;
+    visitedSections.forEach(key=>document.querySelector(`.section-sidebar-item[data-open-section="${key}"]`)?.classList.add("is-visited"));
+    if(cityStatus){
+      cityStatus.textContent=count===tourOrder.length?"CITY COMPLETE // ALL DISTRICTS EXPLORED":`${count} / ${tourOrder.length} DISTRICTS EXPLORED`;
+    }
+  }
+
+  function getDistrictConfig(key){return districtConfigs.find(d=>d.key===key)||null}
+
+  function focusDistrict(key,zoom=1.13){
+    const cfg=getDistrictConfig(key);if(!cfg)return;
+    cameraPanTarget.x=THREE.MathUtils.clamp(cfg.x*.58,-15,15);
+    cameraPanTarget.y=THREE.MathUtils.clamp(cfg.z*.48,-10,10);
+    cameraZoomTarget=zoom;
+    clampPan();
+  }
+
+  function stopGuidedTour(){
+    if(!tourActive)return;
+    tourActive=false;
+    if(tourTimer){clearInterval(tourTimer);tourTimer=null}
+    tourButton?.classList.remove("is-active");tourButton?.setAttribute("aria-pressed","false");
+    if(tourButton)tourButton.textContent="GUIDED TOUR";
+  }
+
+  function tourStep(){
+    if(sectionModal.classList.contains("open")){stopGuidedTour();return}
+    const key=tourOrder[tourIndex%tourOrder.length];tourIndex++;
+    clearDistrictHover();
+    focusDistrict(key,1.08);
+    highlightDistrict(key,true);activeHoverKey=key;
+    const data=portfolioSections[key];
+    hoverIndex.textContent=data.cityIndex;hoverTitle.textContent=data.cityName;hoverDescription.textContent=data.cityDescription;
+    districtHoverCard.style.left="50%";districtHoverCard.style.top="96px";districtHoverCard.style.transform="translateX(-50%)";
+    districtHoverCard.classList.add("visible");districtHoverCard.setAttribute("aria-hidden","false");
+    document.querySelector(`.section-sidebar-item[data-open-section="${key}"]`)?.classList.add("is-map-hover");
+    playTourChime();
+  }
+
+  async function startGuidedTour(){
+    if(tourActive){stopGuidedTour();return}
+    await ensureAudio();
+    tourActive=true;tourIndex=0;
+    tourButton?.classList.add("is-active");tourButton?.setAttribute("aria-pressed","true");
+    if(tourButton)tourButton.textContent="STOP TOUR";
+    tourStep();tourTimer=setInterval(tourStep,3600);
   }
 
   const portfolioSections = {
@@ -1439,8 +1544,11 @@
 
   function openSection(key){
     const data=portfolioSections[key];if(!data)return;
+    stopGuidedTour();
     ensureAudio();
     playOpenSound();
+    focusDistrict(key,1.12);
+    visitedSections.add(key);updateExploredUi();duckMusic(true);
     currentSectionKey=key;currentItemIndex=0;modalSectionIndex.textContent=data.cityIndex;modalSectionTitle.textContent=data.panelTitle;modalSectionSubtitle.textContent=data.panelSubtitle;sliderLabel.textContent=data.panelTitle;
     sectionSlider.min=0;sectionSlider.max=Math.max(0,data.items.length-1);sectionSlider.value=0;sliderTotal.textContent=formatNumber(data.items.length);
     sectionModal.classList.add("open");sectionModal.setAttribute("aria-hidden","false");document.body.classList.add("modal-open");
@@ -1451,7 +1559,7 @@
 
   function closeSection(){
     if(!sectionModal.classList.contains("open"))return;
-    playCloseSound();
+    playCloseSound();duckMusic(false);
     sectionModal.classList.remove("open");sectionModal.setAttribute("aria-hidden","true");document.body.classList.remove("modal-open");
     document.querySelectorAll(".section-sidebar-item.is-active").forEach(el=>el.classList.remove("is-active"));
   }
@@ -1484,7 +1592,7 @@
     raycaster.setFromCamera(p,camera);return raycaster.ray.intersectPlane(dragPlane,target);
   }
 
-  function resetCamera(){cameraPanTarget.set(0,0);cameraZoomTarget=1;clampPan()}
+  function resetCamera(){stopGuidedTour();cameraPanTarget.set(0,0);cameraZoomTarget=1;clampPan()}
 
   function updateCamera(delta){
     // Mouse-only navigation: moving the pointer into the outer edge zones
@@ -1577,6 +1685,7 @@
   ========================================================= */
 
   window.addEventListener("pointermove",event=>{
+    if(tourActive && event.isTrusted) stopGuidedTour();
     customCursor.style.left=`${event.clientX}px`;customCursor.style.top=`${event.clientY}px`;
     latestPointerX=event.clientX;latestPointerY=event.clientY;
     pointerTarget.x=(event.clientX/window.innerWidth)*2-1;pointerTarget.y=-(event.clientY/window.innerHeight)*2+1;
@@ -1634,6 +1743,7 @@
   }
 
   window.addEventListener("wheel",event=>{
+    if(tourActive)stopGuidedTour();
     if(!worldEntered||sectionModal.classList.contains("open"))return;
     cameraZoomTarget=THREE.MathUtils.clamp(cameraZoomTarget-event.deltaY*.0007,.82,1.32);
   },{passive:true});
@@ -1658,6 +1768,14 @@
     });
   }
 
+  if(volumeSlider){
+    volumeSlider.addEventListener("input",async()=>{
+      if(!audioEnabled)await setAudioEnabled(true);
+      await ensureAudio();setMasterVolume(Number(volumeSlider.value)/100);
+    });
+  }
+  if(tourButton)tourButton.addEventListener("click",event=>{event.stopPropagation();startGuidedTour()});
+
   document.querySelectorAll(".section-sidebar-item").forEach(button=>{
     button.addEventListener("mouseenter",()=>{
       if(sectionModal.classList.contains("open"))return;
@@ -1665,6 +1783,7 @@
       if(activeHoverKey && activeHoverKey!==key)highlightDistrict(activeHoverKey,false);
       activeHoverKey=key;
       highlightDistrict(key,true);
+      focusDistrict(key,1.035);
       button.classList.add("is-map-hover");
       sectorReadout.textContent=portfolioSections[key]?.cityName||"CENTRAL";
       if(audioCtx?.state==="running")playHoverTick();
@@ -1697,6 +1816,7 @@
   });
   window.addEventListener("resize",resizeRenderer);
 
+  setMasterVolume(.88);updateExploredUi();
   initWorld();
   runLoadingSequence();
 })();

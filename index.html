@@ -51,10 +51,18 @@
     </div>
 
     <div class="hud-actions">
-      <button class="hud-button sound-button" id="soundToggle" type="button" aria-pressed="true" title="Toggle ambient music and interface sounds">
-        <span class="sound-dot"></span>
-        <span id="soundToggleLabel">SOUND ON</span>
-      </button>
+      <div class="audio-control" id="audioControl">
+        <button class="hud-button sound-button" id="soundToggle" type="button" aria-pressed="true" title="Toggle ambient music and interface sounds">
+          <span class="sound-dot"></span>
+          <span id="soundToggleLabel">SOUND ON</span>
+        </button>
+        <div class="volume-popover" aria-label="Audio volume">
+          <span>VOLUME</span>
+          <input id="volumeSlider" type="range" min="0" max="100" step="1" value="88" aria-label="Portfolio audio volume" />
+          <strong id="volumeValue">88%</strong>
+        </div>
+      </div>
+      <button class="hud-button tour-button" id="tourButton" type="button" aria-pressed="false" title="Start a guided city tour">GUIDED TOUR</button>
       <button class="hud-button" id="homeViewButton" type="button" title="Reset camera">HOME VIEW</button>
       <button class="hud-button hidden-directory-toggle" id="directoryToggle" type="button" aria-hidden="true" tabindex="-1">DISTRICTS</button>
       <a class="hud-button hud-button-primary"
@@ -79,8 +87,9 @@
       <button class="section-sidebar-item" type="button" data-open-section="contact"><span class="sidebar-index">08</span><span class="sidebar-name">Contact</span></button>
     </nav>
     <div class="section-sidebar-foot">
-      <span>HOVER MAP</span>
-      <strong>CLICK TO OPEN</strong>
+      <div class="explored-row"><span>EXPLORED</span><strong id="exploredCount">0 / 8</strong></div>
+      <div class="explored-track"><span id="exploredFill"></span></div>
+      <small>HOVER MAP • CLICK TO OPEN</small>
     </div>
   </aside>
 
@@ -150,9 +159,9 @@
   </section>
 
   <footer class="bottom-hud">
-    <div><span>NAVIGATION</span><strong>MOUSE ONLY • EDGE PAN • DRAG • WHEEL</strong></div>
-    <div class="bottom-hud-center">MOVE TO EDGE // HOVER DISTRICT // CLICK TO OPEN</div>
-    <div><span>MODE</span><strong>DAYLIGHT / OPTIMIZED</strong></div>
+    <div><span>NAVIGATION</span><strong>MOUSE • EDGE PAN • DRAG • WHEEL</strong></div>
+    <div class="bottom-hud-center" id="cityStatus">CITY ONLINE // EXPLORE AT YOUR OWN PACE</div>
+    <div><span>MODE</span><strong>DAYLIGHT / LIVE CITY</strong></div>
   </footer>
 
   <div class="custom-cursor" id="customCursor" aria-hidden="true"><span></span><span></span></div>
