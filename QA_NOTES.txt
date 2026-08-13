@@ -1,0 +1,12 @@
+V27 MOBILE FULL-SCREEN QA
+=========================
+- Desktop base layout/behavior retained from V26.
+- Mobile section modal explicitly fills 100vw x 100dvh/100vh.
+- Mobile section header, Back to Map, text, icons and Previous/Next controls enlarged.
+- Project/Featured media scales to screen width and is much taller.
+- Education/About images and Skills logo grids receive larger visual areas.
+- Experience/Research/Contact visual anchors enlarged.
+- Portrait uses a generous single-column layout.
+- Landscape phones/tablets use two-column media/text layouts where space allows.
+- Active section is exposed through sectionModal[data-section] for future targeted styling.
+- V27 query/cache version prevents stale V26 mobile.css from remaining active.

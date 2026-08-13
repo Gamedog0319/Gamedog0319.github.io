@@ -1,16 +1,16 @@
-/* Rithvik City service worker — fast repeat visits without stale HTML. */
-const CACHE_VERSION = "rithvik-city-v23";
+/* Rithvik City service worker — resilient repeat visits without stale HTML. */
+const CACHE_VERSION = "rithvik-city-v27";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./assets/css/style.css?v=23",
-  "./assets/css/mobile.css?v=23",
-  "./assets/js/modules/runtime.js?v=23",
-  "./assets/js/modules/world-boundaries.js?v=23",
-  "./assets/js/main.js?v=23",
+  "./assets/css/style.css?v=27",
+  "./assets/css/mobile.css?v=27",
+  "./assets/js/modules/runtime.js?v=27",
+  "./assets/js/modules/world-boundaries.js?v=27",
+  "./assets/js/main.js?v=27",
   "./favicon.png"
 ];
 
@@ -23,33 +23,41 @@ self.addEventListener("install", event => {
 });
 
 self.addEventListener("activate", event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(key => !key.startsWith(CACHE_VERSION)).map(key => caches.delete(key))))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => !key.startsWith(CACHE_VERSION)).map(key => caches.delete(key)));
+    if (self.registration.navigationPreload) {
+      try { await self.registration.navigationPreload.enable(); } catch (_error) {}
+    }
+    await self.clients.claim();
+  })());
 });
 
-async function networkFirst(request) {
+async function networkFirst(request, event) {
   const cache = await caches.open(STATIC_CACHE);
   try {
-    const response = await fetch(request);
-    if (response && response.ok) cache.put(request, response.clone());
+    const preload = event?.preloadResponse ? await event.preloadResponse : null;
+    const response = preload || await fetch(request);
+    if (response && response.ok) await cache.put(request, response.clone());
     return response;
   } catch (_error) {
-    return (await cache.match(request)) || (await cache.match("./index.html"));
+    return (await cache.match(request)) || (await cache.match("./index.html")) || Response.error();
   }
 }
 
 async function cacheFirst(request) {
   const cached = await caches.match(request);
   if (cached) return cached;
-  const response = await fetch(request);
-  if (response && (response.ok || response.type === "opaque")) {
-    const cache = await caches.open(RUNTIME_CACHE);
-    cache.put(request, response.clone());
+  try {
+    const response = await fetch(request);
+    if (response && (response.ok || response.type === "opaque")) {
+      const cache = await caches.open(RUNTIME_CACHE);
+      await cache.put(request, response.clone());
+    }
+    return response;
+  } catch (_error) {
+    return cached || Response.error();
   }
-  return response;
 }
 
 self.addEventListener("fetch", event => {
@@ -60,7 +68,7 @@ self.addEventListener("fetch", event => {
   if (url.origin !== self.location.origin) return;
 
   if (request.mode === "navigate" || request.destination === "document") {
-    event.respondWith(networkFirst(request));
+    event.respondWith(networkFirst(request, event));
     return;
   }
 
@@ -72,17 +80,19 @@ self.addEventListener("fetch", event => {
 self.addEventListener("message", event => {
   if (!event.data || event.data.type !== "WARM_CACHE" || !Array.isArray(event.data.urls)) return;
   const urls = [...new Set(event.data.urls)].filter(Boolean);
-  event.waitUntil(
-    caches.open(RUNTIME_CACHE).then(async cache => {
-      for (const url of urls) {
+  event.waitUntil((async () => {
+    const cache = await caches.open(RUNTIME_CACHE);
+    const batchSize = 4;
+    for (let i = 0; i < urls.length; i += batchSize) {
+      const batch = urls.slice(i, i + batchSize);
+      await Promise.allSettled(batch.map(async url => {
         try {
           const request = new Request(url, { credentials: "same-origin" });
-          const existing = await cache.match(request);
-          if (existing) continue;
+          if (await cache.match(request)) return;
           const response = await fetch(request);
           if (response && (response.ok || response.type === "opaque")) await cache.put(request, response.clone());
         } catch (_error) {}
-      }
-    })
-  );
+      }));
+    }
+  })());
 });

@@ -34,13 +34,18 @@
     const promise = new Promise(resolve => {
       const img = new Image();
       img.decoding = "async";
+      img.loading = "eager";
       img.fetchPriority = priority;
+      let settled = false;
 
       const complete = async ok => {
+        if (settled) return;
+        settled = true;
         if (ok && typeof img.decode === "function") {
           try { await img.decode(); } catch (_error) {}
         }
         if (ok && retain) retainedImages.set(src, img);
+        if (!ok) loadedImages.delete(src); // allow a later retry after a transient failure
         resolve(ok);
       };
 
@@ -91,7 +96,7 @@
   async function registerServiceWorker() {
     if (!("serviceWorker" in navigator) || location.protocol === "file:") return null;
     try {
-      const registration = await navigator.serviceWorker.register("./sw.js?v=23", { scope: "./" });
+      const registration = await navigator.serviceWorker.register("./sw.js?v=26", { scope: "./" });
       return registration;
     } catch (error) {
       console.warn("Service worker registration skipped", error);

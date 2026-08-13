@@ -760,18 +760,21 @@
       items:[
         {
           code:"ACADEMIC FILE // 001", symbol:"U", kicker:"CURRENT PROGRAM",
+          image:"./images/education/utah games.jpg", imageAlt:"University of Utah Games program",
           title:"Master of Entertainment Arts and Engineering",
           description:"Game Engineering at the University of Utah.",
           meta:[["INSTITUTION","University of Utah"],["PERIOD","August 2025 — Present"],["GPA","4.0 / 4.0"],["FOCUS","Game engineering, gameplay programming, machine learning and interactive systems."]]
         },
         {
           code:"ACADEMIC FILE // 002", symbol:"AI", kicker:"UNDERGRADUATE",
+          image:"./images/education/au.png", imageAlt:"Undergraduate university",
           title:"B.Tech in Computer Science and Engineering",
           description:"Undergraduate program specializing in Artificial Intelligence and Machine Learning.",
           meta:[["PROGRAM","Computer Science and Engineering — AIML"],["PERIOD","2021 — 2025"],["DOMAIN","Artificial Intelligence and Machine Learning"]]
         },
         {
           code:"ACADEMIC FILE // 003", symbol:"∞", kicker:"CORE AREAS",
+          image:"./images/education/ASU.jpg", imageAlt:"Academic learning and education",
           title:"Academic Focus",
           description:"The areas connecting my academic work to the games and interactive systems I build.",
           meta:[["01","Game Engineering"],["02","Machine Learning"],["03","Interactive Systems"],["04","Simulation and AI"]]
@@ -787,10 +790,10 @@
       panelSubtitle:"Technology used to build intelligent interactive systems",
       type:"skills",
       items:[
-        {symbol:"{ }",kicker:"MODULE 01",title:"Languages",description:"Programming languages used across gameplay systems, AI research, simulation and web development.",skills:["C++","C#","Python","Java","HTML","CSS"],usedIn:["Unreal gameplay and AI systems","Unity VR applications","Reinforcement-learning research","Interactive web systems"]},
-        {symbol:"3D",kicker:"MODULE 02",title:"Engines & Tools",description:"Primary environments used to build, test and ship game and simulation systems.",skills:["Unity","Unreal Engine","Blender","Arduino","Jupyter"],usedIn:["VR Neck Exoskeleton","Unreal Learning Agents","Howzzat!","ShopSim","Molecular Simulation"]},
-        {symbol:"AI",kicker:"MODULE 03",title:"Game AI / Machine Learning",description:"Learning and decision-making systems used to create adaptive agents and player-facing intelligence.",skills:["Reinforcement Learning","Deep Q Networks","Multi-Armed Bandits","Imitation Learning","Behavior Trees","AI Perception"],usedIn:["Minecraft assistive agents","VR controller personalization","Unreal adaptive NPCs","Game AI research"]},
-        {symbol:"XR",kicker:"MODULE 04",title:"VR / Simulation",description:"Interactive and hardware-linked technology for immersive simulation environments.",skills:["Virtual Reality","Mixed Reality","Simulation","Hardware Integration","Interaction Design"],usedIn:["VR Neck Exoskeleton","History Shop Sim","Molecular VR / AR Simulation"]}
+        {symbol:"{ }",kicker:"MODULE 01",title:"Languages",description:"Programming languages used across gameplay systems, AI research, simulation and web development.",visuals:[{src:"./images/cpp_logo.png",alt:"C++ logo",label:"C++",kind:"logo"},{src:"./images/csharp.png",alt:"C# logo",label:"C#",kind:"logo"},{src:"./images/java.jpg",alt:"Java logo",label:"Java",kind:"logo"}],skills:["C++","C#","Python","Java","HTML","CSS"],usedIn:["Unreal gameplay and AI systems","Unity VR applications","Reinforcement-learning research","Interactive web systems"]},
+        {symbol:"3D",kicker:"MODULE 02",title:"Engines & Tools",description:"Primary environments used to build, test and ship game and simulation systems.",visuals:[{src:"./images/unity.png",alt:"Unity logo",label:"Unity",kind:"logo"},{src:"./images/unreal.png",alt:"Unreal Engine logo",label:"Unreal",kind:"logo"},{src:"./images/arduino.png",alt:"Arduino logo",label:"Arduino",kind:"logo"}],skills:["Unity","Unreal Engine","Blender","Arduino","Jupyter"],usedIn:["VR Neck Exoskeleton","Unreal Learning Agents","Howzzat!","ShopSim","Molecular Simulation"]},
+        {symbol:"AI",kicker:"MODULE 03",title:"Game AI / Machine Learning",description:"Learning and decision-making systems used to create adaptive agents and player-facing intelligence.",visuals:[{src:"./images/minecraft.png",alt:"Minecraft reinforcement-learning project",label:"RL Agents",kind:"photo"},{src:"./images/unreal.png",alt:"Unreal Engine AI systems",label:"Unreal AI",kind:"logo"}],skills:["Reinforcement Learning","Deep Q Networks","Multi-Armed Bandits","Imitation Learning","Behavior Trees","AI Perception"],usedIn:["Minecraft assistive agents","VR controller personalization","Unreal adaptive NPCs","Game AI research"]},
+        {symbol:"XR",kicker:"MODULE 04",title:"VR / Simulation",description:"Interactive and hardware-linked technology for immersive simulation environments.",visuals:[{src:"./images/vr-neck.png",alt:"VR Neck Exoskeleton",label:"VR Hardware",kind:"photo"},{src:"./images/shopsim.jpg",alt:"VR history shop simulation",label:"VR Interaction",kind:"photo"},{src:"./images/molecular-sim.jpg",alt:"VR AR molecular simulation",label:"Simulation",kind:"photo"}],skills:["Virtual Reality","Mixed Reality","Simulation","Hardware Integration","Interaction Design"],usedIn:["VR Neck Exoskeleton","History Shop Sim","Molecular VR / AR Simulation"]}
       ]
     },
 
@@ -816,7 +819,7 @@
       panelSubtitle:"Rithvik Mandya // Gameplay • Game AI • VR",
       type:"about",
       items:[
-        {symbol:"RM",kicker:"IDENTITY // RM-0319",title:"Rithvik Mandya",description:"Gameplay programmer focused on building intelligent systems where AI is part of the player experience rather than something layered on top.",meta:[["LOCATION","Salt Lake City, Utah"],["FOCUS","Gameplay Programming, Game AI, VR and Simulation"],["CURRENT","Master of Entertainment Arts and Engineering — Game Engineering, University of Utah"]],tags:["Gameplay Programmer","Game AI","VR","Simulation"]},
+        {symbol:"RM",image:"./images/profile.jpeg",imageAlt:"Rithvik Mandya profile photo",kicker:"IDENTITY // RM-0319",title:"Rithvik Mandya",description:"Gameplay programmer focused on building intelligent systems where AI is part of the player experience rather than something layered on top.",meta:[["LOCATION","Salt Lake City, Utah"],["FOCUS","Gameplay Programming, Game AI, VR and Simulation"],["CURRENT","Master of Entertainment Arts and Engineering — Game Engineering, University of Utah"]],tags:["Gameplay Programmer","Game AI","VR","Simulation"]},
         {symbol:"AI",kicker:"CURRENT MISSION",title:"Intelligence Designed Into Play",description:"My work sits at the intersection of gameplay feel, autonomous behavior and immersive simulation. I am particularly interested in systems where intelligent behavior meaningfully changes how the player experiences the game.",meta:[["01","Gameplay systems and player-facing mechanics"],["02","Reinforcement learning and adaptive behavior"],["03","VR interaction and hardware-linked systems"],["04","Simulation environments for intelligent agents"]]},
         {symbol:"↗",kicker:"ACTIVE RESEARCH",title:"Currently Exploring",description:"Areas I am actively pushing through research and project development.",meta:[["01","Human-in-the-loop training"],["02","Adaptive VR control systems"],["03","Agentic gameplay behaviors"]]}
       ]
@@ -2317,6 +2320,7 @@
     // free to paint text/images immediately instead of showing a white shell.
     currentSectionKey=key;
     currentItemIndex=0;
+    if(sectionModal) sectionModal.dataset.section=key;
     modalSectionIndex.textContent=data.cityIndex;
     modalSectionTitle.textContent=data.panelTitle;
     modalSectionSubtitle.textContent=data.panelSubtitle;
@@ -2335,7 +2339,6 @@
       console.error("Section render failed",error);
       sectionContent.innerHTML=`<div class="mobile-render-error"><strong>Content failed to render.</strong><p>Please close this panel and try again.</p></div>`;
     }
-    if(mobile && sectionContent){void sectionContent.offsetHeight;}
     sectionModal.classList.add("open");
     sectionModal.setAttribute("aria-hidden","false");
     document.body.classList.add("modal-open");
@@ -2369,7 +2372,7 @@
     if(mobile){mobileUiFreeze=false;resetMobileInputState();}
     if(!sectionModal.classList.contains("open"))return;
     playCloseSound();duckMusic(false);
-    sectionModal.classList.remove("open");sectionModal.setAttribute("aria-hidden","true");document.body.classList.remove("modal-open");
+    sectionModal.classList.remove("open");sectionModal.setAttribute("aria-hidden","true");sectionModal.removeAttribute("data-section");document.body.classList.remove("modal-open");
     document.querySelectorAll(".section-sidebar-item.is-active,.mobile-section-item.is-active").forEach(el=>el.classList.remove("is-active"));
     syncMinimap(null);
     if(!mobile&&finalePending&&!finaleShown){finalePending=false;setTimeout(showCompletionFinale,380);}
@@ -2385,19 +2388,31 @@
 
   function buildShowcaseMarkup(item){
     const extras=getProjectExtras(item.title);
-    return `<div class="showcase-layout content-enter"><div class="showcase-media"><img src="${item.media}" alt="${item.mediaAlt}" loading="eager" decoding="async" fetchpriority="auto" /><div class="media-overlay"></div><span class="media-label">PROJECT VISUAL // MEDIA FEED</span><div class="media-tech-overlay"><span>LIVE CASE STUDY</span><strong>${extras.blueprint.length} SYSTEM NODES</strong></div></div><div class="showcase-copy"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}${renderTags(item.tags)}<div class="project-tool-actions"><button type="button" id="projectDemoButton">▶ RUN VISUAL DEMO</button><button type="button" id="projectReplayButton">↻ SYSTEM REPLAY</button><button type="button" id="projectBlueprintButton">⌘ BLUEPRINT</button><button type="button" id="projectWorldButton">◎ PROJECT INTO CITY</button><a class="archive-link" href="${item.link}" target="_blank" rel="noopener noreferrer">${item.linkLabel}</a></div>${renderEvidenceCards(extras)}</div></div>${renderVisualDemo(item,extras)}${renderReplay(extras)}${renderBlueprint(extras)}`;
+    return `<div class="showcase-layout content-enter"><div class="showcase-media"><img src="${item.media}" alt="${item.mediaAlt}" loading="eager" decoding="async" fetchpriority="auto" onerror="this.hidden=true;this.closest('.showcase-media')?.classList.add('image-error')" /><div class="showcase-media-fallback" aria-hidden="true"><span>PROJECT VISUAL</span><strong>${item.title}</strong></div><div class="media-overlay"></div><span class="media-label">PROJECT VISUAL // MEDIA FEED</span><div class="media-tech-overlay"><span>LIVE CASE STUDY</span><strong>${extras.blueprint.length} SYSTEM NODES</strong></div></div><div class="showcase-copy"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}${renderTags(item.tags)}<div class="project-tool-actions"><button type="button" id="projectDemoButton">▶ RUN VISUAL DEMO</button><button type="button" id="projectReplayButton">↻ SYSTEM REPLAY</button><button type="button" id="projectBlueprintButton">⌘ BLUEPRINT</button><button type="button" id="projectWorldButton">◎ PROJECT INTO CITY</button><a class="archive-link" href="${item.link}" target="_blank" rel="noopener noreferrer">${item.linkLabel}</a></div>${renderEvidenceCards(extras)}</div></div>${renderVisualDemo(item,extras)}${renderReplay(extras)}${renderBlueprint(extras)}`;
   }
 
   function buildExperienceMarkup(item){
     return `<div class="timeline-record content-enter"><div class="timeline-side"><span class="timeline-year">${item.year}</span><div class="timeline-period">${item.period}</div><div class="timeline-marker"></div></div><div class="record-main"><span class="record-company">${item.company}</span><h3>${item.title}</h3><span class="record-role">${item.period}</span><p class="content-description">${item.description}</p><ul class="record-points">${item.points.map(p=>`<li>${p}</li>`).join("")}</ul>${renderTags(item.tags)}</div></div>`;
   }
 
+  function renderVisualImage(item,{profile=false}={}){
+    if(!item?.image)return `<div class="visual-symbol">${item?.symbol||""}</div>`;
+    const profileClass=profile?" is-profile":"";
+    return `<div class="visual-image-wrap${profileClass}"><img class="visual-card-image" src="${item.image}" alt="${item.imageAlt||item.title||"Portfolio visual"}" loading="eager" decoding="async" fetchpriority="auto" onerror="this.hidden=true;this.nextElementSibling.hidden=false" /><div class="visual-symbol visual-fallback" hidden>${item.symbol||"•"}</div></div>`;
+  }
+
+  function renderSkillVisuals(item){
+    if(!item?.visuals?.length)return `<div class="visual-symbol">${item?.symbol||""}</div>`;
+    const count=Math.max(1,Math.min(4,item.visuals.length));
+    return `<div class="skill-logo-grid count-${count}">${item.visuals.map(asset=>`<figure class="skill-logo-tile is-${asset.kind||"logo"}"><div class="skill-logo-media"><img src="${asset.src}" alt="${asset.alt||asset.label||"Skill visual"}" loading="eager" decoding="async" fetchpriority="auto" onerror="this.closest('figure')?.classList.add('image-error')" /></div><figcaption>${asset.label||""}</figcaption></figure>`).join("")}</div>`;
+  }
+
   function buildEducationMarkup(item){
-    return `<div class="education-record content-enter"><div class="visual-card"><span class="visual-card-code">${item.code}</span><div class="visual-symbol">${item.symbol}</div></div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}</div></div>`;
+    return `<div class="education-record content-enter"><div class="visual-card education-visual"><span class="visual-card-code">${item.code}</span>${renderVisualImage(item)}</div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}</div></div>`;
   }
 
   function buildSkillsMarkup(item){
-    return `<div class="skill-record content-enter"><div class="visual-card"><div class="visual-symbol">${item.symbol}</div></div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p><div class="skill-list">${item.skills.map(s=>`<span class="skill-pill">${s}</span>`).join("")}</div><div class="used-in"><span>USED IN</span><div class="used-projects">${item.usedIn.map(p=>`<div class="used-project">${p}</div>`).join("")}</div></div></div></div>`;
+    return `<div class="skill-record content-enter"><div class="visual-card skills-visual">${renderSkillVisuals(item)}</div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p><div class="skill-list">${item.skills.map(s=>`<span class="skill-pill">${s}</span>`).join("")}</div><div class="used-in"><span>USED IN</span><div class="used-projects">${item.usedIn.map(p=>`<div class="used-project">${p}</div>`).join("")}</div></div></div></div>`;
   }
 
   function buildResearchMarkup(item){
@@ -2405,12 +2420,12 @@
   }
 
   function buildAboutMarkup(item){
-    return `<div class="about-record content-enter"><div class="visual-card"><div class="visual-symbol">${item.symbol}</div></div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${item.meta?renderMeta(item.meta):""}${item.tags?renderTags(item.tags):""}</div></div>`;
+    return `<div class="about-record content-enter"><div class="visual-card about-visual">${renderVisualImage(item,{profile:!!item.image})}</div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${item.meta?renderMeta(item.meta):""}${item.tags?renderTags(item.tags):""}</div></div>`;
   }
 
   function buildContactMarkup(item){
     const target=item.link.startsWith("mailto:")?"":'target="_blank" rel="noopener noreferrer"';
-    return `<div class="contact-record content-enter"><div class="contact-inner"><div class="contact-signal">${item.icon}</div><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p><div class="contact-value">${item.value}</div><a class="archive-link" href="${item.link}" ${target}>${item.button}</a></div></div>`;
+    return `<div class="contact-record content-enter"><div class="contact-inner"><div class="contact-signal" aria-hidden="true">${item.icon}</div><div class="contact-copy"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p></div><div class="contact-value" title="${item.value}">${item.value}</div><div class="contact-actions"><a class="archive-link contact-cta" href="${item.link}" ${target}>${item.button}</a></div></div></div>`;
   }
 
   function buildItemMarkup(sectionKey,index){
@@ -2478,7 +2493,7 @@
     if(item.demoVideo){
       return `<div class="project-tool-panel demo-panel" id="projectDemoPanel" hidden><div class="tool-panel-head"><div><span>PROJECT DEMO</span><strong>Running software</strong></div><span class="demo-state" id="demoState">READY</span></div><video class="project-demo-video" id="projectDemoVideo" muted playsinline preload="metadata" poster="${item.media}"><source src="${item.demoVideo}" type="video/mp4" /></video></div>`;
     }
-    return `<div class="project-tool-panel demo-panel" id="projectDemoPanel" hidden><div class="tool-panel-head"><div><span>VISUAL DEMO</span><strong>Animated system walkthrough</strong></div><span class="demo-state" id="demoState">READY</span></div><div class="demo-stage"><img src="${item.media}" alt="${item.mediaAlt}" loading="${mobile?"eager":"lazy"}" decoding="async" fetchpriority="${mobile?"high":"auto"}" /><div class="demo-scanline"></div><div class="demo-node-layer">${extras.replay.slice(0,6).map((step,index)=>`<span class="demo-node" data-demo-step="${index}"><b>${String(index+1).padStart(2,"0")}</b>${step}</span>`).join("")}</div><div class="demo-reticle" aria-hidden="true"></div></div><p class="demo-note">Animated system visualization. Add a real MP4/WebM to <code>demoVideo</code> for this project and the player will use it automatically.</p></div>`;
+    return `<div class="project-tool-panel demo-panel" id="projectDemoPanel" hidden><div class="tool-panel-head"><div><span>VISUAL DEMO</span><strong>Animated system walkthrough</strong></div><span class="demo-state" id="demoState">READY</span></div><div class="demo-stage"><img src="${item.media}" alt="${item.mediaAlt}" loading="${mobile?"eager":"lazy"}" decoding="async" fetchpriority="${mobile?"high":"auto"}" onerror="this.hidden=true;this.closest('.demo-stage')?.classList.add('image-error')" /><div class="demo-scanline"></div><div class="demo-node-layer">${extras.replay.slice(0,6).map((step,index)=>`<span class="demo-node" data-demo-step="${index}"><b>${String(index+1).padStart(2,"0")}</b>${step}</span>`).join("")}</div><div class="demo-reticle" aria-hidden="true"></div></div><p class="demo-note">Animated system visualization. Add a real MP4/WebM to <code>demoVideo</code> for this project and the player will use it automatically.</p></div>`;
   }
 
   function startProjectDemo(item,extras){
@@ -2540,19 +2555,6 @@
     worldButton?.addEventListener("click",()=>{stopProjectReplay();stopProjectDemo();launchProjectWorldBlueprint(item,extras)});
   }
 
-  function renderShowcase(item){
-    stopProjectReplay();stopProjectDemo();
-    const extras=getProjectExtras(item.title);
-    sectionContent.innerHTML=`<div class="showcase-layout content-enter"><div class="showcase-media"><img src="${item.media}" alt="${item.mediaAlt}" loading="${mobile?"eager":"lazy"}" decoding="async" fetchpriority="${mobile?"high":"auto"}" /><div class="media-overlay"></div><span class="media-label">PROJECT VISUAL // MEDIA FEED</span><div class="media-tech-overlay"><span>LIVE CASE STUDY</span><strong>${extras.blueprint.length} SYSTEM NODES</strong></div></div><div class="showcase-copy"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}${renderTags(item.tags)}<div class="project-tool-actions"><button type="button" id="projectDemoButton">▶ RUN VISUAL DEMO</button><button type="button" id="projectReplayButton">↻ SYSTEM REPLAY</button><button type="button" id="projectBlueprintButton">⌘ BLUEPRINT</button><button type="button" id="projectWorldButton">◎ PROJECT INTO CITY</button><a class="archive-link" href="${item.link}" target="_blank" rel="noopener noreferrer">${item.linkLabel}</a></div>${renderEvidenceCards(extras)}</div></div>${renderVisualDemo(item,extras)}${renderReplay(extras)}${renderBlueprint(extras)}`;
-    bindProjectTools(item);
-  }
-
-  function renderExperience(item){sectionContent.innerHTML=`<div class="timeline-record content-enter"><div class="timeline-side"><span class="timeline-year">${item.year}</span><div class="timeline-period">${item.period}</div><div class="timeline-marker"></div></div><div class="record-main"><span class="record-company">${item.company}</span><h3>${item.title}</h3><span class="record-role">${item.period}</span><p class="content-description">${item.description}</p><ul class="record-points">${item.points.map(p=>`<li>${p}</li>`).join("")}</ul>${renderTags(item.tags)}</div></div>`}
-  function renderEducation(item){sectionContent.innerHTML=`<div class="education-record content-enter"><div class="visual-card"><span class="visual-card-code">${item.code}</span><div class="visual-symbol">${item.symbol}</div></div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}</div></div>`}
-  function renderSkills(item){sectionContent.innerHTML=`<div class="skill-record content-enter"><div class="visual-card"><div class="visual-symbol">${item.symbol}</div></div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p><div class="skill-list">${item.skills.map(s=>`<span class="skill-pill">${s}</span>`).join("")}</div><div class="used-in"><span>USED IN</span><div class="used-projects">${item.usedIn.map(p=>`<div class="used-project">${p}</div>`).join("")}</div></div></div></div>`}
-  function renderResearch(item){sectionContent.innerHTML=`<div class="research-record content-enter"><div class="research-file-number">${item.number}</div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p><div class="research-citation">${item.citation}</div>${renderTags(item.tags)}</div></div>`}
-  function renderAbout(item){sectionContent.innerHTML=`<div class="about-record content-enter"><div class="visual-card"><div class="visual-symbol">${item.symbol}</div></div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${item.meta?renderMeta(item.meta):""}${item.tags?renderTags(item.tags):""}</div></div>`}
-  function renderContact(item){const target=item.link.startsWith("mailto:")?"":'target="_blank" rel="noopener noreferrer"';sectionContent.innerHTML=`<div class="contact-record content-enter"><div class="contact-inner"><div class="contact-signal">${item.icon}</div><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p><div class="contact-value">${item.value}</div><a class="archive-link" href="${item.link}" ${target}>${item.button}</a></div></div>`}
   function renderMeta(meta=[]){return `<div class="content-meta">${meta.map(row=>`<div class="meta-row"><span>${row[0]}</span><strong>${row[1]}</strong></div>`).join("")}</div>`}
   function renderTags(tags=[]){return `<div class="tag-list">${tags.map(tag=>`<span>${tag}</span>`).join("")}</div>`}
 
@@ -2732,6 +2734,8 @@
     const videos=[];
     Object.values(portfolioSections).forEach(section=>section.items?.forEach(item=>{
       if(item.media)images.push(item.media);
+      if(item.image)images.push(item.image);
+      if(Array.isArray(item.visuals))item.visuals.forEach(asset=>asset?.src&&images.push(asset.src));
       if(item.demoVideo)videos.push(item.demoVideo);
     }));
     return {
@@ -2744,11 +2748,11 @@
     const media=collectPortfolioMedia();
     return [
       "./index.html",
-      "./assets/css/style.css?v=23",
-      "./assets/css/mobile.css?v=23",
-      "./assets/js/modules/runtime.js?v=23",
-      "./assets/js/modules/world-boundaries.js?v=23",
-      "./assets/js/main.js?v=23",
+      "./assets/css/style.css?v=27",
+      "./assets/css/mobile.css?v=27",
+      "./assets/js/modules/runtime.js?v=27",
+      "./assets/js/modules/world-boundaries.js?v=27",
+      "./assets/js/main.js?v=27",
       "./favicon.png",
       ...media.images,
       ...media.videos
@@ -2758,8 +2762,16 @@
   function warmPrioritySection(sectionKey){
     if(!portfolioSections[sectionKey])return;
     warmSectionMarkup(sectionKey);
-    const images=portfolioSections[sectionKey].items.map(item=>item.media).filter(Boolean);
-    if(images.length)Runtime.preloadImages(images,{batchSize:1,retain:true,priority:"high",idleTimeout:80}).catch(()=>{});
+    // Hover/focus warming should never flood the network. Warm only the first
+    // couple of likely visuals; the staged background preloader handles the rest.
+    const images=[];
+    portfolioSections[sectionKey].items.forEach(item=>{
+      if(item.media)images.push(item.media);
+      else if(item.image)images.push(item.image);
+      else if(Array.isArray(item.visuals) && item.visuals[0]?.src)images.push(item.visuals[0].src);
+    });
+    const priorityImages=[...new Set(images)].slice(0,2);
+    if(priorityImages.length)Runtime.preloadImages(priorityImages,{batchSize:1,retain:true,priority:"low",idleTimeout:120}).catch(()=>{});
   }
 
   function startPortfolioWarmup(){
@@ -2773,7 +2785,9 @@
     const firstImages=[
       portfolioSections.projects?.items?.[0]?.media,
       portfolioSections.projects?.items?.[1]?.media,
-      portfolioSections.featured?.items?.[0]?.media
+      portfolioSections.featured?.items?.[0]?.media,
+      portfolioSections.about?.items?.[0]?.image,
+      portfolioSections.education?.items?.[0]?.image
     ].filter(Boolean);
     const remainingImages=media.images.filter(url=>!firstImages.includes(url));
     const swRegistrationPromise=Runtime.registerServiceWorker();
@@ -3099,14 +3113,6 @@
   });
   mobileMenuClose?.addEventListener("click",event=>{event.stopPropagation();setMobileMenu(false)});
   mobileMenuBackdrop?.addEventListener("click",event=>{event.stopPropagation();setMobileMenu(false)});
-  document.querySelectorAll("[data-mobile-menu-tab]").forEach(button=>{
-    button.addEventListener("click",event=>{
-      event.stopPropagation();
-      setMobileMenuView(button.dataset.mobileMenuTab||"explore");
-      if(audioCtx?.state==="running")playClick();
-    });
-  });
-
   mobileSoundToggle?.addEventListener("click",async event=>{
     event.stopPropagation();
     await setAudioEnabled(!audioEnabled);
