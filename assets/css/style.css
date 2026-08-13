@@ -48,6 +48,7 @@ img{display:block;max-width:100%}
   background:linear-gradient(180deg,rgba(255,255,255,.14),transparent 36%);
 }
 .sun-glare{
+  filter:blur(.3px);
   position:absolute;
   width:420px;
   height:420px;
@@ -225,4 +226,24 @@ img{display:block;max-width:100%}
 }
 @media (pointer:coarse){
   .explore-hint p{font-size:.72rem}
+}
+
+.loading-logo.welcome-only{
+  display:block;
+  letter-spacing:-.06em;
+  line-height:.9;
+}
+.loading-logo.welcome-only span{
+  display:block;
+  color:#142333;
+  -webkit-text-stroke:0;
+}
+.sky-wash{
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.06) 24%,transparent 48%);
+}
+.atmosphere-haze{
+  background:linear-gradient(180deg,rgba(255,255,255,.05) 0%,transparent 56%,rgba(255,255,255,.28) 100%);
+}
+.city-vignette{
+  background:radial-gradient(circle at center,transparent 50%,rgba(69,107,145,.06) 80%,rgba(69,107,145,.12) 100%);
 }

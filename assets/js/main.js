@@ -330,14 +330,14 @@
   };
 
   const districtConfigs = [
-    {key:"projects",x:0,z:0,width:23,depth:18,accent:COLORS.accent},
-    {key:"featured",x:-28,z:-1,width:19,depth:17,accent:0xd76b69},
-    {key:"experience",x:28,z:-1,width:19,depth:18,accent:0x5aa7bd},
-    {key:"education",x:0,z:25,width:22,depth:15,accent:0x7a93c9},
-    {key:"research",x:-28,z:24,width:19,depth:16,accent:0x9277bd},
-    {key:"skills",x:28,z:24,width:19,depth:16,accent:0x4c9b82},
-    {key:"about",x:-16,z:-25,width:21,depth:15,accent:COLORS.accent},
-    {key:"contact",x:17,z:-25,width:21,depth:15,accent:0xd8824f}
+    {key:"projects",x:0,z:0,width:21,depth:16,accent:COLORS.accent},
+    {key:"featured",x:-24,z:-1,width:17,depth:15,accent:0xd76b69},
+    {key:"experience",x:24,z:-1,width:17,depth:16,accent:0x5aa7bd},
+    {key:"education",x:0,z:21,width:20,depth:14,accent:0x7a93c9},
+    {key:"research",x:-24,z:21,width:17,depth:14,accent:0x9277bd},
+    {key:"skills",x:24,z:21,width:17,depth:14,accent:0x4c9b82},
+    {key:"about",x:-14,z:-21,width:19,depth:14,accent:COLORS.accent},
+    {key:"contact",x:14,z:-21,width:19,depth:14,accent:0xd8824f}
   ];
 
   const mobile = window.matchMedia("(max-width: 720px)").matches;
@@ -382,7 +382,7 @@
   let cameraZoom = 1;
   const cameraPan = new THREE.Vector2(0,0);
   const cameraPanTarget = new THREE.Vector2(0,0);
-  const baseCamera = new THREE.Vector3(54,63,58);
+  const baseCamera = new THREE.Vector3(48,72,52);
   const dragPlane = new THREE.Plane(new THREE.Vector3(0,1,0),0);
   const dragStartWorld = new THREE.Vector3();
   const dragCurrentWorld = new THREE.Vector3();
@@ -407,8 +407,8 @@
   let personBodyMesh, personHeadMesh;
 
   function clampPan(){
-    cameraPanTarget.x = THREE.MathUtils.clamp(cameraPanTarget.x,-18,18);
-    cameraPanTarget.y = THREE.MathUtils.clamp(cameraPanTarget.y,-13,13);
+    cameraPanTarget.x = THREE.MathUtils.clamp(cameraPanTarget.x,-15,15);
+    cameraPanTarget.y = THREE.MathUtils.clamp(cameraPanTarget.y,-10,10);
   }
 
   function makeSharedAssets(){
@@ -437,7 +437,7 @@
   function initWorld(){
     scene = new THREE.Scene();
     scene.background = new THREE.Color(COLORS.sky);
-    scene.fog = new THREE.Fog(COLORS.fog,82,170);
+    scene.fog = new THREE.Fog(COLORS.fog,78,156);
 
     camera = new THREE.OrthographicCamera(-50,50,40,-40,.1,300);
     camera.position.copy(baseCamera);
@@ -469,6 +469,7 @@
     createPedestrians();
     createAmbientLife();
     createPublicSpaces();
+    createEnvironmentDesign();
     resizeRenderer();
     animate();
   }
@@ -510,13 +511,13 @@
   ========================================================= */
 
   function createTerrain(){
-    const outer = new THREE.Mesh(new THREE.PlaneGeometry(190,155),shared.grassDark);
+    const outer = new THREE.Mesh(new THREE.PlaneGeometry(176,142),shared.grassDark);
     outer.rotation.x=-Math.PI/2;outer.position.y=-.07;scene.add(outer);
 
-    const city = new THREE.Mesh(new THREE.BoxGeometry(110,.42,82),new THREE.MeshStandardMaterial({color:0xbcb9ae,roughness:.96}));
+    const city = new THREE.Mesh(new THREE.BoxGeometry(104,.42,78),new THREE.MeshStandardMaterial({color:0xbcb9ae,roughness:.96}));
     city.position.y=-.23;city.receiveShadow=true;scene.add(city);
 
-    const turf = new THREE.Mesh(new THREE.PlaneGeometry(108,80),shared.grass);
+    const turf = new THREE.Mesh(new THREE.PlaneGeometry(101,74),shared.grass);
     turf.rotation.x=-Math.PI/2;turf.position.y=.001;turf.receiveShadow=true;scene.add(turf);
   }
 
@@ -881,41 +882,7 @@
   }
 
   function createSignboard(text,{x=0,y=0,z=0,width=3.6,height=.8,color=COLORS.accent,rotationY=Math.PI/4}={}){
-    const group=new THREE.Group();
-    group.position.set(x,y,z);
-    group.rotation.y=rotationY;
-
-    const backing=new THREE.Mesh(
-      new THREE.BoxGeometry(width+.14,height+.12,.10),
-      new THREE.MeshStandardMaterial({color:0x24313b,roughness:.48,metalness:.28})
-    );
-    backing.position.y=.18;
-    group.add(backing);
-
-    const poleMat=shared.metal || new THREE.MeshStandardMaterial({color:0x7c858a,roughness:.45,metalness:.5});
-    [-width*.31,width*.31].forEach(px=>{
-      const pole=new THREE.Mesh(new THREE.BoxGeometry(.07,.75,.07),poleMat);
-      pole.position.set(px,-.28,0);
-      group.add(pole);
-    });
-
-    const canvas=document.createElement("canvas");
-    canvas.width=768;canvas.height=192;
-    const ctx=canvas.getContext("2d");
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle="rgba(22, 31, 39, 0.98)";
-    roundRect(ctx,8,8,752,176,28);ctx.fill();
-    ctx.strokeStyle=`#${new THREE.Color(color).getHexString()}`;ctx.lineWidth=10;
-    roundRect(ctx,14,14,740,164,24);ctx.stroke();
-    ctx.fillStyle="#ffffff";
-    const fontSize=text.length>15?46:text.length>10?52:58;
-    ctx.font=`800 ${fontSize}px Inter, Arial, sans-serif`;
-    ctx.textAlign="center";ctx.textBaseline="middle";
-    ctx.fillText(text,384,96,700);
-    const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;tex.minFilter=THREE.LinearFilter;tex.generateMipmaps=false;
-    const board=new THREE.Mesh(new THREE.PlaneGeometry(width,height),new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide}));
-    board.position.set(0,.18,.056);group.add(board);
-    return group;
+    return new THREE.Group();
   }
 
   function roundRect(ctx,x,y,w,h,r){
@@ -1097,18 +1064,93 @@
   ========================================================= */
 
   function createPublicSpaces(){
-    const plaza=new THREE.Mesh(new THREE.CylinderGeometry(5.2,5.2,.13,32),new THREE.MeshStandardMaterial({color:0xd9d5ca,roughness:.9}));
+    const plaza=new THREE.Mesh(new THREE.CylinderGeometry(5.8,5.8,.13,32),new THREE.MeshStandardMaterial({color:0xd9d5ca,roughness:.9}));
     plaza.position.set(0,.08,-34);scene.add(plaza);
-    const basin=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.4,.5,28),new THREE.MeshStandardMaterial({color:0xb4b1aa,roughness:.75}));basin.position.set(0,.34,-34);scene.add(basin);
-    const water=new THREE.Mesh(new THREE.CylinderGeometry(1.95,1.95,.08,28),shared.water);water.position.set(0,.62,-34);scene.add(water);
+    const basin=new THREE.Mesh(new THREE.CylinderGeometry(2.45,2.65,.56,28),new THREE.MeshStandardMaterial({color:0xb4b1aa,roughness:.75}));basin.position.set(0,.34,-34);scene.add(basin);
+    const water=new THREE.Mesh(new THREE.CylinderGeometry(2.12,2.12,.08,28),shared.water);water.position.set(0,.62,-34);scene.add(water);
     animatedElements.push({object:water,type:"water",baseY:.62});
 
-    const lightPositions=[[-5,-5],[5,-5],[-5,5],[5,5],[-32,-5],[-22,-5],[22,-5],[32,-5]];
+    const lightPositions=[[-5,-5],[5,-5],[-5,5],[5,5],[-32,-5],[-22,-5],[22,-5],[32,-5],[-32,5],[-22,5],[22,5],[32,5]];
     lightPositions.forEach(([x,z],i)=>{
       const pole=new THREE.Mesh(new THREE.CylinderGeometry(.06,.08,3.1,6),shared.dark);pole.position.set(x,1.55,z);scene.add(pole);
       const box=new THREE.Mesh(new THREE.BoxGeometry(.28,.7,.22),new THREE.MeshLambertMaterial({color:0x303436}));box.position.set(x,2.7,z);scene.add(box);
       const signal=new THREE.Mesh(new THREE.SphereGeometry(.07,6,6),new THREE.MeshBasicMaterial({color:i%3===0?0xe84b45:0x55a76a}));signal.position.set(x,2.82,z+.12);scene.add(signal);
     });
+  }
+
+  function createEnvironmentDesign(){
+    const pavedMat = new THREE.MeshStandardMaterial({color:0xe4ddd1,roughness:.95});
+    const hedgeMat = new THREE.MeshLambertMaterial({color:0x6a9756});
+    const flowerPalette=[0xe9829b,0xffce68,0x7fa7d9,0xf6f0da];
+
+    // Reflecting pool near the northern academic districts
+    const poolBorder = new THREE.Mesh(new THREE.BoxGeometry(14,.32,5.8), new THREE.MeshStandardMaterial({color:0xc7c1b7,roughness:.88}));
+    poolBorder.position.set(0,.16,35.5); poolBorder.receiveShadow=true; scene.add(poolBorder);
+    const poolWater = new THREE.Mesh(new THREE.PlaneGeometry(13.1,4.9), shared.water);
+    poolWater.rotation.x=-Math.PI/2; poolWater.position.set(0,.34,35.5); scene.add(poolWater);
+    animatedElements.push({object:poolWater,type:"water",baseY:.34});
+
+    // Pocket parks around the city to soften the layout
+    createPocketPark(-43,-26,10,8);
+    createPocketPark(43,-26,10,8);
+    createPocketPark(-43,26,10,8);
+    createPocketPark(43,26,10,8);
+
+    // Courtyard gardens closer to the center
+    createPocketGarden(-13,34,7.5,5.2);
+    createPocketGarden(13,34,7.5,5.2);
+    createPocketGarden(-13,-34,7.5,5.2);
+    createPocketGarden(13,-34,7.5,5.2);
+
+    // Decorative promenade ring around the fountain plaza
+    const ring = new THREE.Mesh(new THREE.RingGeometry(6.6,8.7,48), pavedMat);
+    ring.rotation.x=-Math.PI/2; ring.position.set(0,.081,-34); scene.add(ring);
+    for(let i=0;i<8;i++){
+      const a=(i/8)*Math.PI*2;
+      const px=Math.cos(a)*7.65;
+      const pz=-34+Math.sin(a)*7.65;
+      const planter = new THREE.Mesh(new THREE.CylinderGeometry(.45,.52,.28,10), new THREE.MeshLambertMaterial({color:0xb18a65}));
+      planter.position.set(px,.18,pz); scene.add(planter);
+      const shrub = new THREE.Mesh(new THREE.SphereGeometry(.52,10,8), hedgeMat);
+      shrub.position.set(px,.58,pz); scene.add(shrub);
+    }
+
+    // Median landscaping strips
+    createFlatRect(0,14,8.4,1.1,new THREE.MeshLambertMaterial({color:0x7baa67}),.082);
+    createFlatRect(0,-14,8.4,1.1,new THREE.MeshLambertMaterial({color:0x7baa67}),.082);
+    addFlowerBed(0,14,7,8,flowerPalette);
+    addFlowerBed(0,-14,7,8,flowerPalette);
+
+    function createPocketPark(x,z,w,d){
+      const base = new THREE.Mesh(new THREE.BoxGeometry(w,.18,d), pavedMat);
+      base.position.set(x,.09,z); scene.add(base);
+      const lawn = new THREE.Mesh(new THREE.PlaneGeometry(w-1.2,d-1.2), new THREE.MeshLambertMaterial({color:0x7dab65}));
+      lawn.rotation.x=-Math.PI/2; lawn.position.set(x,.19,z); scene.add(lawn);
+      const pathH = new THREE.Mesh(new THREE.PlaneGeometry(w-1.2,.55), new THREE.MeshBasicMaterial({color:0xece5d8}));
+      pathH.rotation.x=-Math.PI/2; pathH.position.set(x,.195,z); scene.add(pathH);
+      const pathV = new THREE.Mesh(new THREE.PlaneGeometry(.55,d-1.2), new THREE.MeshBasicMaterial({color:0xece5d8}));
+      pathV.rotation.x=-Math.PI/2; pathV.position.set(x,.196,z); scene.add(pathV);
+      addFlowerBed(x,z,6,12,flowerPalette);
+    }
+
+    function createPocketGarden(x,z,w,d){
+      const pad = new THREE.Mesh(new THREE.BoxGeometry(w,.16,d), pavedMat);
+      pad.position.set(x,.08,z); scene.add(pad);
+      const green = new THREE.Mesh(new THREE.PlaneGeometry(w-.8,d-.8), new THREE.MeshLambertMaterial({color:0x85b66a}));
+      green.rotation.x=-Math.PI/2; green.position.set(x,.17,z); scene.add(green);
+      const circle = new THREE.Mesh(new THREE.CircleGeometry(.95,18), new THREE.MeshLambertMaterial({color:0x6f9650}));
+      circle.rotation.x=-Math.PI/2; circle.position.set(x,.18,z); scene.add(circle);
+      addFlowerBed(x,z,4,6,flowerPalette);
+    }
+
+    function addFlowerBed(x,z,count,spread,palette){
+      for(let i=0;i<count;i++){
+        const px = x + (((i*37)%100)/100-.5)*spread;
+        const pz = z + (((i*53)%100)/100-.5)*spread*.6;
+        const flower = new THREE.Mesh(new THREE.CircleGeometry(.14 + (i%3)*.03,8), new THREE.MeshBasicMaterial({color:palette[i%palette.length]}));
+        flower.rotation.x=-Math.PI/2; flower.position.set(px,.205,pz); scene.add(flower);
+      }
+    }
   }
 
   /* =========================================================
@@ -1289,8 +1331,8 @@
   function resizeRenderer(){
     if(!renderer||!camera)return;
     const width=window.innerWidth,height=window.innerHeight,aspect=width/height;
-    let viewHeight=width<720?86:67;let viewWidth=viewHeight*aspect;
-    if(aspect>1.8){viewWidth=108;viewHeight=viewWidth/aspect}
+    let viewHeight=width<720?96:78;let viewWidth=viewHeight*aspect;
+    if(aspect>1.8){viewWidth=122;viewHeight=viewWidth/aspect}
     camera.left=-viewWidth/2;camera.right=viewWidth/2;camera.top=viewHeight/2;camera.bottom=-viewHeight/2;camera.updateProjectionMatrix();
     renderer.setSize(width,height);renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,mobile?1.05:lowCpu?1.25:1.5));
   }
@@ -1313,7 +1355,7 @@
   ========================================================= */
 
   const loadingPhases=[
-    [14,"Preparing daylight simulation..."],[28,"Building roads and districts..."],[43,"Planting parks and streetscape..."],[59,"Adding pedestrians and traffic..."],[74,"Starting city animations..."],[90,"Calibrating navigation..."],[100,"City ready."]
+    [14,"Preparing welcome screen..."],[28,"Building compact city layout..."],[43,"Designing parks and public spaces..."],[59,"Adding pedestrians and traffic..."],[74,"Starting ambient city animation..."],[90,"Calibrating mouse navigation..."],[100,"Welcome — city ready."]
   ];
   function runLoadingSequence(){
     let progress=0;const tick=()=>{progress+=progress<70?Math.random()*9:Math.random()*4;progress=Math.min(100,progress);const rounded=Math.floor(progress);loadingFill.style.width=`${rounded}%`;loadingPercent.textContent=`${rounded}%`;const phase=loadingPhases.find(([max])=>rounded<=max);if(phase)loadingStatus.textContent=phase[1];if(rounded<100)setTimeout(tick,72+Math.random()*90);else{loadingFill.style.width="100%";loadingPercent.textContent="100%";enterCityButton.disabled=false;enterCityButton.classList.add("ready")}};tick();
@@ -1375,7 +1417,7 @@
 
   window.addEventListener("wheel",event=>{
     if(!worldEntered||sectionModal.classList.contains("open"))return;
-    cameraZoomTarget=THREE.MathUtils.clamp(cameraZoomTarget-event.deltaY*.0007,.78,1.4);
+    cameraZoomTarget=THREE.MathUtils.clamp(cameraZoomTarget-event.deltaY*.0007,.82,1.32);
   },{passive:true});
 
 
