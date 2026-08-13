@@ -1,10 +1,15 @@
-V29 — Crisp Mobile Scanner Labels
+Rithvik City V30 — hosted performance + sensitivity + mobile media
 
-Fixes:
-- Scanner text projected over buildings uses a 1280x320 canvas texture on mobile instead of 512x128.
-- Uses native mobile/system font rasterization for scanner textures.
-- Disables CanvasTexture mipmaps to prevent soft downsampling during orthographic zoom.
-- Uses linear min/mag filtering plus supported anisotropic filtering.
-- Slightly increases mobile scanner label world size for readability.
-- Desktop scanner path keeps the lightweight 512x128 texture and original sizing.
-- Cache/assets bumped to V29 so older V28 scanner textures are not reused.
+- Hosted startup background work waits until the city is interactive.
+- Service worker no longer pre-downloads the full app during install.
+- Image warming is low-priority, small-batch and network-aware.
+- Videos are not service-worker cached.
+- Hosted desktop render density/ambient actor counts are modestly reduced.
+- Google Fonts request removed; system font stack used.
+- cdnjs DNS/preconnect added for the pinned Three.js script.
+- Desktop edge camera speed increased 25%: 34.0 -> 42.5.
+- Desktop drag sensitivity increased 25%: 1.16 -> 1.45.
+- Desktop pointer parallax increased 25%.
+- Mobile section media frames enlarged and use object-fit: contain.
+- Education/About/Recruiter images show full assets instead of crops.
+- All local cache/version references normalized to V30.

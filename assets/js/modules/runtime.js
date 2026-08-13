@@ -96,7 +96,7 @@
   async function registerServiceWorker() {
     if (!("serviceWorker" in navigator) || location.protocol === "file:") return null;
     try {
-      const registration = await navigator.serviceWorker.register("./sw.js?v=26", { scope: "./" });
+      const registration = await navigator.serviceWorker.register("./sw.js?v=30", { scope: "./" });
       return registration;
     } catch (error) {
       console.warn("Service worker registration skipped", error);

@@ -1,25 +1,10 @@
-/* Rithvik City service worker — resilient repeat visits without stale HTML. */
-const CACHE_VERSION = "rithvik-city-v29";
+/* Rithvik City service worker — V30 lean first-visit cache + fast repeats. */
+const CACHE_VERSION = "rithvik-city-v30";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
-const APP_SHELL = [
-  "./",
-  "./index.html",
-  "./assets/css/style.css?v=29",
-  "./assets/css/mobile.css?v=29",
-  "./assets/js/modules/runtime.js?v=29",
-  "./assets/js/modules/world-boundaries.js?v=29",
-  "./assets/js/main.js?v=29",
-  "./favicon.png"
-];
-
 self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then(cache => Promise.allSettled(APP_SHELL.map(url => cache.add(url))))
-      .then(() => self.skipWaiting())
-  );
+  event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener("activate", event => {
@@ -50,7 +35,7 @@ async function cacheFirst(request) {
   if (cached) return cached;
   try {
     const response = await fetch(request);
-    if (response && (response.ok || response.type === "opaque")) {
+    if (response && response.ok) {
       const cache = await caches.open(RUNTIME_CACHE);
       await cache.put(request, response.clone());
     }
@@ -72,7 +57,7 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  if (["style", "script", "image", "font", "video"].includes(request.destination)) {
+  if (["style", "script", "image", "font"].includes(request.destination)) {
     event.respondWith(cacheFirst(request));
   }
 });
@@ -80,19 +65,21 @@ self.addEventListener("fetch", event => {
 self.addEventListener("message", event => {
   if (!event.data || event.data.type !== "WARM_CACHE" || !Array.isArray(event.data.urls)) return;
   const urls = [...new Set(event.data.urls)].filter(Boolean);
+
   event.waitUntil((async () => {
     const cache = await caches.open(RUNTIME_CACHE);
-    const batchSize = 4;
+    const batchSize = 2;
     for (let i = 0; i < urls.length; i += batchSize) {
       const batch = urls.slice(i, i + batchSize);
       await Promise.allSettled(batch.map(async url => {
         try {
-          const request = new Request(url, { credentials: "same-origin" });
+          const request = new Request(url, { credentials: "same-origin", cache: "default" });
           if (await cache.match(request)) return;
           const response = await fetch(request);
-          if (response && (response.ok || response.type === "opaque")) await cache.put(request, response.clone());
+          if (response && response.ok) await cache.put(request, response.clone());
         } catch (_error) {}
       }));
+      await new Promise(resolve => setTimeout(resolve, 40));
     }
   })());
 });

@@ -972,6 +972,9 @@
   const veryLowEnd = cpuCores <= 2 || deviceMemory <= 2 || (saveData && cpuCores <= 4);
   const largeMobile = mobile && Math.min(window.innerWidth,window.innerHeight) >= 600;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hosted = location.protocol === "http:" || location.protocol === "https:";
+  const networkConnection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const networkConstrained = !!networkConnection?.saveData || /(^|-)2g/i.test(networkConnection?.effectiveType || "");
 
   document.body.classList.toggle("touch-mode", coarsePointer);
   document.body.classList.toggle("mobile-mode", mobile);
@@ -991,20 +994,29 @@
   syncMobileOrientation();
 
   const PERF = {
-    pixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? (veryLowEnd ? .56 : largeMobile ? .82 : .72) : lowCpu ? 1.16 : 1.35),
-    minPixelRatio: mobile ? (veryLowEnd ? .44 : .48) : .95,
+    // Hosted builds trade a tiny amount of render density for steadier interaction
+    // while assets are still arriving over the network.
+    pixelRatio: Math.min(
+      window.devicePixelRatio || 1,
+      mobile
+        ? (veryLowEnd ? .54 : largeMobile ? .78 : .68)
+        : lowCpu
+          ? 1.08
+          : hosted ? 1.18 : 1.35
+    ),
+    minPixelRatio: mobile ? (veryLowEnd ? .42 : .46) : hosted ? .82 : .95,
     antialias: !mobile && !lowCpu,
     shadows: !mobile && !lowCpu,
-    shadowMap: lowCpu ? 512 : 1024,
-    people: reducedMotion ? 4 : mobile ? (veryLowEnd ? 3 : largeMobile ? 7 : 5) : lowCpu ? 16 : 28,
-    movingCars: reducedMotion ? 3 : mobile ? (veryLowEnd ? 2 : largeMobile ? 4 : 3) : lowCpu ? 9 : 14,
-    parkedCars: mobile ? (largeMobile ? 4 : 3) : 12,
-    trees: mobile ? (veryLowEnd ? 12 : largeMobile ? 22 : 18) : lowCpu ? 44 : 62,
-    lamps: mobile ? (largeMobile ? 15 : 12) : 42,
-    benches: mobile ? 2 : 13,
-    birds: reducedMotion ? 0 : mobile ? 0 : 6,
-    clouds: mobile ? 1 : lowCpu ? 3 : 5,
-    targetFps: mobile ? (veryLowEnd ? 26 : 34) : 60,
+    shadowMap: lowCpu || hosted ? 512 : 1024,
+    people: reducedMotion ? 4 : mobile ? (veryLowEnd ? 3 : largeMobile ? 6 : 4) : lowCpu ? 14 : hosted ? 22 : 28,
+    movingCars: reducedMotion ? 3 : mobile ? (veryLowEnd ? 2 : largeMobile ? 4 : 3) : lowCpu ? 8 : hosted ? 11 : 14,
+    parkedCars: mobile ? (largeMobile ? 4 : 3) : hosted ? 10 : 12,
+    trees: mobile ? (veryLowEnd ? 11 : largeMobile ? 20 : 16) : lowCpu ? 40 : hosted ? 52 : 62,
+    lamps: mobile ? (largeMobile ? 14 : 11) : hosted ? 34 : 42,
+    benches: mobile ? 2 : hosted ? 10 : 13,
+    birds: reducedMotion ? 0 : mobile ? 0 : hosted ? 4 : 6,
+    clouds: mobile ? 1 : lowCpu ? 3 : hosted ? 4 : 5,
+    targetFps: mobile ? (veryLowEnd ? 26 : 34) : hosted ? 55 : 60,
     animate: !reducedMotion
   };
 
@@ -2630,7 +2642,7 @@
         cameraRight.set(1,0,0).applyQuaternion(camera.quaternion);cameraRight.y=0;cameraRight.normalize();
         cameraForward.set(0,0,-1).applyQuaternion(camera.quaternion);cameraForward.y=0;cameraForward.normalize();
         const edgeStrength=Math.max(Math.abs(edgeX),Math.abs(edgeY));
-        const speed=(mobile?14.5:34.0)*(0.72+edgeStrength*.62)*delta/Math.max(.82,cameraZoom);
+        const speed=(mobile?14.5:42.5)*(0.72+edgeStrength*.62)*delta/Math.max(.82,cameraZoom);
         cameraPanTarget.x += (cameraRight.x*edgeX + cameraForward.x*(-edgeY))*speed;
         cameraPanTarget.y += (cameraRight.z*edgeX + cameraForward.z*(-edgeY))*speed;
         clampPan();
@@ -2649,8 +2661,8 @@
 
     // Very small parallax keeps the city feeling alive without fighting hover.
     const cinematicDrift=cinematicMode?Math.sin(clock.elapsedTime*.22)*.65:0;
-    const parallaxX=mobile?0:pointer.x*.42+cinematicDrift;
-    const parallaxZ=mobile?0:pointer.y*-.32+(cinematicMode?Math.cos(clock.elapsedTime*.18)*.45:0);
+    const parallaxX=mobile?0:pointer.x*.525+cinematicDrift;
+    const parallaxZ=mobile?0:pointer.y*-.40+(cinematicMode?Math.cos(clock.elapsedTime*.18)*.45:0);
     camera.position.set(baseCamera.x+cameraPan.x+parallaxX,baseCamera.y,baseCamera.z+cameraPan.y+parallaxZ);
     camera.lookAt(cameraPan.x+parallaxX*.12,0,cameraPan.y+parallaxZ*.12);
     cameraReadout.textContent=`${Math.round(cameraZoom*100)}%`;
@@ -2789,17 +2801,16 @@
   }
 
   function collectLocalWarmUrls(){
-    const media=collectPortfolioMedia();
+    // Keep first-visit service-worker warming deliberately small. Media is
+    // cached naturally as the staged image preloader fetches it.
     return [
       "./index.html",
-      "./assets/css/style.css?v=28",
-      "./assets/css/mobile.css?v=28",
-      "./assets/js/modules/runtime.js?v=28",
-      "./assets/js/modules/world-boundaries.js?v=28",
-      "./assets/js/main.js?v=28",
-      "./favicon.png",
-      ...media.images,
-      ...media.videos
+      "./assets/css/style.css?v=30",
+      "./assets/css/mobile.css?v=30",
+      "./assets/js/modules/runtime.js?v=30",
+      "./assets/js/modules/world-boundaries.js?v=30",
+      "./assets/js/main.js?v=30",
+      "./favicon.png"
     ];
   }
 
@@ -2823,9 +2834,42 @@
     contentWarmupState="warming";
     document.documentElement.dataset.contentWarmup="warming";
 
-    const media=collectPortfolioMedia();
     const priorityOrder=["projects","featured","experience","about","research","skills","education","contact"];
     const tasks=[];
+
+    // Cache DOM/search first. This is lightweight and makes the first section
+    // open quickly without competing with the initial WebGL/network startup.
+    priorityOrder.forEach(sectionKey=>{
+      tasks.push(async()=>warmSectionMarkup(sectionKey));
+    });
+    tasks.push(async()=>{buildSearchIndex();});
+
+    contentWarmupPromise=Runtime.runIdleQueue(tasks,{
+      timeout:mobile?180:120,
+      pauseEvery:2
+    }).then(()=>{
+      contentWarmupState="ready";
+      document.documentElement.dataset.contentWarmup="ready";
+      window.dispatchEvent(new CustomEvent("rithvik:content-ready"));
+      scheduleMediaWarmup();
+      return true;
+    }).catch(error=>{
+      console.warn("Portfolio DOM warm-up completed with errors",error);
+      contentWarmupState="partial";
+      document.documentElement.dataset.contentWarmup="partial";
+      scheduleMediaWarmup();
+      return false;
+    });
+
+    return contentWarmupPromise;
+  }
+
+  let mediaWarmupScheduled=false;
+  function scheduleMediaWarmup(){
+    if(mediaWarmupScheduled)return;
+    mediaWarmupScheduled=true;
+
+    const media=collectPortfolioMedia();
     const firstImages=[
       portfolioSections.projects?.items?.[0]?.media,
       portfolioSections.projects?.items?.[1]?.media,
@@ -2834,63 +2878,40 @@
       portfolioSections.education?.items?.[0]?.image
     ].filter(Boolean);
     const remainingImages=media.images.filter(url=>!firstImages.includes(url));
-    const swRegistrationPromise=Runtime.registerServiceWorker();
 
-    // Start the three most likely recruiter-facing images immediately in the
-    // background. We intentionally do not await this task, so DOM warming keeps going.
-    tasks.push(async()=>{
-      Runtime.preloadImages(firstImages,{batchSize:3,retain:true,priority:"high",idleTimeout:40}).catch(()=>{});
-    });
+    const delay=hosted ? (mobile?1450:1150) : 250;
+    setTimeout(async()=>{
+      const registration=await Runtime.registerServiceWorker();
 
-    // 1) Prebuild every section/item into detached <template> DOM. First open
-    // therefore clones already-parsed nodes instead of parsing large HTML strings.
-    priorityOrder.forEach(sectionKey=>{
-      tasks.push(async()=>warmSectionMarkup(sectionKey));
-    });
+      if(!networkConstrained){
+        await Runtime.preloadImages(firstImages,{
+          batchSize:1,
+          retain:true,
+          priority:"low",
+          idleTimeout:mobile?220:140
+        }).catch(()=>{});
 
-    // 2) Build the command/search database once instead of on first search.
-    tasks.push(async()=>{buildSearchIndex();});
+        await Runtime.preloadImages(remainingImages,{
+          batchSize:mobile?1:(hosted?2:4),
+          retain:!veryLowEnd,
+          priority:"low",
+          idleTimeout:mobile?420:(hosted?260:90)
+        }).catch(()=>{});
+      }
 
-    // 3) Decode the rest of the project imagery in small batches. Keeping the
-    // decoded Image objects alive avoids blank media frames on first open.
-    tasks.push(async()=>{
-      const connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
-      const constrained=!!connection?.saveData || /(^|-)2g/i.test(connection?.effectiveType||"");
-      if(constrained)return;
-      await Runtime.preloadImages(remainingImages,{batchSize:mobile?2:4,retain:!veryLowEnd,priority:"low",idleTimeout:mobile?120:60});
-    });
-
-    // 4) Warm same-origin files in the service worker for repeat visits.
-    tasks.push(async()=>{
-      await swRegistrationPromise;
-      await Runtime.warmServiceWorkerCache(collectLocalWarmUrls());
-    });
-
-    contentWarmupPromise=Runtime.runIdleQueue(tasks,{
-      timeout:mobile?120:80,
-      pauseEvery:1
-    }).then(()=>{
-      contentWarmupState="ready";
-      document.documentElement.dataset.contentWarmup="ready";
-      window.dispatchEvent(new CustomEvent("rithvik:content-ready"));
-      return true;
-    }).catch(error=>{
-      console.warn("Portfolio background warm-up completed with errors",error);
-      contentWarmupState="partial";
-      document.documentElement.dataset.contentWarmup="partial";
-      return false;
-    });
-
-    return contentWarmupPromise;
+      if(registration && !networkConstrained){
+        setTimeout(()=>Runtime.warmServiceWorkerCache(collectLocalWarmUrls()).catch(()=>{}), hosted?2400:700);
+      }
+    },delay);
   }
 
   function schedulePortfolioWarmup(){
-    // Give Three.js and the initial city paint first priority. The delay is short
-    // enough that content is normally ready before a visitor reaches a district.
-    const delay=mobile?300:220;
+    // Hosted pages wait for the first interactive frames before doing background
+    // cache work. Local-file testing can warm immediately.
+    const delay=hosted ? (mobile?850:650) : (mobile?300:220);
     setTimeout(()=>{
       if("requestIdleCallback" in window){
-        requestIdleCallback(()=>startPortfolioWarmup(),{timeout:mobile?250:180});
+        requestIdleCallback(()=>startPortfolioWarmup(),{timeout:mobile?500:320});
       }else{
         startPortfolioWarmup();
       }
@@ -2964,7 +2985,7 @@
       const dx=event.clientX-dragStartScreenX,dy=event.clientY-dragStartScreenY;
       if(Math.hypot(dx,dy)>(coarsePointer?9:5))dragMoved=true;
       if(screenToGround(event.clientX,event.clientY,dragCurrentWorld)){
-        const dragSensitivity=mobile?1:1.16;
+        const dragSensitivity=mobile?1:1.45;
         cameraPanTarget.x=dragPanStart.x+(dragStartWorld.x-dragCurrentWorld.x)*dragSensitivity;
         cameraPanTarget.y=dragPanStart.y+(dragStartWorld.z-dragCurrentWorld.z)*dragSensitivity;clampPan();
       }
