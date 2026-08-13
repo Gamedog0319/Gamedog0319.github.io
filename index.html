@@ -84,6 +84,8 @@
       <button class="hud-button tour-button" id="tourButton" type="button" aria-pressed="false" title="Start a guided city tour">GUIDED TOUR</button>
       <button class="hud-button" id="homeViewButton" type="button" title="Reset camera">HOME VIEW</button>
       <button class="hud-button hidden-directory-toggle" id="directoryToggle" type="button" aria-hidden="true" tabindex="-1">DISTRICTS</button>
+      <button class="hud-button scanner-button" id="scannerButton" type="button" aria-pressed="false" title="Toggle technical scanner mode">SCAN</button>
+      <button class="hud-button search-button" id="commandButton" type="button" title="Search projects, skills and districts">SEARCH</button>
       <button class="hud-button recruiter-button" id="recruiterViewButton" type="button" title="Open a 30-second recruiter overview">QUICK VIEW</button>
       <a class="hud-button hud-button-primary resume-button" aria-label="Open resume in a new tab"
          href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing"
@@ -163,6 +165,8 @@
           <button class="mobile-action-card" id="mobileTourButton" type="button"><span class="mobile-action-icon">▶</span><span><strong>Guided Tour</strong><small id="mobileTourState">Start</small></span></button>
           <button class="mobile-action-card" id="mobileHomeViewButton" type="button"><span class="mobile-action-icon">⌂</span><span><strong>Home View</strong><small>Reset camera</small></span></button>
           <button class="mobile-action-card" id="mobileCinematicButton" type="button"><span class="mobile-action-icon">◉</span><span><strong>Cinematic</strong><small id="mobileCinematicState">Off</small></span></button>
+          <button class="mobile-action-card" id="mobileScannerButton" type="button"><span class="mobile-action-icon">⌖</span><span><strong>Scanner</strong><small id="mobileScannerState">Off</small></span></button>
+          <button class="mobile-action-card" id="mobileCommandButton" type="button"><span class="mobile-action-icon">⌕</span><span><strong>Search City</strong><small>Projects • Skills • AI</small></span></button>
         </div>
       </section>
     </div>
@@ -266,6 +270,52 @@
   </aside>
 
   <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
+
+  <aside class="scanner-hud" id="scannerHud" aria-live="polite" aria-hidden="true">
+    <div class="scanner-hud-line"><span>TECHNICAL SCANNER</span><strong id="scannerStateText">ACTIVE</strong></div>
+    <div class="scanner-crosshair" aria-hidden="true"><span></span><span></span></div>
+    <div class="scanner-readout">
+      <small id="scannerDistrictIndex">CITY // CENTRAL</small>
+      <strong id="scannerDistrictName">Move across the city</strong>
+      <p id="scannerDistrictMeta">Interactive districts will expose their technical role and portfolio data.</p>
+    </div>
+  </aside>
+
+  <div class="tour-cinematic-caption" id="tourCinematicCaption" aria-live="polite" aria-hidden="true">
+    <span id="tourCaptionKicker">GUIDED TOUR</span>
+    <strong id="tourCaptionTitle">RITHVIK PORTFOLIO CITY</strong>
+    <p id="tourCaptionText">Game AI • Gameplay • XR • Research</p>
+  </div>
+
+  <aside class="world-blueprint-hud" id="worldBlueprintHud" aria-hidden="true">
+    <div><span>3D SYSTEM BLUEPRINT</span><strong id="worldBlueprintTitle">SYSTEM</strong><p id="worldBlueprintSubtitle">Technical architecture projected into the city.</p></div>
+    <div class="world-blueprint-actions"><button type="button" id="worldBlueprintReturn">RETURN TO PROJECT</button><button type="button" id="worldBlueprintClose" aria-label="Close world blueprint">×</button></div>
+  </aside>
+
+  <section class="command-palette" id="commandPalette" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="commandPaletteTitle">
+    <div class="command-backdrop" id="commandBackdrop"></div>
+    <article class="command-panel">
+      <header><div><span>CITY SEARCH</span><h2 id="commandPaletteTitle">Find anything</h2></div><button id="commandClose" type="button" aria-label="Close search">×</button></header>
+      <label class="command-search"><span>⌕</span><input id="commandInput" type="search" autocomplete="off" spellcheck="false" placeholder="Search DQN, Unreal, VR, C++, research..." aria-label="Search portfolio" /><kbd>ESC</kbd></label>
+      <div class="command-suggestions"><button type="button" data-command-query="reinforcement learning">REINFORCEMENT LEARNING</button><button type="button" data-command-query="Unreal">UNREAL</button><button type="button" data-command-query="VR">VR</button><button type="button" data-command-query="C++">C++</button></div>
+      <div class="command-results" id="commandResults" role="listbox" aria-label="Search results"></div>
+      <footer><span>ENTER / TAP TO OPEN</span><span>CTRL / ⌘ + K</span></footer>
+    </article>
+  </section>
+
+  <section class="completion-finale" id="completionFinale" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="completionTitle">
+    <div class="completion-backdrop" id="completionBackdrop"></div>
+    <article class="completion-card">
+      <button type="button" id="completionClose" aria-label="Close completion screen">×</button>
+      <span class="completion-kicker">CITY ANALYSIS COMPLETE</span>
+      <div class="completion-mark">RM</div>
+      <h2 id="completionTitle">Rithvik Mandya</h2>
+      <p>Game AI • Gameplay Programming • XR / VR • Research</p>
+      <div class="completion-stats"><span><strong>8 / 8</strong><small>DISTRICTS</small></span><span><strong>AI + GAMEPLAY</strong><small>CORE PROFILE</small></span><span><strong>UNITY + UNREAL</strong><small>ENGINES</small></span></div>
+      <div class="completion-actions"><a href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing" target="_blank" rel="noopener noreferrer">RESUME ↗</a><a href="https://github.com/Gamedog0319" target="_blank" rel="noopener noreferrer">GITHUB ↗</a><a href="mailto:rithvikmandya@gmail.com">CONTACT →</a></div>
+      <button class="completion-continue" id="completionContinue" type="button">CONTINUE EXPLORING</button>
+    </article>
+  </section>
 
   <section class="recruiter-modal" id="recruiterModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="recruiterTitle">
     <div class="recruiter-backdrop" id="recruiterBackdrop"></div>
