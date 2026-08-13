@@ -63,16 +63,86 @@
           <strong id="volumeValue">95%</strong>
         </div>
       </div>
-      <button class="hud-button world-button" id="timeModeButton" type="button" title="Switch between Day, Golden Hour and Night modes">MODE: DAY</button>
+      <button class="hud-button world-button" id="timeModeButton" type="button" title="Switch between Day and Night modes">MODE: DAY</button>
       <button class="hud-button cinematic-button" id="cinematicButton" type="button" aria-pressed="false" title="Hide nonessential HUD">CINEMATIC</button>
       <button class="hud-button tour-button" id="tourButton" type="button" aria-pressed="false" title="Start a guided city tour">GUIDED TOUR</button>
       <button class="hud-button" id="homeViewButton" type="button" title="Reset camera">HOME VIEW</button>
       <button class="hud-button hidden-directory-toggle" id="directoryToggle" type="button" aria-hidden="true" tabindex="-1">DISTRICTS</button>
-      <a class="hud-button hud-button-primary"
+      <button class="hud-button recruiter-button" id="recruiterViewButton" type="button" title="Open a 30-second recruiter overview">QUICK VIEW</button>
+      <a class="hud-button hud-button-primary resume-button" aria-label="Open resume in a new tab"
          href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing"
          target="_blank" rel="noopener noreferrer">RESUME ↗</a>
     </div>
+
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Open mobile menu" aria-controls="mobileMenuPanel" aria-expanded="false">
+      <span aria-hidden="true">⋮</span>
+    </button>
   </header>
+
+  <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" aria-hidden="true"></div>
+
+  <aside class="mobile-menu-panel" id="mobileMenuPanel" aria-hidden="true" aria-label="Portfolio menu">
+    <div class="mobile-menu-header">
+      <div class="mobile-menu-brand">
+        <span class="mobile-menu-brand-mark">RM</span>
+        <div>
+          <small>PORTFOLIO CITY</small>
+          <strong>MENU</strong>
+        </div>
+      </div>
+      <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Close mobile menu">×</button>
+    </div>
+
+    <div class="mobile-menu-scroll">
+      <section class="mobile-menu-group">
+        <div class="mobile-menu-group-title"><span>EXPLORE</span><strong>SECTIONS</strong></div>
+        <nav class="mobile-menu-sections">
+          <button class="mobile-section-item" style="--district:#ff5f57" type="button" data-open-section="projects"><span class="mobile-section-icon">◈</span><span class="mobile-section-copy"><strong>Projects</strong><small>Games • AI • VR</small></span><span class="mobile-section-index">01</span></button>
+          <button class="mobile-section-item" style="--district:#ff7f7f" type="button" data-open-section="featured"><span class="mobile-section-icon">✦</span><span class="mobile-section-copy"><strong>Featured Work</strong><small>Selected case studies</small></span><span class="mobile-section-index">02</span></button>
+          <button class="mobile-section-item" style="--district:#57bde3" type="button" data-open-section="experience"><span class="mobile-section-icon">▥</span><span class="mobile-section-copy"><strong>Experience</strong><small>Career timeline</small></span><span class="mobile-section-index">03</span></button>
+          <button class="mobile-section-item" style="--district:#7fa5ff" type="button" data-open-section="education"><span class="mobile-section-icon">⌂</span><span class="mobile-section-copy"><strong>Education</strong><small>Academic record</small></span><span class="mobile-section-index">04</span></button>
+          <button class="mobile-section-item" style="--district:#50d5a4" type="button" data-open-section="skills"><span class="mobile-section-icon">⚙</span><span class="mobile-section-copy"><strong>Skills</strong><small>Engines • AI • Code</small></span><span class="mobile-section-index">05</span></button>
+          <button class="mobile-section-item" style="--district:#b38cff" type="button" data-open-section="research"><span class="mobile-section-icon">⌬</span><span class="mobile-section-copy"><strong>Research</strong><small>Game AI • RL</small></span><span class="mobile-section-index">06</span></button>
+          <button class="mobile-section-item" style="--district:#ff5f57" type="button" data-open-section="about"><span class="mobile-section-icon mobile-section-rm">RM</span><span class="mobile-section-copy"><strong>About</strong><small>Profile • Current work</small></span><span class="mobile-section-index">07</span></button>
+          <button class="mobile-section-item" style="--district:#ffa35f" type="button" data-open-section="contact"><span class="mobile-section-icon">◎</span><span class="mobile-section-copy"><strong>Contact</strong><small>Email • LinkedIn • GitHub</small></span><span class="mobile-section-index">08</span></button>
+        </nav>
+      </section>
+
+      <section class="mobile-menu-group mobile-map-group">
+        <div class="mobile-menu-group-title"><span>NAVIGATE</span><strong>CITY MAP</strong></div>
+        <div class="mobile-city-map" aria-label="City minimap">
+          <button type="button" data-map-section="research" style="--map:#b38cff"><span>⌬</span><small>Research</small></button>
+          <button type="button" data-map-section="education" style="--map:#7fa5ff"><span>⌂</span><small>Education</small></button>
+          <button type="button" data-map-section="skills" style="--map:#50d5a4"><span>⚙</span><small>Skills</small></button>
+          <button type="button" data-map-section="featured" style="--map:#ff7f7f"><span>✦</span><small>Featured</small></button>
+          <button type="button" data-map-section="projects" style="--map:#ff5f57"><span>◈</span><small>Projects</small></button>
+          <button type="button" data-map-section="experience" style="--map:#57bde3"><span>▥</span><small>Experience</small></button>
+          <button type="button" data-map-section="about" style="--map:#ff5f57"><span>RM</span><small>About</small></button>
+          <span class="mobile-map-center" aria-hidden="true">CITY</span>
+          <button type="button" data-map-section="contact" style="--map:#ffa35f"><span>◎</span><small>Contact</small></button>
+        </div>
+      </section>
+
+      <section class="mobile-menu-group">
+        <div class="mobile-menu-group-title"><span>CITY</span><strong>CONTROLS</strong></div>
+        <div class="mobile-action-grid">
+          <button class="mobile-action-card" id="mobileSoundToggle" type="button"><span class="mobile-action-icon">♫</span><span><strong>Sound</strong><small id="mobileSoundState">On • 88%</small></span></button>
+          <button class="mobile-action-card" id="mobileTimeModeButton" type="button"><span class="mobile-action-icon">☀</span><span><strong>World Mode</strong><small id="mobileTimeState">Day</small></span></button>
+          <button class="mobile-action-card" id="mobileTourButton" type="button"><span class="mobile-action-icon">▶</span><span><strong>Guided Tour</strong><small id="mobileTourState">Start</small></span></button>
+          <button class="mobile-action-card" id="mobileHomeViewButton" type="button"><span class="mobile-action-icon">⌂</span><span><strong>Home View</strong><small>Reset camera</small></span></button>
+          <button class="mobile-action-card" id="mobileCinematicButton" type="button"><span class="mobile-action-icon">◉</span><span><strong>Cinematic</strong><small id="mobileCinematicState">Off</small></span></button>
+          <button class="mobile-action-card mobile-action-recruiter" id="mobileRecruiterViewButton" type="button"><span class="mobile-action-icon">★</span><span><strong>Quick View</strong><small>30-second overview</small></span></button>
+          <a class="mobile-action-card mobile-action-resume" aria-label="Open resume in a new tab" href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing" target="_blank" rel="noopener noreferrer"><span class="mobile-action-icon">↗</span><span><strong>Resume</strong><small>Open PDF</small></span></a>
+        </div>
+      </section>
+    </div>
+
+    <div class="mobile-menu-footer">
+      <div><span>EXPLORED</span><strong id="mobileExploredCount">0 / 8</strong></div>
+      <div class="mobile-explored-track"><span id="mobileExploredFill"></span></div>
+      <small>Drag to move • pinch to zoom • tap a district</small>
+    </div>
+  </aside>
 
   <aside class="section-sidebar" id="sectionSidebar" aria-label="Portfolio sections" role="navigation">
     <div class="section-sidebar-head">
@@ -134,6 +204,22 @@
     <span class="hover-click-hint">CLICK DISTRICT TO OPEN</span>
   </div>
 
+  <aside class="city-minimap" id="cityMinimap" aria-label="City navigator">
+    <div class="minimap-header"><span>TACTICAL MAP</span><strong>CITY NAV</strong></div>
+    <div class="minimap-grid">
+      <button type="button" data-map-section="research" style="--map:#b38cff" aria-label="Focus Research Complex"><span>⌬</span></button>
+      <button type="button" data-map-section="education" style="--map:#7fa5ff" aria-label="Focus University Campus"><span>⌂</span></button>
+      <button type="button" data-map-section="skills" style="--map:#50d5a4" aria-label="Focus Tech Foundry"><span>⚙</span></button>
+      <button type="button" data-map-section="featured" style="--map:#ff7f7f" aria-label="Focus Innovation Center"><span>✦</span></button>
+      <button type="button" data-map-section="projects" style="--map:#ff5f57" aria-label="Focus Project District"><span>◈</span></button>
+      <button type="button" data-map-section="experience" style="--map:#57bde3" aria-label="Focus Experience Towers"><span>▥</span></button>
+      <button type="button" data-map-section="about" style="--map:#ff5f57" aria-label="Focus Rithvik HQ"><span>RM</span></button>
+      <span class="minimap-core" aria-hidden="true">+</span>
+      <button type="button" data-map-section="contact" style="--map:#ffa35f" aria-label="Focus Communications Array"><span>◎</span></button>
+    </div>
+    <div class="minimap-footer"><span class="minimap-pulse"></span><span id="minimapLabel">CENTRAL</span></div>
+  </aside>
+
   <aside class="objective-card" id="objectiveCard" aria-live="polite">
     <span class="objective-kicker">CURRENT OBJECTIVE</span>
     <strong id="objectiveTitle">Explore the city</strong>
@@ -142,6 +228,101 @@
   </aside>
 
   <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
+
+  <section class="recruiter-modal" id="recruiterModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="recruiterTitle">
+    <div class="recruiter-backdrop" id="recruiterBackdrop"></div>
+    <article class="recruiter-panel">
+      <header class="recruiter-header">
+        <div>
+          <span class="recruiter-eyebrow">30-SECOND OVERVIEW</span>
+          <h2 id="recruiterTitle">Rithvik Mandya</h2>
+          <p>Game AI • Gameplay Programming • VR</p>
+        </div>
+        <button class="recruiter-close" id="recruiterClose" type="button" aria-label="Close quick view">×</button>
+      </header>
+
+      <div class="recruiter-scroll">
+        <section class="recruiter-hero">
+          <div class="recruiter-hero-copy">
+            <span class="recruiter-status">M.E.A.E. Game Engineering • University of Utah</span>
+            <h3>I build intelligent game systems that connect AI, gameplay and immersive simulation.</h3>
+            <p>My work spans adaptive VR controllers, reinforcement-learning agents, Unreal Engine NPC systems, gameplay programming and research-focused simulation tools.</p>
+            <div class="recruiter-actions">
+              <a class="recruiter-primary" href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing" target="_blank" rel="noopener noreferrer">RESUME ↗</a>
+              <a href="https://github.com/Gamedog0319" target="_blank" rel="noopener noreferrer">GITHUB ↗</a>
+              <a href="https://www.linkedin.com/in/rithvik-mandya-49a59222b/" target="_blank" rel="noopener noreferrer">LINKEDIN ↗</a>
+              <a href="mailto:rithvikmandya@gmail.com">EMAIL ↗</a>
+            </div>
+          </div>
+          <div class="recruiter-snapshot">
+            <span>PROFILE SNAPSHOT</span>
+            <dl>
+              <div><dt>CURRENT</dt><dd>Research Assistant • University of Utah</dd></div>
+              <div><dt>INDUSTRY</dt><dd>Game Developer Intern • Zen Technologies</dd></div>
+              <div><dt>ENGINES</dt><dd>Unity • Unreal Engine</dd></div>
+              <div><dt>AI</dt><dd>RL • DQN • Bandits • Behavior Trees</dd></div>
+            </dl>
+          </div>
+        </section>
+
+        <section class="recruiter-block recruiter-value-block">
+          <div class="recruiter-block-head">
+            <div><span>WHAT I BRING</span><h3>Four disciplines, one technical profile</h3></div>
+            <span class="recruiter-overlap-label">GAME SYSTEMS × INTELLIGENT BEHAVIOR</span>
+          </div>
+          <div class="recruiter-value-grid">
+            <article><span class="value-icon">G</span><small>GAMEPLAY</small><h4>Player-facing systems</h4><p>Unity and Unreal gameplay logic, interactions, physics, animation integration and simulation-focused mechanics.</p><strong>C++ • C# • Unreal • Unity</strong></article>
+            <article><span class="value-icon">AI</span><small>GAME AI</small><h4>Adaptive behavior</h4><p>Reinforcement learning, DQN, contextual/non-contextual bandits, Learning Agents, behavior trees and AI perception.</p><strong>Python • RL • DQN • Bandits</strong></article>
+            <article><span class="value-icon">XR</span><small>IMMERSIVE</small><h4>VR + hardware</h4><p>VR interaction, mixed-reality visualization and hardware-linked systems, including adaptive wearable assistance.</p><strong>VR • AR • Unity • Hardware</strong></article>
+            <article><span class="value-icon">R</span><small>RESEARCH</small><h4>Experiments + evaluation</h4><p>Research prototypes, human-in-the-loop experiments, controller comparisons, data collection and technical visualization.</p><strong>Experiments • Analysis • Prototyping</strong></article>
+          </div>
+        </section>
+
+        <section class="recruiter-block">
+          <div class="recruiter-block-head">
+            <div><span>SELECTED WORK</span><h3>Three projects to look at first</h3></div>
+            <button type="button" data-recruiter-section="featured">OPEN FEATURED DISTRICT →</button>
+          </div>
+          <div class="recruiter-project-grid">
+            <article class="recruiter-project-card">
+              <img src="./images/vr-neck.png" alt="VR neck exoskeleton project" loading="lazy" decoding="async" />
+              <div><span>ADAPTIVE VR • GAME AI</span><h4>VR Neck Exoskeleton</h4><p>Built the Unity-side adaptive assistance runtime for a wearable VR system and experimented with contextual/non-contextual bandit controller selection.</p><strong>Unity • C# • Python • Bandits • VR Hardware</strong><a href="https://github.com/aria-lab-code/vr-exoskeleton/tree/master/vr_exoskeleton" target="_blank" rel="noopener noreferrer">VIEW PROJECT ↗</a></div>
+            </article>
+            <article class="recruiter-project-card">
+              <img src="./images/minecraft.png" alt="Minecraft reinforcement learning project" loading="lazy" decoding="async" />
+              <div><span>REINFORCEMENT LEARNING</span><h4>Human-in-the-Loop RL for Minecraft</h4><p>Built a DQN-based Project Malmo agent with replay memory, a target network and epsilon-greedy exploration for human-guided learning experiments.</p><strong>Python • DQN • Project Malmo • Imitation Learning</strong><a href="https://github.com/Gamedog0319/ImitationLearning" target="_blank" rel="noopener noreferrer">VIEW PROJECT ↗</a></div>
+            </article>
+            <article class="recruiter-project-card recruiter-project-noimage">
+              <div class="recruiter-project-symbol">UE</div>
+              <div><span>UNREAL ENGINE • NPC AI</span><h4>Unreal Learning Agents</h4><p>Worked on simulation-oriented NPC intelligence using Learning Agents, AI perception, pathfinding and behavior systems during my internship at Zen Technologies.</p><strong>Unreal Engine • Learning Agents • Perception • Behavior Trees</strong><button type="button" data-recruiter-section="experience">VIEW EXPERIENCE →</button></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="recruiter-two-column">
+          <div class="recruiter-block recruiter-compact">
+            <div class="recruiter-block-head"><div><span>EXPERIENCE</span><h3>Relevant work</h3></div><button type="button" data-recruiter-section="experience">FULL TIMELINE →</button></div>
+            <div class="recruiter-record"><strong>Research Assistant</strong><span>University of Utah • Aug 2025 — Present</span><p>Adaptive VR systems, intelligent agents and human-in-the-loop learning.</p></div>
+            <div class="recruiter-record"><strong>Game Developer Intern</strong><span>Zen Technologies • Aug 2024 — Jun 2025</span><p>Unreal Engine AI, Learning Agents, perception, pathfinding and behavior systems.</p></div>
+          </div>
+          <div class="recruiter-block recruiter-compact">
+            <div class="recruiter-block-head"><div><span>CORE STACK</span><h3>What I work with</h3></div><button type="button" data-recruiter-section="skills">ALL SKILLS →</button></div>
+            <div class="recruiter-skill-groups">
+              <div><span>ENGINES</span><p>Unity • Unreal Engine • Blender</p></div>
+              <div><span>LANGUAGES</span><p>C++ • C# • Python • Java</p></div>
+              <div><span>GAME AI</span><p>Reinforcement Learning • DQN • Bandits • Imitation Learning • Behavior Trees</p></div>
+              <div><span>IMMERSIVE</span><p>VR • AR • Simulation • Hardware Integration</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="recruiter-footer-cta">
+          <div><span>EDUCATION</span><strong>M.E.A.E. Game Engineering • University of Utah • GPA 4.0 / 4.0</strong></div>
+          <div class="recruiter-footer-links"><a href="mailto:rithvikmandya@gmail.com">rithvikmandya@gmail.com</a><a href="https://github.com/Gamedog0319" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://www.linkedin.com/in/rithvik-mandya-49a59222b/" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></div>
+        </section>
+      </div>
+    </article>
+  </section>
 
   <section class="section-modal" id="sectionModal" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="section-backdrop" id="sectionBackdrop"></div>

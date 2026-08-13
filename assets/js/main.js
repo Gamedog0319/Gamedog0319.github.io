@@ -1,5 +1,5 @@
 /* =========================================================
-   RITHVIK CITY — GitHub Pages build
+   RITHVIK CITY — Recruiter Optimized V13
    Uses the global THREE object loaded in index.html.
 ========================================================= */
 
@@ -66,6 +66,28 @@
   const controlHintText = $("controlHintText");
   const hudStatusPrimary = $("hudStatusPrimary");
   const hudStatusSecondary = $("hudStatusSecondary");
+  const recruiterViewButton = $("recruiterViewButton");
+  const mobileRecruiterViewButton = $("mobileRecruiterViewButton");
+  const recruiterModal = $("recruiterModal");
+  const recruiterBackdrop = $("recruiterBackdrop");
+  const recruiterClose = $("recruiterClose");
+  const cityMinimap = $("cityMinimap");
+  const minimapLabel = $("minimapLabel");
+  const mobileMenuToggle = $("mobileMenuToggle");
+  const mobileMenuPanel = $("mobileMenuPanel");
+  const mobileMenuBackdrop = $("mobileMenuBackdrop");
+  const mobileMenuClose = $("mobileMenuClose");
+  const mobileSoundToggle = $("mobileSoundToggle");
+  const mobileSoundState = $("mobileSoundState");
+  const mobileTimeModeButton = $("mobileTimeModeButton");
+  const mobileTimeState = $("mobileTimeState");
+  const mobileTourButton = $("mobileTourButton");
+  const mobileTourState = $("mobileTourState");
+  const mobileHomeViewButton = $("mobileHomeViewButton");
+  const mobileCinematicButton = $("mobileCinematicButton");
+  const mobileCinematicState = $("mobileCinematicState");
+  const mobileExploredCount = $("mobileExploredCount");
+  const mobileExploredFill = $("mobileExploredFill");
 
   /* =========================================================
      LIGHTWEIGHT PROCEDURAL AUDIO
@@ -93,9 +115,32 @@
   let tourIndex = 0;
   const tourOrder = ["about","featured","projects","experience","education","research","skills","contact"];
   const districtGlyphs = {projects:"◈",featured:"✦",experience:"▥",education:"⌂",skills:"⚙",research:"⌬",about:"RM",contact:"◎"};
-  const timeModes = ["day","golden","night"];
+  const timeModes = ["day","night"];
   let timeModeIndex = 0;
   let cinematicMode = false;
+  let projectReplayTimer = null;
+  let projectReplayStep = -1;
+
+  function setMobileMenu(open,withSound=true){
+    if(!mobileMenuPanel||!mobileMenuToggle)return;
+    mobileMenuPanel.classList.toggle("open",open);
+    mobileMenuBackdrop?.classList.toggle("open",open);
+    mobileMenuPanel.setAttribute("aria-hidden",open?"false":"true");
+    mobileMenuBackdrop?.setAttribute("aria-hidden",open?"false":"true");
+    mobileMenuToggle.setAttribute("aria-expanded",open?"true":"false");
+    document.body.classList.toggle("mobile-menu-open",open);
+    if(open&&typeof clearDistrictHover==="function")clearDistrictHover();
+    if(withSound&&audioCtx?.state==="running")playClick();
+  }
+
+  function syncMobileMenuUi(){
+    if(mobileSoundState) mobileSoundState.textContent=audioEnabled?`On • ${Math.round(masterVolume*100)}%`:"Off";
+    if(mobileTimeState) mobileTimeState.textContent=(timeModes[timeModeIndex]||"day").replace(/^./,c=>c.toUpperCase());
+    if(mobileTourState) mobileTourState.textContent=tourActive?"Running":"Start";
+    if(mobileCinematicState) mobileCinematicState.textContent=cinematicMode?"On":"Off";
+    if(mobileExploredCount) mobileExploredCount.textContent=`${visitedSections.size} / ${tourOrder.length}`;
+    if(mobileExploredFill) mobileExploredFill.style.width=`${(visitedSections.size/tourOrder.length)*100}%`;
+  }
 
   function createAudioContext(){
     if(audioCtx) return audioCtx;
@@ -233,6 +278,7 @@
     soundToggle?.classList.toggle("sound-off",!enabled);
     soundToggle?.setAttribute("aria-pressed",enabled?"true":"false");
     if(soundToggleLabel) soundToggleLabel.textContent=enabled?"SOUND ON":"SOUND OFF";
+    syncMobileMenuUi();
 
     if(enabled){
       await ensureAudio();
@@ -254,6 +300,7 @@
       masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
       masterGain.gain.setTargetAtTime(masterVolume,audioCtx.currentTime,.035);
     }
+    syncMobileMenuUi();
   }
 
   function duckMusic(ducked){
@@ -268,7 +315,10 @@
     if(exploredCount) exploredCount.textContent=`${count} / ${tourOrder.length}`;
     if(exploredFill) exploredFill.style.width=`${pct}%`;
     if(objectiveFill) objectiveFill.style.width=`${pct}%`;
-    visitedSections.forEach(key=>document.querySelector(`.section-sidebar-item[data-open-section="${key}"]`)?.classList.add("is-visited"));
+    visitedSections.forEach(key=>{
+      document.querySelectorAll(`[data-open-section="${key}"]`).forEach(el=>el.classList.add("is-visited"));
+    });
+    syncMobileMenuUi();
     const next=tourOrder.find(key=>!visitedSections.has(key));
     if(cityStatus){
       cityStatus.textContent=count===tourOrder.length?"CITY COMPLETE // ALL DISTRICTS EXPLORED":`${count} / ${tourOrder.length} DISTRICTS EXPLORED`;
@@ -308,12 +358,35 @@
     clampPan();
   }
 
+  function syncMinimap(key=null){
+    document.querySelectorAll("[data-map-section]").forEach(button=>button.classList.toggle("is-active",!!key && button.dataset.mapSection===key));
+    if(minimapLabel) minimapLabel.textContent=key && portfolioSections[key] ? portfolioSections[key].cityName : "CENTRAL";
+  }
+
+  function focusFromMinimap(key){
+    if(!portfolioSections[key])return;
+    stopGuidedTour();
+    if(activeHoverKey && activeHoverKey!==key)highlightDistrict(activeHoverKey,false);
+    activeHoverKey=key;
+    focusDistrict(key,1.08);
+    highlightDistrict(key,true);
+    syncMinimap(key);
+    sectorReadout.textContent=portfolioSections[key].cityName;
+    if(!coarsePointer && window.innerWidth>720){
+      const x=Math.max(330,window.innerWidth-560),y=Math.max(120,window.innerHeight-270);
+      showDistrictHover(key,x,y);
+    }
+    if(audioCtx?.state==="running")playTourChime();
+  }
+
+
   function stopGuidedTour(){
     if(!tourActive)return;
     tourActive=false;
     if(tourTimer){clearInterval(tourTimer);tourTimer=null}
     tourButton?.classList.remove("is-active");tourButton?.setAttribute("aria-pressed","false");
     if(tourButton)tourButton.textContent="GUIDED TOUR";
+    syncMobileMenuUi();
   }
 
   function tourStep(){
@@ -321,6 +394,7 @@
     const key=tourOrder[tourIndex%tourOrder.length];tourIndex++;
     clearDistrictHover();
     focusDistrict(key,1.08);
+    syncMinimap(key);
     highlightDistrict(key,true);activeHoverKey=key;
     const data=portfolioSections[key];
     hoverIndex.textContent=data.cityIndex;if(hoverGlyph)hoverGlyph.textContent=districtGlyphs[key]||"◈";hoverTitle.textContent=data.cityName;hoverDescription.textContent=data.cityDescription;
@@ -337,6 +411,7 @@
     tourActive=true;tourIndex=0;
     tourButton?.classList.add("is-active");tourButton?.setAttribute("aria-pressed","true");
     if(tourButton)tourButton.textContent="STOP TOUR";
+    syncMobileMenuUi();
     tourStep();tourTimer=setInterval(tourStep,3600);
   }
 
@@ -352,12 +427,12 @@
         {
           kicker: "PROJECT 01 // GAME AI",
           title: "Human in the Loop RL for Minecraft",
-          description: "A reinforcement-learning experimentation environment built in Project Malmo. The system uses a baseline DQN with replay memory, a target network and epsilon-greedy exploration while supporting human-in-the-loop and imitation-learning research.",
+          description: "Built a reinforcement-learning agent in Project Malmo using a DQN, replay memory, a target network and epsilon-greedy exploration, then extended the environment for human-in-the-loop and imitation-learning experiments.",
           media: "./images/minecraft.png",
           mediaAlt: "Minecraft reinforcement learning project",
           meta: [
-            ["SYSTEM", "Deep Q Network with replay buffer, target network and epsilon-greedy exploration."],
-            ["PURPOSE", "Assistive-agent and human-guided learning experiments."],
+            ["WHAT I BUILT", "DQN game agent with replay memory, target network and epsilon-greedy exploration."],
+            ["RESEARCH USE", "Human-in-the-loop and imitation-learning experiments."],
             ["ENVIRONMENT", "Microsoft Project Malmo / Minecraft."]
           ],
           tags: ["Python","DQN","Reinforcement Learning","Project Malmo","Imitation Learning"],
@@ -367,13 +442,13 @@
         {
           kicker: "PROJECT 02 // VR + AI",
           title: "VR Neck Exoskeleton",
-          description: "A wearable neck-assistance prototype connected to a Unity VR environment. The system explores adaptive controller selection and personalized assistance using online bandit algorithms.",
+          description: "Built the Unity-side adaptive assistance runtime for a wearable VR neck-exoskeleton prototype, connecting immersive interaction, experiment logging and online bandit-based controller selection.",
           media: "./images/vr-neck.png",
           mediaAlt: "VR neck exoskeleton",
           meta: [
-            ["PROBLEM", "Fixed assistance policies do not adapt to individual comfort or behavior."],
-            ["SYSTEM", "Unity integration, wearable hardware and adaptive controller selection."],
-            ["AI", "Contextual and non-contextual bandit experimentation."]
+            ["WHAT I BUILT", "Unity runtime connecting wearable hardware, adaptive assistance and experiment logging."],
+            ["AI SYSTEM", "Contextual and non-contextual bandit controller selection."],
+            ["FOCUS", "Personalized VR assistance and human-centered adaptive control."]
           ],
           tags: ["Unity","VR","Bandits","Adaptive Systems","Hardware"],
           link: "https://github.com/aria-lab-code/vr-exoskeleton/tree/master/vr_exoskeleton",
@@ -382,7 +457,7 @@
         {
           kicker: "PROJECT 03 // VR",
           title: "Indonesian VR History Shop Sim",
-          description: "An interactive VR history-shop experience designed around artifact interaction, environmental storytelling and smooth standalone VR performance.",
+          description: "Built a standalone VR history-shop experience in Unity with interactive artifacts, environment-driven storytelling and interaction systems designed around immersive exploration.",
           media: "./images/shopsim.jpg",
           mediaAlt: "VR history shop simulation",
           meta: [["ENGINE","Unity"],["FOCUS","Immersive interaction and virtual artifact exploration."],["PLATFORM","Standalone VR."]],
@@ -393,7 +468,7 @@
         {
           kicker: "PROJECT 04 // GAMEPLAY",
           title: "Pompeii",
-          description: "An Unreal Engine FPS jam project featuring weapon mechanics, damage systems, animation setup and gameplay-focused interaction systems.",
+          description: "Implemented core FPS gameplay systems in Unreal Engine, including weapons, damage handling, animation setup and moment-to-moment interaction logic for a game-jam project.",
           media: "./images/pompeii.jpg",
           mediaAlt: "Pompeii Unreal Engine project",
           meta: [["ENGINE","Unreal Engine"],["SYSTEMS","FPS weapons, damage, animation and gameplay logic."],["TYPE","Game jam / gameplay programming project."]],
@@ -404,7 +479,7 @@
         {
           kicker: "PROJECT 05 // COMPUTER VISION",
           title: "Howzzat!",
-          description: "A cricket simulation built in Unity using computer-vision gesture batting, custom stadium assets and physics-driven ball behavior.",
+          description: "Built a Unity cricket simulation that maps computer-vision gesture input to batting, with custom stadium assets and physics-driven ball behavior.",
           media: "./images/Howzzatt.jpg",
           mediaAlt: "Howzzat cricket simulator",
           meta: [["ENGINE","Unity"],["INPUT","Computer-vision gesture recognition."],["GAMEPLAY","Physics-based cricket batting and ball simulation."]],
@@ -415,7 +490,7 @@
         {
           kicker: "PROJECT 06 // MIXED REALITY",
           title: "VR / AR Molecular Simulation",
-          description: "An interactive Unity molecular-visualization system for mixed-reality research workflows, including real-time manipulation and nanoparticle orientation exploration.",
+          description: "Built an interactive Unity VR/AR molecular-visualization system for research workflows, including real-time manipulation and nanoparticle-orientation exploration.",
           media: "./images/molecular-sim.jpg",
           mediaAlt: "VR AR molecular simulation",
           meta: [["ENGINE","Unity"],["DOMAIN","Scientific visualization and mixed reality."],["INTERACTION","Real-time molecular manipulation and orientation exploration."]],
@@ -437,7 +512,7 @@
         {
           kicker: "FEATURED 01 // ADAPTIVE VR",
           title: "VR Neck Exoskeleton",
-          description: "Designed and prototyped a wearable VR neck exoskeleton with adaptive controller personalization, connecting real hardware, immersive VR and online learning.",
+          description: "Built and prototyped a wearable VR neck-exoskeleton system with adaptive controller personalization, connecting Unity, physical hardware and online bandit learning.",
           media: "./images/vr-neck.png",
           mediaAlt: "VR neck exoskeleton",
           meta: [["PROBLEM","Support VR comfort and posture using adaptive rather than fixed assistance."],["SYSTEM","Wearable hardware, Unity runtime and online controller selection."],["FOCUS","Human-centered adaptive control."]],
@@ -448,7 +523,7 @@
         {
           kicker: "FEATURED 02 // GAME AI",
           title: "DQN Assistive Agent",
-          description: "Built an assistive reinforcement-learning agent in Project Malmo for navigation and resource-collection tasks using Deep Q Learning.",
+          description: "Built an assistive DQN agent in Project Malmo for navigation and resource-collection tasks, using replay memory, a target network and epsilon-greedy exploration.",
           media: "./images/minecraft.png",
           mediaAlt: "Minecraft reinforcement learning agent",
           meta: [["PROBLEM","Create a reliable game agent capable of supporting player tasks."],["SYSTEM","DQN, replay memory and epsilon-greedy exploration."],["ENVIRONMENT","Minecraft via Microsoft Project Malmo."]],
@@ -459,7 +534,7 @@
         {
           kicker: "FEATURED 03 // UNREAL AI",
           title: "Unreal Learning Agents",
-          description: "Worked with Unreal Engine Learning Agents, NPC perception, pathfinding and behavior systems in battle-simulation environments at Zen Technologies.",
+          description: "Developed and integrated Unreal Engine AI systems for simulation environments, working with Learning Agents, AI perception, pathfinding and behavior logic at Zen Technologies.",
           media: "./images/unreal.png",
           mediaAlt: "Unreal Engine Learning Agents",
           meta: [["PROBLEM","Develop adaptive NPC behavior for simulation-driven scenes."],["SYSTEM","Learning Agents, AI perception, pathfinding and behavior trees."],["ENGINE","Unreal Engine 5.3 / 5.4."]],
@@ -600,6 +675,89 @@
      DAYLIGHT CITY / PERFORMANCE CONFIG
   ========================================================= */
 
+  const projectExtras = {
+    "Human in the Loop RL for Minecraft": {
+      replay:["Observe the Minecraft state","Encode the current observation","DQN selects an action","Execute action through Project Malmo","Store transition in replay memory","Sample replay and update the network"],
+      blueprint:["Minecraft / Malmo","Observation","DQN Policy","Action","Reward","Replay Buffer","Training Update"],
+      evidence:[
+        ["AI","AGENT BUILT","DQN with replay memory and a target network"],
+        ["HL","HUMAN LOOP","Environment extended for human-guided learning experiments"],
+        ["EX","EXPLORATION","Epsilon-greedy action selection"]
+      ]
+    },
+    "DQN Assistive Agent": {
+      replay:["Observe the Minecraft state","Encode the current observation","DQN selects an action","Execute action through Project Malmo","Store transition in replay memory","Sample replay and update the network"],
+      blueprint:["Minecraft / Malmo","Observation","DQN Policy","Action","Reward","Replay Buffer","Training Update"],
+      evidence:[
+        ["AI","AGENT BUILT","Deep Q-learning decision system"],
+        ["RB","REPLAY BUFFER","Experience replay used during learning"],
+        ["TG","TARGET NETWORK","Separate target network for DQN updates"]
+      ]
+    },
+    "VR Neck Exoskeleton": {
+      replay:["Read VR and user context","Build the controller context vector","Bandit scores available controllers","Select an assistance policy","Apply assistance through the Unity runtime","Log interaction and experimental outcome"],
+      blueprint:["VR User","Unity Runtime","Context Vector","Bandit Selector","Assistance Controller","Wearable Hardware","Experiment Log"],
+      evidence:[
+        ["XR","HARDWARE LINKED","Unity runtime connected to wearable VR assistance"],
+        ["AI","ONLINE LEARNING","Contextual and non-contextual bandit controller selection"],
+        ["DX","EXPERIMENT PIPELINE","Interaction and controller outcomes logged for evaluation"]
+      ]
+    },
+    "Unreal Learning Agents": {
+      replay:["Sense the simulation environment","Update AI perception","Evaluate learning / behavior state","Request pathfinding when movement is needed","Execute the NPC action","Feed simulation state into the next decision"],
+      blueprint:["Simulation World","AI Perception","Learning Agents","Behavior Logic","Navigation","NPC Action"],
+      evidence:[
+        ["UE","UNREAL AI","Learning Agents used in simulation-oriented environments"],
+        ["AP","AI PERCEPTION","Perception integrated with NPC decision systems"],
+        ["BT","BEHAVIOR SYSTEMS","Pathfinding and behavior-tree logic"]
+      ]
+    },
+    "Indonesian VR History Shop Sim": {
+      replay:["Player explores the VR shop","VR input targets an artifact","Interaction logic validates the action","Artifact state responds","Environmental feedback updates","Player continues the exploration loop"],
+      blueprint:["VR Input","Unity Interaction","Artifact Logic","Object State","Environmental Feedback"],
+      evidence:[
+        ["VR","STANDALONE VR","Interactive experience designed for immersive exploration"],
+        ["IN","INTERACTION","Artifact-focused interaction systems"],
+        ["ES","ENVIRONMENT","Storytelling delivered through the virtual shop space"]
+      ]
+    },
+    "Pompeii": {
+      replay:["Player sends combat input","Weapon system processes the action","Hit / damage logic resolves","Animation state responds","Gameplay state is updated"],
+      blueprint:["Player Input","Weapon System","Hit Detection","Damage Logic","Animation","Game State"],
+      evidence:[
+        ["UE","UNREAL","Gameplay implementation in Unreal Engine"],
+        ["DM","DAMAGE SYSTEM","Weapon and damage handling"],
+        ["AN","ANIMATION","Gameplay logic connected to animation setup"]
+      ]
+    },
+    "Howzzat!": {
+      replay:["Camera captures the batting gesture","Computer-vision layer recognizes the gesture","Gesture maps to game input","Bat interaction drives the physics response","Ball simulation updates the play"],
+      blueprint:["Camera Input","Gesture Recognition","Input Mapping","Bat Controller","Physics","Ball State"],
+      evidence:[
+        ["CV","COMPUTER VISION","Gesture-driven batting input"],
+        ["PH","PHYSICS","Physics-based bat and ball behavior"],
+        ["3D","CUSTOM WORLD","Unity stadium experience with custom assets"]
+      ]
+    },
+    "VR / AR Molecular Simulation": {
+      replay:["User targets a molecular object","VR / AR input selects the object","Interaction system applies manipulation","Molecular orientation updates","Visualization refreshes for the research task"],
+      blueprint:["XR Input","Object Selection","Unity Interaction","Molecular Model","Transform / Orientation","Research Visualization"],
+      evidence:[
+        ["XR","MIXED REALITY","VR / AR scientific visualization workflow"],
+        ["3D","MANIPULATION","Real-time molecular interaction"],
+        ["RS","RESEARCH TOOL","Nanoparticle-orientation exploration"]
+      ]
+    }
+  };
+
+  function getProjectExtras(title){
+    return projectExtras[title] || {
+      replay:["Input enters the system","Runtime processes the state","Core logic selects a response","The result updates the experience"],
+      blueprint:["Input","Runtime","Core System","Output"],
+      evidence:[["SYS","SYSTEM BUILT","Project-specific interactive system"],["DEV","IMPLEMENTED","Gameplay / simulation logic"],["OUT","OUTPUT","Working interactive result"]]
+    };
+  }
+
   const COLORS = {
     accent: 0xff5f57,
     accentSoft: 0xff8b7d,
@@ -643,8 +801,8 @@
   document.body.classList.toggle("mobile-mode", mobile);
 
   const PERF = {
-    pixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? (veryLowEnd ? .82 : .98) : lowCpu ? 1.2 : 1.45),
-    minPixelRatio: mobile ? .72 : 1,
+    pixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? (veryLowEnd ? .80 : .96) : lowCpu ? 1.16 : 1.35),
+    minPixelRatio: mobile ? .68 : .95,
     antialias: !mobile && !lowCpu,
     shadows: !mobile && !lowCpu,
     shadowMap: lowCpu ? 512 : 1024,
@@ -656,14 +814,14 @@
     benches: mobile ? 5 : 13,
     birds: reducedMotion ? 0 : mobile ? 1 : 6,
     clouds: mobile ? 2 : lowCpu ? 3 : 5,
-    targetFps: mobile ? (veryLowEnd ? 36 : 45) : 60,
+    targetFps: mobile ? (veryLowEnd ? 32 : 42) : 60,
     animate: !reducedMotion
   };
 
   if(controlHintText){
     controlHintText.textContent = coarsePointer
       ? "Drag to move • pinch to zoom • tap any district to open."
-      : "Move near the screen edge to glide • drag to pan • wheel to zoom • hover to identify • click a district to open.";
+      : "Explore the city • or use QUICK VIEW for a 30-second recruiter overview.";
   }
 
   let scene, camera, renderer, raycaster, sunLight, hemiLight, ambientLight, sunDisc;
@@ -764,7 +922,7 @@
     renderer = new THREE.WebGLRenderer({
       antialias:PERF.antialias,
       alpha:false,
-      powerPreference:"high-performance"
+      powerPreference: mobile ? "default" : "high-performance"
     });
     renderer.setPixelRatio(PERF.pixelRatio);
     renderer.setSize(window.innerWidth,window.innerHeight);
@@ -830,12 +988,11 @@
   }
 
   function applyTimeMode(mode,withSound=true){
-    document.body.classList.remove("time-day","time-golden","time-night");
+    document.body.classList.remove("time-day","time-night");
     document.body.classList.add(`time-${mode}`);
     if(!scene||!renderer)return;
     const presets={
       day:{sky:0x9fd1ff,fog:0xdff0fb,sun:0xffe4a1,sunI:3.25,hemiSky:0xf5fbff,hemiGround:0x7da26a,hemiI:1.78,ambient:0xffffff,ambientI:.36,exposure:1.04,sunPos:[-48,75,-28],disc:0xffefaa},
-      golden:{sky:0xf0b184,fog:0xf2d0ae,sun:0xffa85d,sunI:3.6,hemiSky:0xffddb7,hemiGround:0x7a7057,hemiI:1.4,ambient:0xffddc1,ambientI:.31,exposure:1.03,sunPos:[-62,39,-22],disc:0xffc06c},
       night:{sky:0x0d1a2b,fog:0x22374f,sun:0x7fb0ff,sunI:.74,hemiSky:0x6385b3,hemiGround:0x1c3041,hemiI:.85,ambient:0x9ec0ff,ambientI:.27,exposure:.88,sunPos:[-45,62,-32],disc:0xdce9ff}
     };
     const p=presets[mode]||presets.day;
@@ -852,10 +1009,11 @@
     });
     if(sunDisc){sunDisc.material.color.setHex(p.disc);sunDisc.visible=mode!=="night";}
     if(timeModeButton)timeModeButton.textContent=`MODE: ${mode.toUpperCase()}`;
-    if(hudStatusPrimary) hudStatusPrimary.textContent = mode==="night" ? "NIGHT MODE ONLINE" : mode==="golden" ? "GOLDEN HOUR ONLINE" : "DAY MODE ONLINE";
-    if(hudStatusSecondary) hudStatusSecondary.textContent = mode==="night" ? "CITY LIGHTS ACTIVE" : mode==="golden" ? "SUNSET ATMOSPHERE ACTIVE" : "CLEAR SKIES ACTIVE";
-    if(cityStatus) cityStatus.textContent = mode==="night" ? "NIGHT CITY // LIGHTS AND AMBIENCE ACTIVE" : mode==="golden" ? "GOLDEN HOUR // WARM EVENING LIGHT" : "DAY CITY // BRIGHT AND READABLE";
-    if(withSound){playTone(mode==="night"?340:mode==="golden"?520:690,mode==="night"?220:mode==="golden"?680:860,.12,.09,"sine");}
+    if(hudStatusPrimary) hudStatusPrimary.textContent = mode==="night" ? "NIGHT MODE ONLINE" : "DAY MODE ONLINE";
+    if(hudStatusSecondary) hudStatusSecondary.textContent = mode==="night" ? "CITY LIGHTS ACTIVE" : "CLEAR SKIES ACTIVE";
+    if(cityStatus) cityStatus.textContent = mode==="night" ? "NIGHT CITY // LIGHTS AND AMBIENCE ACTIVE" : "DAY CITY // BRIGHT AND READABLE";
+    syncMobileMenuUi();
+    if(withSound){playTone(mode==="night"?340:690,mode==="night"?220:860,.12,.09,"sine");}
   }
 
   function cycleTimeMode(){
@@ -868,6 +1026,7 @@
     document.body.classList.toggle("cinematic-mode",cinematicMode);
     cinematicButton?.setAttribute("aria-pressed",cinematicMode?"true":"false");
     if(cinematicButton)cinematicButton.textContent=cinematicMode?"HUD ON":"CINEMATIC";
+    syncMobileMenuUi();
     playClick();
   }
 
@@ -1630,6 +1789,7 @@
       if(audioCtx?.state==="running") playHoverTick();
     }
     hoverIndex.textContent=data.cityIndex;if(hoverGlyph)hoverGlyph.textContent=districtGlyphs[key]||"◈";hoverTitle.textContent=data.cityName;hoverDescription.textContent=data.cityDescription;sectorReadout.textContent=data.cityName;
+    syncMinimap(key);
     districtHoverCard.style.setProperty("--hover-accent",`#${new THREE.Color(getDistrictConfig(key)?.accent||COLORS.accent).getHexString()}`);
     positionHoverCard(mouseX,mouseY);districtHoverCard.classList.add("visible");districtHoverCard.setAttribute("aria-hidden","false");customCursor.classList.add("active");exploreHint.classList.add("hidden");
   }
@@ -1646,6 +1806,7 @@
   function clearDistrictHover(){
     if(activeHoverKey)highlightDistrict(activeHoverKey,false);
     activeHoverKey=null;districtHoverCard.classList.remove("visible");districtHoverCard.setAttribute("aria-hidden","true");sectorReadout.textContent="CENTRAL";customCursor.classList.remove("active");
+    if(!sectionModal.classList.contains("open"))syncMinimap(null);
     document.querySelectorAll(".section-sidebar-item.is-map-hover").forEach(el=>el.classList.remove("is-map-hover"));
   }
 
@@ -1690,15 +1851,52 @@
   }
 
   /* =========================================================
+     RECRUITER QUICK VIEW
+  ========================================================= */
+
+  function openRecruiterView(){
+    if(!recruiterModal)return;
+    stopGuidedTour();
+    setMobileMenu(false,false);
+    recruiterModal.classList.add("open");
+    recruiterModal.setAttribute("aria-hidden","false");
+    document.body.classList.add("recruiter-open");
+    if(bgmGain&&audioCtx){
+      bgmGain.gain.cancelScheduledValues(audioCtx.currentTime);
+      bgmGain.gain.linearRampToValueAtTime(.22,audioCtx.currentTime+.12);
+    }
+    playOpenSound();
+  }
+
+  function closeRecruiterView(){
+    if(!recruiterModal)return;
+    recruiterModal.classList.remove("open");
+    recruiterModal.setAttribute("aria-hidden","true");
+    document.body.classList.remove("recruiter-open");
+    if(bgmGain&&audioCtx){
+      bgmGain.gain.cancelScheduledValues(audioCtx.currentTime);
+      bgmGain.gain.linearRampToValueAtTime(.52,audioCtx.currentTime+.18);
+    }
+    playCloseSound();
+  }
+
+  function openFromRecruiter(key){
+    closeRecruiterView();
+    window.setTimeout(()=>openSection(key),120);
+  }
+
+  /* =========================================================
      MODAL / PORTFOLIO CONTENT
   ========================================================= */
 
   function openSection(key){
     const data=portfolioSections[key];if(!data)return;
     stopGuidedTour();
+    setMobileMenu(false,false);
     ensureAudio();
     playOpenSound();
     focusDistrict(key,1.12);
+    syncMinimap(key);
     const firstVisit=!visitedSections.has(key);
     visitedSections.add(key);updateExploredUi();
     if(firstVisit){showDiscoveryToast(key);playTourChime();}
@@ -1707,15 +1905,17 @@
     sectionSlider.min=0;sectionSlider.max=Math.max(0,data.items.length-1);sectionSlider.value=0;sliderTotal.textContent=formatNumber(data.items.length);
     sectionModal.classList.add("open");sectionModal.setAttribute("aria-hidden","false");document.body.classList.add("modal-open");
     districtDirectory.classList.remove("open");districtDirectory.setAttribute("aria-hidden","true");
-    document.querySelectorAll(".section-sidebar-item").forEach(el=>el.classList.toggle("is-active",el.dataset.openSection===key));
+    document.querySelectorAll(".section-sidebar-item,.mobile-section-item").forEach(el=>el.classList.toggle("is-active",el.dataset.openSection===key));
     renderCurrentItem();
   }
 
   function closeSection(){
+    stopProjectReplay();
     if(!sectionModal.classList.contains("open"))return;
     playCloseSound();duckMusic(false);
     sectionModal.classList.remove("open");sectionModal.setAttribute("aria-hidden","true");document.body.classList.remove("modal-open");
-    document.querySelectorAll(".section-sidebar-item.is-active").forEach(el=>el.classList.remove("is-active"));
+    document.querySelectorAll(".section-sidebar-item.is-active,.mobile-section-item.is-active").forEach(el=>el.classList.remove("is-active"));
+    syncMinimap(null);
   }
 
   function navigateItem(direction){
@@ -1727,7 +1927,72 @@
     if(data.type==="showcase")return renderShowcase(item);if(data.type==="experience")return renderExperience(item);if(data.type==="education")return renderEducation(item);if(data.type==="skills")return renderSkills(item);if(data.type==="research")return renderResearch(item);if(data.type==="about")return renderAbout(item);if(data.type==="contact")return renderContact(item);
   }
 
-  function renderShowcase(item){sectionContent.innerHTML=`<div class="showcase-layout content-enter"><div class="showcase-media"><img src="${item.media}" alt="${item.mediaAlt}" loading="lazy" decoding="async" /><div class="media-overlay"></div><span class="media-label">PROJECT VISUAL // MEDIA FEED</span></div><div class="showcase-copy"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}${renderTags(item.tags)}<a class="archive-link" href="${item.link}" target="_blank" rel="noopener noreferrer">${item.linkLabel}</a></div></div>`}
+  function stopProjectReplay(){
+    if(projectReplayTimer){clearInterval(projectReplayTimer);projectReplayTimer=null}
+    projectReplayStep=-1;
+  }
+
+  function renderEvidenceCards(extras){
+    return `<div class="project-evidence"><span class="project-subhead">TECHNICAL EVIDENCE</span><div class="evidence-grid">${extras.evidence.map(([icon,label,text])=>`<article class="evidence-card"><span>${icon}</span><div><small>${label}</small><strong>${text}</strong></div></article>`).join("")}</div></div>`;
+  }
+
+  function renderReplay(extras){
+    return `<div class="project-tool-panel replay-panel" id="projectReplayPanel" hidden><div class="tool-panel-head"><div><span>SYSTEM REPLAY</span><strong>Watch the logic flow</strong></div><span class="replay-state" id="replayState">READY</span></div><div class="replay-track">${extras.replay.map((step,index)=>`<div class="replay-step" data-replay-step="${index}"><span>${String(index+1).padStart(2,"0")}</span><p>${step}</p></div>`).join("")}</div><div class="replay-progress"><span id="replayProgress"></span></div></div>`;
+  }
+
+  function renderBlueprint(extras){
+    return `<div class="project-tool-panel blueprint-panel" id="projectBlueprintPanel" hidden><div class="tool-panel-head"><div><span>TECHNICAL BLUEPRINT</span><strong>System architecture</strong></div><span class="blueprint-legend">DATA / DECISION FLOW</span></div><div class="blueprint-flow">${extras.blueprint.map((node,index)=>`<div class="blueprint-node"><span>${String(index+1).padStart(2,"0")}</span><strong>${node}</strong></div>${index<extras.blueprint.length-1?'<span class="blueprint-arrow">→</span>':''}`).join("")}</div></div>`;
+  }
+
+  function startProjectReplay(extras){
+    stopProjectReplay();
+    const panel=$("projectReplayPanel"),state=$("replayState"),progress=$("replayProgress");
+    if(!panel)return;
+    panel.hidden=false;
+    const steps=[...panel.querySelectorAll(".replay-step")];
+    const runStep=()=>{
+      projectReplayStep++;
+      steps.forEach((el,index)=>el.classList.toggle("is-active",index===projectReplayStep));
+      if(progress)progress.style.width=`${((projectReplayStep+1)/steps.length)*100}%`;
+      if(state)state.textContent=projectReplayStep>=steps.length-1?"COMPLETE":`STEP ${String(projectReplayStep+1).padStart(2,"0")} / ${String(steps.length).padStart(2,"0")}`;
+      if(projectReplayStep>=steps.length-1){stopProjectReplay();return}
+      if(audioCtx?.state==="running")playHoverTick();
+    };
+    projectReplayStep=-1;runStep();
+    projectReplayTimer=setInterval(runStep,900);
+  }
+
+  function bindProjectTools(item){
+    const extras=getProjectExtras(item.title);
+    const replayButton=$("projectReplayButton");
+    const blueprintButton=$("projectBlueprintButton");
+    const replayPanel=$("projectReplayPanel");
+    const blueprintPanel=$("projectBlueprintPanel");
+    replayButton?.addEventListener("click",()=>{
+      ensureAudio();
+      if(blueprintPanel)blueprintPanel.hidden=true;
+      blueprintButton?.classList.remove("is-active");
+      replayButton.classList.add("is-active");
+      startProjectReplay(extras);
+    });
+    blueprintButton?.addEventListener("click",()=>{
+      stopProjectReplay();
+      if(replayPanel)replayPanel.hidden=true;
+      replayButton?.classList.remove("is-active");
+      const opening=blueprintPanel?.hidden!==false;
+      if(blueprintPanel)blueprintPanel.hidden=!opening;
+      blueprintButton.classList.toggle("is-active",opening);
+      if(audioCtx?.state==="running")playOpenSound();
+    });
+  }
+
+  function renderShowcase(item){
+    stopProjectReplay();
+    const extras=getProjectExtras(item.title);
+    sectionContent.innerHTML=`<div class="showcase-layout content-enter"><div class="showcase-media"><img src="${item.media}" alt="${item.mediaAlt}" loading="lazy" decoding="async" /><div class="media-overlay"></div><span class="media-label">PROJECT VISUAL // MEDIA FEED</span><div class="media-tech-overlay"><span>LIVE CASE STUDY</span><strong>${extras.blueprint.length} SYSTEM NODES</strong></div></div><div class="showcase-copy"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}${renderTags(item.tags)}<div class="project-tool-actions"><button type="button" id="projectReplayButton">▶ PLAY SYSTEM REPLAY</button><button type="button" id="projectBlueprintButton">⌘ VIEW SYSTEM</button><a class="archive-link" href="${item.link}" target="_blank" rel="noopener noreferrer">${item.linkLabel}</a></div>${renderEvidenceCards(extras)}</div></div>${renderReplay(extras)}${renderBlueprint(extras)}`;
+    bindProjectTools(item);
+  }
+
   function renderExperience(item){sectionContent.innerHTML=`<div class="timeline-record content-enter"><div class="timeline-side"><span class="timeline-year">${item.year}</span><div class="timeline-period">${item.period}</div><div class="timeline-marker"></div></div><div class="record-main"><span class="record-company">${item.company}</span><h3>${item.title}</h3><span class="record-role">${item.period}</span><p class="content-description">${item.description}</p><ul class="record-points">${item.points.map(p=>`<li>${p}</li>`).join("")}</ul>${renderTags(item.tags)}</div></div>`}
   function renderEducation(item){sectionContent.innerHTML=`<div class="education-record content-enter"><div class="visual-card"><span class="visual-card-code">${item.code}</span><div class="visual-symbol">${item.symbol}</div></div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}</div></div>`}
   function renderSkills(item){sectionContent.innerHTML=`<div class="skill-record content-enter"><div class="visual-card"><div class="visual-symbol">${item.symbol}</div></div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p><div class="skill-list">${item.skills.map(s=>`<span class="skill-pill">${s}</span>`).join("")}</div><div class="used-in"><span>USED IN</span><div class="used-projects">${item.usedIn.map(p=>`<div class="used-project">${p}</div>`).join("")}</div></div></div></div>`}
@@ -1822,11 +2087,11 @@
     perfFrames=0;
     perfWindowStart=now;
 
-    if(fps < 29 && renderPixelRatio > PERF.minPixelRatio){
-      renderPixelRatio=Math.max(PERF.minPixelRatio,renderPixelRatio-.08);
+    if(fps < 27 && renderPixelRatio > PERF.minPixelRatio){
+      renderPixelRatio=Math.max(PERF.minPixelRatio,renderPixelRatio-.07);
       renderer.setPixelRatio(renderPixelRatio);
-    }else if(fps > 41 && renderPixelRatio < PERF.pixelRatio){
-      renderPixelRatio=Math.min(PERF.pixelRatio,renderPixelRatio+.04);
+    }else if(fps > 39 && renderPixelRatio < PERF.pixelRatio){
+      renderPixelRatio=Math.min(PERF.pixelRatio,renderPixelRatio+.025);
       renderer.setPixelRatio(renderPixelRatio);
     }
   }
@@ -1839,31 +2104,35 @@
     requestAnimationFrame(animate);
     if(!pageVisible)return;
 
-    const minFrameMs=1000/PERF.targetFps;
+    const sectionOpen=sectionModal.classList.contains("open");
+    const recruiterOpen=!!recruiterModal?.classList.contains("open");
+    const mobileMenuOpen=!!mobileMenuPanel?.classList.contains("open");
+    const uiOverlayOpen=sectionOpen||recruiterOpen||mobileMenuOpen;
+    const effectiveFps=(mobile&&uiOverlayOpen)?24:PERF.targetFps;
+    const minFrameMs=1000/effectiveFps;
     if(now-lastRenderStamp<minFrameMs)return;
     lastRenderStamp=now;
 
     const delta=Math.min(clock.getDelta(),.045);
     const elapsed=clock.elapsedTime;
-    const modalOpen=sectionModal.classList.contains("open");
 
     updateCamera(delta);
 
-    // The map behind a mobile modal is mostly obscured, so pausing its busy
-    // simulation saves battery/GPU without changing the visible experience.
-    if(!(mobile && modalOpen)){
+    // Pause nonessential world simulation behind large mobile UI and recruiter overlays.
+    // The city remains rendered, but actors stop consuming CPU/GPU while obscured.
+    if(!(mobile&&uiOverlayOpen) && !recruiterOpen){
       updateTraffic(delta);
       updatePedestrians(delta,elapsed);
       updateAmbient(elapsed,delta);
       updateDistrictHoverMotion();
     }
 
-    if(raycastDirty&&!dragMoved&&!pinching&&worldEntered&&!modalOpen){
+    if(raycastDirty&&!dragMoved&&!pinching&&worldEntered&&!uiOverlayOpen){
       raycastDirty=false;
       updateRaycast(latestPointerX,latestPointerY);
     }
 
-    adaptMobileQuality(now);
+    if(!(mobile&&uiOverlayOpen)) adaptMobileQuality(now);
     renderer.render(scene,camera);
   }
 
@@ -1873,19 +2142,20 @@
 
   function runLoadingSequence(){
     let progress=0;
+    const started=performance.now();
     const tick=()=>{
-      progress += progress < 72 ? Math.random()*10 : Math.random()*4.5;
-      progress=Math.min(100,progress);
+      const elapsed=performance.now()-started;
+      progress=Math.min(100,Math.max(progress+14,elapsed/5.5));
       loadingFill.style.width=`${Math.floor(progress)}%`;
       if(progress<100){
-        setTimeout(tick,58+Math.random()*72);
+        setTimeout(tick,42);
       }else{
         loadingFill.style.width="100%";
         setTimeout(()=>{
           worldEntered=true;
           loadingScreen.classList.add("is-hidden");
-          setTimeout(()=>exploreHint.classList.remove("hidden"),250);
-        },280);
+          setTimeout(()=>exploreHint.classList.remove("hidden"),140);
+        },100);
       }
     };
     tick();
@@ -1934,7 +2204,7 @@
       return;
     }
 
-    pointerOverUi=!!event.target.closest(".game-hud,.district-directory,.section-sidebar,.section-modal,.explore-hint");
+    pointerOverUi=!!event.target.closest(".game-hud,.district-directory,.section-sidebar,.mobile-menu-panel,.mobile-menu-toggle,.mobile-menu-backdrop,.city-minimap,.section-modal,.explore-hint");
     if(!worldEntered||sectionModal.classList.contains("open"))return;
     if(pointerOverUi)return;
     raycastDirty=true;
@@ -1947,7 +2217,7 @@
     document.addEventListener("pointerdown",event=>{
       if(worldEntered && audioEnabled) ensureAudio();
       if(!worldEntered||sectionModal.classList.contains("open"))return;
-      if(event.target.closest("button,a,.district-directory,.section-sidebar,.section-modal"))return;
+      if(event.target.closest("button,a,.district-directory,.section-sidebar,.mobile-menu-panel,.mobile-menu-toggle,.mobile-menu-backdrop,.city-minimap,.section-modal"))return;
       if(!event.target.closest("#threeContainer"))return;
 
       if(coarsePointer){
@@ -2032,7 +2302,9 @@
   window.addEventListener("keydown",event=>{
     // Escape is kept only as a conventional close shortcut; city navigation is mouse-only.
     if(event.key==="Escape"){
-      if(sectionModal.classList.contains("open"))closeSection();
+      if(recruiterModal?.classList.contains("open"))closeRecruiterView();
+      else if(sectionModal.classList.contains("open"))closeSection();
+      else if(mobileMenuPanel?.classList.contains("open"))setMobileMenu(false);
       else{districtDirectory.classList.remove("open");districtDirectory.setAttribute("aria-hidden","true")}
     }
   });
@@ -2055,8 +2327,51 @@
     });
   }
   if(timeModeButton)timeModeButton.addEventListener("click",event=>{event.stopPropagation();ensureAudio();cycleTimeMode()});
+  recruiterViewButton?.addEventListener("click",event=>{event.stopPropagation();ensureAudio();openRecruiterView()});
+  mobileRecruiterViewButton?.addEventListener("click",event=>{event.stopPropagation();ensureAudio();openRecruiterView()});
+  recruiterClose?.addEventListener("click",closeRecruiterView);
+  recruiterBackdrop?.addEventListener("click",closeRecruiterView);
+  document.querySelectorAll("[data-recruiter-section]").forEach(button=>button.addEventListener("click",()=>openFromRecruiter(button.dataset.recruiterSection)));
   if(cinematicButton)cinematicButton.addEventListener("click",event=>{event.stopPropagation();toggleCinematic()});
   if(tourButton)tourButton.addEventListener("click",event=>{event.stopPropagation();startGuidedTour()});
+
+  mobileMenuToggle?.addEventListener("click",async event=>{
+    event.stopPropagation();
+    if(audioEnabled)await ensureAudio();
+    setMobileMenu(!mobileMenuPanel?.classList.contains("open"));
+  });
+  mobileMenuClose?.addEventListener("click",event=>{event.stopPropagation();setMobileMenu(false)});
+  mobileMenuBackdrop?.addEventListener("click",event=>{event.stopPropagation();setMobileMenu(false)});
+
+  mobileSoundToggle?.addEventListener("click",async event=>{
+    event.stopPropagation();
+    await setAudioEnabled(!audioEnabled);
+    syncMobileMenuUi();
+  });
+  mobileTimeModeButton?.addEventListener("click",async event=>{
+    event.stopPropagation();
+    await ensureAudio();
+    cycleTimeMode();
+    syncMobileMenuUi();
+  });
+  mobileTourButton?.addEventListener("click",async event=>{
+    event.stopPropagation();
+    setMobileMenu(false,false);
+    await startGuidedTour();
+    syncMobileMenuUi();
+  });
+  mobileHomeViewButton?.addEventListener("click",event=>{
+    event.stopPropagation();
+    playClick();
+    resetCamera();
+    setMobileMenu(false,false);
+  });
+  mobileCinematicButton?.addEventListener("click",event=>{
+    event.stopPropagation();
+    toggleCinematic();
+    setMobileMenu(false,false);
+    syncMobileMenuUi();
+  });
 
   document.querySelectorAll(".section-sidebar-item").forEach(button=>{
     button.addEventListener("mouseenter",()=>{
@@ -2066,6 +2381,7 @@
       activeHoverKey=key;
       highlightDistrict(key,true);
       focusDistrict(key,1.035);
+      syncMinimap(key);
       button.classList.add("is-map-hover");
       sectorReadout.textContent=portfolioSections[key]?.cityName||"CENTRAL";
       if(audioCtx?.state==="running")playHoverTick();
@@ -2076,8 +2392,25 @@
       highlightDistrict(key,false);
       button.classList.remove("is-map-hover");
       activeHoverKey=null;
+      syncMinimap(null);
       sectorReadout.textContent="CENTRAL";
     });
+  });
+
+  document.querySelectorAll("[data-map-section]").forEach(button=>{
+    button.addEventListener("click",event=>{
+      event.stopPropagation();
+      ensureAudio();
+      const key=button.dataset.mapSection;
+      focusFromMinimap(key);
+      if(button.closest(".mobile-menu-panel"))setMobileMenu(false,false);
+    });
+    if(!coarsePointer){
+      button.addEventListener("mouseenter",()=>{
+        const key=button.dataset.mapSection;
+        if(key)focusFromMinimap(key);
+      });
+    }
   });
 
   document.addEventListener("click",event=>{
@@ -2088,7 +2421,10 @@
 
   directoryToggle.addEventListener("click",()=>{const open=districtDirectory.classList.toggle("open");districtDirectory.setAttribute("aria-hidden",open?"false":"true")});
   directoryClose.addEventListener("click",()=>{districtDirectory.classList.remove("open");districtDirectory.setAttribute("aria-hidden","true")});
-  document.querySelectorAll("[data-open-section]").forEach(button=>button.addEventListener("click",()=>openSection(button.dataset.openSection)));
+  document.querySelectorAll("[data-open-section]").forEach(button=>button.addEventListener("click",()=>{
+    if(button.closest(".mobile-menu-panel"))setMobileMenu(false,false);
+    openSection(button.dataset.openSection);
+  }));
   homeViewButton?.addEventListener("click",()=>{playClick();resetCamera()});
 
   document.addEventListener("visibilitychange",()=>{
@@ -2100,7 +2436,7 @@
   window.addEventListener("orientationchange",()=>setTimeout(resizeRenderer,120),{passive:true});
   if(window.visualViewport) window.visualViewport.addEventListener("resize",resizeRenderer,{passive:true});
 
-  setMasterVolume(.88);updateExploredUi();
+  setMasterVolume(.88);updateExploredUi();syncMobileMenuUi();
   initWorld();
   runLoadingSequence();
 })();
