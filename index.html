@@ -4,41 +4,36 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="description" content="Interactive portfolio city of Rithvik Mandya — gameplay programming, game AI, VR and simulation." />
-  <meta name="theme-color" content="#030406" />
+  <meta name="theme-color" content="#dcecff" />
   <title>Rithvik City | Interactive Portfolio</title>
 
   <link rel="icon" href="./favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
   <link rel="stylesheet" href="./assets/css/style.css" />
 </head>
 <body>
-  <main id="cityWorld" aria-label="Interactive portfolio city">
+  <main id="cityWorld" aria-label="Interactive daytime portfolio city">
     <div id="threeContainer"></div>
+    <div class="sky-wash"></div>
+    <div class="sun-glare" aria-hidden="true"><span></span></div>
+    <div class="atmosphere-haze"></div>
     <div class="city-vignette"></div>
-    <div class="scan-lines"></div>
-    <div class="noise-layer"></div>
   </main>
 
   <section class="loading-screen" id="loadingScreen" aria-label="Loading portfolio">
     <div class="loading-grid"></div>
-    <div class="loading-glow glow-a"></div>
-    <div class="loading-glow glow-b"></div>
-
+    <div class="loading-sun"></div>
     <div class="loading-inner">
-      <p class="loading-kicker">PORTFOLIO SIMULATION // RM-0319</p>
+      <p class="loading-kicker">PORTFOLIO CITY // RM-0319</p>
       <h1 class="loading-logo"><span>RITHVIK</span><span>CITY</span></h1>
       <p class="loading-description">GAME AI • GAMEPLAY PROGRAMMING • VR • SIMULATION</p>
-
       <div class="loading-progress-layout">
         <div class="loading-track"><span id="loadingFill"></span></div>
         <span id="loadingPercent">0%</span>
       </div>
-
-      <p class="loading-status" id="loadingStatus">Initializing city kernel...</p>
-
+      <p class="loading-status" id="loadingStatus">Preparing daylight simulation...</p>
       <button class="enter-city-button" id="enterCityButton" type="button" disabled>
         ENTER CITY <span>→</span>
       </button>
@@ -57,12 +52,13 @@
     <div class="hud-status">
       <span class="status-dot"></span>
       <div>
-        <strong>SYSTEM ONLINE</strong>
+        <strong>DAYLIGHT ONLINE</strong>
         <span>EXPLORE THE CITY</span>
       </div>
     </div>
 
     <div class="hud-actions">
+      <button class="hud-button" id="homeViewButton" type="button" title="Reset camera">HOME VIEW</button>
       <button class="hud-button" id="directoryToggle" type="button">DISTRICTS</button>
       <a class="hud-button hud-button-primary"
          href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing"
@@ -72,6 +68,7 @@
 
   <div class="coordinate-hud">
     <div><span>SECTOR</span><strong id="sectorReadout">CENTRAL</strong></div>
+    <div><span>CAMERA</span><strong id="cameraReadout">100%</strong></div>
     <div><span>POINTER</span><strong id="coordinateReadout">X 000 // Y 000</strong></div>
   </div>
 
@@ -79,19 +76,15 @@
     <span class="explore-icon">+</span>
     <div>
       <strong>EXPLORE</strong>
-      <p>Hover over a district, then choose ENTER.</p>
+      <p>Move the mouse to the screen edges to glide • click-drag to pan • wheel to zoom • hover any landmark to enter.</p>
     </div>
   </div>
 
   <aside class="district-directory" id="districtDirectory" aria-hidden="true">
     <div class="directory-header">
-      <div>
-        <span>QUICK ACCESS</span>
-        <h2>CITY DIRECTORY</h2>
-      </div>
+      <div><span>QUICK ACCESS</span><h2>CITY DIRECTORY</h2></div>
       <button type="button" class="directory-close" id="directoryClose" aria-label="Close directory">×</button>
     </div>
-
     <div class="directory-grid">
       <button type="button" class="directory-item" data-open-section="projects"><span>01</span><strong>PROJECT DISTRICT</strong><small>Games • AI • VR</small></button>
       <button type="button" class="directory-item" data-open-section="featured"><span>02</span><strong>INNOVATION CENTER</strong><small>Featured work</small></button>
@@ -113,7 +106,6 @@
 
   <section class="section-modal" id="sectionModal" aria-hidden="true">
     <div class="section-backdrop" id="sectionBackdrop"></div>
-
     <article class="section-panel">
       <header class="section-panel-header">
         <div>
@@ -123,12 +115,9 @@
         </div>
         <button class="section-close" id="sectionClose" type="button" aria-label="Close section">×</button>
       </header>
-
       <div class="section-content" id="sectionContent"></div>
-
       <footer class="section-navigation">
         <button type="button" class="section-nav-button" id="previousItem">← PREVIOUS</button>
-
         <div class="section-slider-area">
           <div class="slider-meta">
             <span id="sliderCurrent">01</span>
@@ -137,25 +126,21 @@
           </div>
           <input id="sectionSlider" type="range" min="0" max="5" step="1" value="0" aria-label="Navigate section items" />
         </div>
-
         <button type="button" class="section-nav-button" id="nextItem">NEXT →</button>
       </footer>
     </article>
   </section>
 
   <footer class="bottom-hud">
-    <div><span>CAMERA</span><strong>TACTICAL OVERVIEW</strong></div>
-    <div class="bottom-hud-center">MOVE CURSOR // HOVER DISTRICT // ENTER</div>
-    <div><span>BUILD</span><strong>2026.08</strong></div>
+    <div><span>NAVIGATION</span><strong>MOUSE ONLY • EDGE PAN • DRAG • WHEEL</strong></div>
+    <div class="bottom-hud-center">MOVE TO EDGE // GLIDE CITY // HOVER LANDMARK // ENTER</div>
+    <div><span>MODE</span><strong>DAYLIGHT / OPTIMIZED</strong></div>
   </footer>
 
   <div class="custom-cursor" id="customCursor" aria-hidden="true"><span></span><span></span></div>
 
-  <noscript>
-    <div class="noscript">This interactive portfolio requires JavaScript.</div>
-  </noscript>
+  <noscript><div class="noscript">This interactive portfolio requires JavaScript.</div></noscript>
 
-  <!-- Classic Three.js build: works as a normal static GitHub Pages site. -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
   <script src="./assets/js/main.js"></script>
 </body>
