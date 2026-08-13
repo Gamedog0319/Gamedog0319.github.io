@@ -1,805 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Rithvik Mandya | Agentic Game AI • Gameplay Programmer • VR</title>
-  <meta
-    name="description"
-    content="Portfolio of Rithvik Mandya — gameplay programmer focused on agentic game AI, VR, reinforcement learning, simulation systems, and interactive environments in Unity and Unreal."
-  />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Interactive portfolio city of Rithvik Mandya — gameplay programming, game AI, VR and simulation." />
+  <meta name="theme-color" content="#030406" />
+  <title>Rithvik City | Interactive Portfolio</title>
+
+  <link rel="icon" href="./favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Serif+Devanagari:wght@500;700&display=swap"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="portfolio-style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="./assets/css/style.css" />
 </head>
 <body>
-  <div class="loading-screen" id="loadingScreen" aria-hidden="true">
-    <div class="loading-bg-grid"></div>
-    <div class="loading-energy loading-energy-1"></div>
-    <div class="loading-energy loading-energy-2"></div>
-    <div class="loading-energy loading-energy-3"></div>
-    <div class="loading-vignette"></div>
+  <main id="cityWorld" aria-label="Interactive portfolio city">
+    <div id="threeContainer"></div>
+    <div class="city-vignette"></div>
+    <div class="scan-lines"></div>
+    <div class="noise-layer"></div>
+  </main>
 
-    <div class="loading-content">
-      <p class="loading-kicker">INITIALIZING PORTFOLIO WEBSITE</p>
-      <h1 class="loading-title">
-        <span>RITHVIK</span>
-        <span>MANDYA</span>
-      </h1>
-      <p class="loading-subtitle">Agentic Game AI • Gameplay Programming • VR / Simulation</p>
+  <section class="loading-screen" id="loadingScreen" aria-label="Loading portfolio">
+    <div class="loading-grid"></div>
+    <div class="loading-glow glow-a"></div>
+    <div class="loading-glow glow-b"></div>
 
-      <div class="loading-bar-shell">
-        <div class="loading-bar">
-          <span id="loadingBarFill"></span>
-        </div>
-        <div class="loading-percent" id="loadingPercent">0%</div>
+    <div class="loading-inner">
+      <p class="loading-kicker">PORTFOLIO SIMULATION // RM-0319</p>
+      <h1 class="loading-logo"><span>RITHVIK</span><span>CITY</span></h1>
+      <p class="loading-description">GAME AI • GAMEPLAY PROGRAMMING • VR • SIMULATION</p>
+
+      <div class="loading-progress-layout">
+        <div class="loading-track"><span id="loadingFill"></span></div>
+        <span id="loadingPercent">0%</span>
       </div>
 
-      <div class="loading-status" id="loadingStatus">Booting interface…</div>
-    </div>
-  </div>
+      <p class="loading-status" id="loadingStatus">Initializing city kernel...</p>
 
-  <div class="progress-bar" aria-hidden="true">
-    <span id="progressFill"></span>
-  </div>
-
-  <div class="bg-shell" aria-hidden="true">
-    <div class="bg-gradient bg-gradient-1"></div>
-    <div class="bg-gradient bg-gradient-2"></div>
-    <div class="bg-gradient bg-gradient-3"></div>
-    <div class="bg-grid"></div>
-    <div class="bg-noise"></div>
-    <div class="bg-lines"></div>
-  </div>
-
-  <header class="site-header">
-    <div class="container nav-shell">
-      <a class="brand" href="#top">Rithvik Mandya</a>
-
-      <button class="menu-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Toggle navigation">
-        <span></span><span></span><span></span>
+      <button class="enter-city-button" id="enterCityButton" type="button" disabled>
+        ENTER CITY <span>→</span>
       </button>
+    </div>
+  </section>
 
-      <nav id="site-nav" class="site-nav" aria-label="Primary">
-        <a href="#about" data-nav="about">About</a>
-        <a href="#education" data-nav="education">Education</a>
-        <a href="#featured" data-nav="featured">Featured Work</a>
-        <a href="#experience" data-nav="experience">Experience</a>
-        <a href="#projects" data-nav="projects">Projects</a>
-        <a href="#skills" data-nav="skills">Skills</a>
-        <a href="#research" data-nav="research">Research</a>
-        <a href="#contact" data-nav="contact">Contact</a>
-        <a class="nav-resume" href="https://drive.google.com/file/d/1snkzkc5dWGXPY-CZWQjcXVcBfOmz1VCM/view?usp=drive_link" target="_blank" rel="noopener noreferrer">Resume</a>
-      </nav>
+  <header class="game-hud">
+    <div class="hud-brand">
+      <div class="hud-brand-mark">RM</div>
+      <div>
+        <strong>RITHVIK CITY</strong>
+        <span>INTERACTIVE PORTFOLIO</span>
+      </div>
+    </div>
+
+    <div class="hud-status">
+      <span class="status-dot"></span>
+      <div>
+        <strong>SYSTEM ONLINE</strong>
+        <span>EXPLORE THE CITY</span>
+      </div>
+    </div>
+
+    <div class="hud-actions">
+      <button class="hud-button" id="directoryToggle" type="button">DISTRICTS</button>
+      <a class="hud-button hud-button-primary"
+         href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing"
+         target="_blank" rel="noopener noreferrer">RESUME ↗</a>
     </div>
   </header>
 
-  <main id="top">
-    <section class="hero reveal section-track" data-section="hero">
-      <div class="container hero-layout">
-        <div class="hero-copy">
-          <p class="eyebrow">Agentic Game AI • Gameplay Programming • VR / Simulation</p>
-          <h1>Agentic gameplay systems for games, VR, and simulation.</h1>
-          <p class="hero-lead">
-            I build intelligent gameplay systems using reinforcement learning, adaptive control, and AI driven behavior in Unity and Unreal.
-          </p>
-          <p class="hero-sub">
-            Gameplay programmer focused on turning ML research into playable game systems. I build learning agents in Project Malmo and Unreal Learning Agents, and I design VR and simulation experiences that stay responsive on real hardware.
-          </p>
+  <div class="coordinate-hud">
+    <div><span>SECTOR</span><strong id="sectorReadout">CENTRAL</strong></div>
+    <div><span>POINTER</span><strong id="coordinateReadout">X 000 // Y 000</strong></div>
+  </div>
 
-          <p class="hero-role-target">
-            Seeking Gameplay Programmer, Game AI Programmer, AI Gameplay Programmer, and VR/Simulation Programmer roles at game studios and interactive entertainment teams.
-          </p>
+  <div class="explore-hint" id="exploreHint">
+    <span class="explore-icon">+</span>
+    <div>
+      <strong>EXPLORE</strong>
+      <p>Hover over a district, then choose ENTER.</p>
+    </div>
+  </div>
 
-          <div class="hero-actions">
-            <a class="btn btn-primary magnetic" href="#featured">View featured work</a>
-            <a class="btn btn-secondary magnetic" href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing" target="_blank" rel="noopener noreferrer">Open resume</a>
+  <aside class="district-directory" id="districtDirectory" aria-hidden="true">
+    <div class="directory-header">
+      <div>
+        <span>QUICK ACCESS</span>
+        <h2>CITY DIRECTORY</h2>
+      </div>
+      <button type="button" class="directory-close" id="directoryClose" aria-label="Close directory">×</button>
+    </div>
+
+    <div class="directory-grid">
+      <button type="button" class="directory-item" data-open-section="projects"><span>01</span><strong>PROJECT DISTRICT</strong><small>Games • AI • VR</small></button>
+      <button type="button" class="directory-item" data-open-section="featured"><span>02</span><strong>INNOVATION CENTER</strong><small>Featured work</small></button>
+      <button type="button" class="directory-item" data-open-section="experience"><span>03</span><strong>EXPERIENCE TOWERS</strong><small>Career timeline</small></button>
+      <button type="button" class="directory-item" data-open-section="education"><span>04</span><strong>UNIVERSITY CAMPUS</strong><small>Education</small></button>
+      <button type="button" class="directory-item" data-open-section="skills"><span>05</span><strong>TECH FOUNDRY</strong><small>Skills</small></button>
+      <button type="button" class="directory-item" data-open-section="research"><span>06</span><strong>RESEARCH COMPLEX</strong><small>Publications</small></button>
+      <button type="button" class="directory-item" data-open-section="about"><span>07</span><strong>RITHVIK HQ</strong><small>About</small></button>
+      <button type="button" class="directory-item" data-open-section="contact"><span>08</span><strong>COMMS ARRAY</strong><small>Contact</small></button>
+    </div>
+  </aside>
+
+  <div class="district-hover-card" id="districtHoverCard" aria-hidden="true">
+    <span class="hover-index" id="hoverIndex">DISTRICT 01</span>
+    <h2 id="hoverTitle">PROJECT DISTRICT</h2>
+    <p id="hoverDescription">Games • AI • VR • Simulation</p>
+    <button id="enterSectionButton" type="button">ENTER <span>→</span></button>
+  </div>
+
+  <section class="section-modal" id="sectionModal" aria-hidden="true">
+    <div class="section-backdrop" id="sectionBackdrop"></div>
+
+    <article class="section-panel">
+      <header class="section-panel-header">
+        <div>
+          <span class="section-panel-index" id="modalSectionIndex">DISTRICT 01</span>
+          <h2 id="modalSectionTitle">PROJECT ARCHIVE</h2>
+          <p id="modalSectionSubtitle">Games • AI • VR • Simulation</p>
+        </div>
+        <button class="section-close" id="sectionClose" type="button" aria-label="Close section">×</button>
+      </header>
+
+      <div class="section-content" id="sectionContent"></div>
+
+      <footer class="section-navigation">
+        <button type="button" class="section-nav-button" id="previousItem">← PREVIOUS</button>
+
+        <div class="section-slider-area">
+          <div class="slider-meta">
+            <span id="sliderCurrent">01</span>
+            <span id="sliderLabel">ARCHIVE</span>
+            <span id="sliderTotal">06</span>
           </div>
-
-          <div class="hero-links">
-            <a href="mailto:rithvikmandya@gmail.com">Email</a>
-            <a href="https://www.linkedin.com/in/rithvik-mandya-49a59222b/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-            <a href="https://github.com/Gamedog0319" target="_blank" rel="noopener noreferrer">GitHub</a>
-          </div>
+          <input id="sectionSlider" type="range" min="0" max="5" step="1" value="0" aria-label="Navigate section items" />
         </div>
 
-        <aside class="hero-panel glass reveal tilt-card spotlight-card">
-          <div class="panel-row">
-            <span class="panel-label">Focus</span>
-            <strong>Agentic AI, gameplay systems, game programming</strong>
-          </div>
-          <div class="panel-row">
-            <span class="panel-label">Platforms</span>
-            <strong>Unity, Unreal, VR, Project Malmo</strong>
-          </div>
-          <div class="panel-row">
-            <span class="panel-label">Core stack</span>
-            <strong>Bandits, DQN, imitation learning, adaptive control</strong>
-          </div>
-          <div class="panel-row">
-            <span class="panel-label">Best fit roles</span>
-            <strong>Gameplay Programmer, Game AI Programmer, AI Gameplay Programmer, VR/Simulation Programmer</strong>
-          </div>
-        </aside>
-      </div>
-      <div class="hero-spotlight" id="heroSpotlight" aria-hidden="true"></div>
-    </section>
-
-    <section class="section tech-strip reveal">
-      <div class="container">
-        <div class="tech-row glass spotlight-card">
-          <span>Unity</span>
-          <span>Unreal Engine</span>
-          <span>C++</span>
-          <span>C#</span>
-          <span>Python</span>
-          <span>Reinforcement Learning</span>
-          <span>Bandits</span>
-          <span>VR</span>
-          <span>Simulation</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="section metrics reveal">
-      <div class="container metrics-grid">
-        <div class="metric-card glass tilt-card spotlight-card">
-          <span class="metric-number" data-target="10">0</span>
-          <p>Systems built</p>
-        </div>
-        <div class="metric-card glass tilt-card spotlight-card">
-          <span class="metric-number" data-target="4">0</span>
-          <p>Core runtime lanes</p>
-        </div>
-        <div class="metric-card glass tilt-card spotlight-card">
-          <span class="metric-number" data-target="3">0</span>
-          <p>Publications</p>
-        </div>
-        <div class="metric-card glass tilt-card spotlight-card">
-          <span class="metric-number" data-target="4">0</span>
-          <p>Major roles</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section reveal">
-      <div class="container">
-        <div class="section-heading">
-          <p class="section-kicker">Currently Exploring</p>
-          <h2>What I’m actively pushing right now.</h2>
-        </div>
-
-        <div class="explore-grid">
-          <article class="glass explore-card tilt-card spotlight-card">
-            <h3>Human in the loop training</h3>
-            <p>Designing agent pipelines that remain steerable and interpretable during learning.</p>
-          </article>
-          <article class="glass explore-card tilt-card spotlight-card">
-            <h3>Adaptive VR control systems</h3>
-            <p>Building interaction loops that adjust to player behavior, preference, and response timing.</p>
-          </article>
-          <article class="glass explore-card tilt-card spotlight-card">
-            <h3>Agentic gameplay behaviors</h3>
-            <p>Creating game systems where intelligence is designed into play rather than layered on top.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="about" class="section reveal section-track" data-section="about">
-      <div class="container">
-        <div class="section-heading">
-          <p class="section-kicker">About</p>
-          <h2>I design gameplay systems with agency built into them.</h2>
-          <p class="section-subtext">
-            My work sits at the intersection of gameplay feel, autonomous behavior, and immersive simulation.
-          </p>
-        </div>
-
-        <div class="three-grid">
-          <article class="glass info-card tilt-card spotlight-card">
-            <p>
-              I’m currently pursuing a Master of Entertainment Arts and Engineering in Game Engineering at the University of Utah. I’m especially interested in systems where intelligence is designed into the player experience from the start.
-            </p>
-            <p>
-              I work across RL agents in Minecraft, adaptive control systems in VR, NPC behavior in Unreal, and real time prototypes tied to hardware.
-            </p>
-          </article>
-
-          <article class="glass info-card tilt-card spotlight-card">
-            <h3>What I work on</h3>
-            <ul class="bullet-list">
-              <li>Gameplay systems and player facing mechanics</li>
-              <li>Game AI, reinforcement learning, and adaptive behaviors</li>
-              <li>VR interactions and hardware linked control loops</li>
-              <li>Simulation environments for intelligent behavior</li>
-            </ul>
-          </article>
-
-          <article class="glass info-card tilt-card spotlight-card">
-            <h3>At a glance</h3>
-            <div class="stacked-meta">
-              <div>
-                <strong>City</strong>
-                <p>Salt Lake City, Utah</p>
-              </div>
-              <div>
-                <strong>Email</strong>
-                <p>rithvikmandya@gmail.com</p>
-              </div>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="education" class="section section-alt reveal section-track" data-section="education">
-      <div class="container">
-        <div class="section-heading">
-          <p class="section-kicker">Education</p>
-          <h2>Current training and academic base.</h2>
-        </div>
-
-        <div class="three-grid">
-          <article class="glass info-card tilt-card spotlight-card">
-            <h3>University of Utah</h3>
-            <p><strong>Master of Entertainment Arts and Engineering — Game Engineering</strong></p>
-            <p>August 2025 to Present</p>
-            <p>GPA: 4.0 / 4.0</p>
-          </article>
-
-          <article class="glass info-card tilt-card spotlight-card">
-            <h3>Undergraduate</h3>
-            <p><strong>B.Tech in Computer Science and Engineering — AIML</strong></p>
-            <p>2021 to 2025</p>
-          </article>
-
-          <article class="glass info-card tilt-card spotlight-card">
-            <h3>Relevant areas</h3>
-            <ul class="bullet-list">
-              <li>Game engineering</li>
-              <li>Machine learning</li>
-              <li>Interactive systems</li>
-              <li>Simulation and AI</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="featured" class="section reveal section-track" data-section="featured">
-      <div class="container">
-        <div class="section-heading">
-          <p class="section-kicker">Featured Work</p>
-          <h2>Selected systems across gameplay, AI, and simulation.</h2>
-          <p class="section-subtext">
-            These projects best represent how I build adaptive systems, intelligent agents, and playable environments.
-          </p>
-        </div>
-
-        <div class="featured-layout">
-          <article class="feature-block feature-block-large glass tilt-card spotlight-card">
-            <div class="feature-meta">Featured 01</div>
-            <div class="feature-content">
-              <div class="feature-copy">
-                <h3>VR Neck Exoskeleton</h3>
-                <p>
-                  Designed and prototyped a wearable VR neck exoskeleton with UCB1 bandit personalization to learn controller and assistance preferences for comfort.
-                </p>
-
-                <div class="case-meta">
-                  <div>
-                    <span>Problem</span>
-                    <strong>Support VR comfort and posture with adaptive control instead of fixed behavior.</strong>
-                  </div>
-                  <div>
-                    <span>System</span>
-                    <strong>Wearable prototype, Unity integration, and personalization through UCB1 controller selection.</strong>
-                  </div>
-                  <div>
-                    <span>Outcome</span>
-                    <strong>Pilot comfort improvement reported at +67% self reported comfort.</strong>
-                  </div>
-                </div>
-
-                <div class="tag-row">
-                  <span>Gameplay Systems</span>
-                  <span>Bandits</span>
-                  <span>Unity</span>
-                  <span>VR Hardware</span>
-                </div>
-
-                <a class="text-link" href="https://github.com/aria-lab-code/vr-exoskeleton/tree/master/vr_exoskeleton" target="_blank" rel="noopener noreferrer">Open project ↗</a>
-              </div>
-              <div class="feature-visual animated-visual">
-                <img src="images/vr-neck.png" alt="VR Neck Exoskeleton project screenshot" class="project-image" />
-              </div>
-            </div>
-          </article>
-
-          <div class="feature-side">
-            <article class="feature-block glass tilt-card spotlight-card">
-              <div class="feature-meta">Featured 02</div>
-              <div class="feature-content side-content">
-                <div class="feature-copy">
-                  <h3>DQN Assistive Bot in Project Malmo</h3>
-                  <p>
-                    Built a DQN based assistive bot for navigation and resource collection using replay buffer and epsilon greedy exploration.
-                  </p>
-
-                  <div class="case-meta compact">
-                    <div>
-                      <span>Problem</span>
-                      <strong>Build a reliable assistive agent for player support tasks in game environments.</strong>
-                    </div>
-                    <div>
-                      <span>System</span>
-                      <strong>DQN, replay buffer, and epsilon greedy exploration in Project Malmo.</strong>
-                    </div>
-                    <div>
-                      <span>Outcome</span>
-                      <strong>Reported 97% task success over 1000 trials.</strong>
-                    </div>
-                  </div>
-
-                  <div class="tag-row">
-                    <span>Game AI</span>
-                    <span>Project Malmo</span>
-                    <span>Human in the loop</span>
-                  </div>
-                  <a class="text-link" href="https://github.com/Gamedog0319/ImitationLearning" target="_blank" rel="noopener noreferrer">Open project ↗</a>
-                </div>
-                <div class="feature-visual animated-visual">
-                  <img src="images/minecraft.png" alt="Project Malmo DQN agent screenshot" class="project-image" />
-                </div>
-              </div>
-            </article>
-
-            <article class="feature-block glass tilt-card spotlight-card">
-              <div class="feature-meta">Featured 03</div>
-              <div class="feature-content side-content">
-                <div class="feature-copy">
-                  <h3>UE 5.3 / 5.4 Learning Agents</h3>
-                  <p>
-                    Trained and deployed ML agents for adaptive NPC behavior in battle simulation environments at Zen Technologies.
-                  </p>
-
-                  <div class="case-meta compact">
-                    <div>
-                      <span>Problem</span>
-                      <strong>Improve NPC behavior and runtime performance in simulation driven gameplay scenes.</strong>
-                    </div>
-                    <div>
-                      <span>System</span>
-                      <strong>Unreal Learning Agents, perception, pathfinding, and behavior trees.</strong>
-                    </div>
-                    <div>
-                      <span>Outcome</span>
-                      <strong>Runtime improved to 45 FPS on the target scene.</strong>
-                    </div>
-                  </div>
-
-                  <div class="tag-row">
-                    <span>Unreal</span>
-                    <span>Learning Agents</span>
-                    <span>Adaptive NPCs</span>
-                  </div>
-                  <a class="text-link" href="https://github.com/Gamedog0319/RLAgentDrivers-Unreal" target="_blank" rel="noopener noreferrer">Open project ↗</a>
-                </div>
-                <div class="feature-visual animated-visual">
-                  <img src="images/unreal.png" alt="Unreal gameplay screenshot" class="project-image" />
-                </div>
-              </div>
-            </article>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="experience" class="section section-alt reveal section-track" data-section="experience">
-      <div class="container">
-        <div class="section-heading">
-          <p class="section-kicker">Experience</p>
-          <h2>Research, prototyping, and intelligent systems development.</h2>
-        </div>
-
-        <div class="timeline">
-          <article class="timeline-item glass tilt-card spotlight-card">
-            <div class="timeline-date">Aug 2025 to Present</div>
-            <div class="timeline-copy">
-              <h3>Research Assistant · Robotics Center, University of Utah</h3>
-              <p>Designed and prototyped a wearable VR neck exoskeleton with UCB1 bandit personalization and built a DQN based assistive bot in Project Malmo for navigation and resource collection.</p>
-            </div>
-          </article>
-
-          <article class="timeline-item glass tilt-card spotlight-card">
-            <div class="timeline-date">Aug 2024 to Jun 2025</div>
-            <div class="timeline-copy">
-              <h3>Game Developer Intern · Zen Technologies</h3>
-              <p>Trained and deployed ML agents with Unreal 5.3/5.4 Learning Agents, integrated perception, pathfinding, and behavior trees, and improved target scene runtime to 45 FPS.</p>
-            </div>
-          </article>
-
-          <article class="timeline-item glass tilt-card spotlight-card">
-            <div class="timeline-date">May 2024 to Jun 2025</div>
-            <div class="timeline-copy">
-              <h3>Teaching Assistant · Advanced Academic Center</h3>
-              <p>Trained aspiring game developers in Unity and C#, and authored a guidebook on building immersive games with Unity from scratch.</p>
-            </div>
-          </article>
-
-          <article class="timeline-item glass tilt-card spotlight-card">
-            <div class="timeline-date">Apr 2024 to Jun 2024</div>
-            <div class="timeline-copy">
-              <h3>Summer Research Intern · IIT Gandhinagar</h3>
-              <p>Developed a Unity VR/AR molecular simulation for nanoparticle orientation prediction with mixed reality visualization and real time manipulation for research and education.</p>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="projects" class="section reveal section-track" data-section="projects">
-      <div class="container">
-        <div class="section-heading">
-          <p class="section-kicker">Projects</p>
-          <h2>Additional work across games, AI, and simulation.</h2>
-        </div>
-
-        <div class="project-grid">
-          <article class="glass project-card tilt-card spotlight-card">
-            <div class="project-card-content">
-              <div>
-                <h3>Human in the Loop RL for Minecraft</h3>
-                <p>Baseline DQN with replay buffer, target network, epsilon greedy exploration, and data pipelines for imitation learning in Project Malmo.</p>
-                <a class="text-link" href="https://github.com/Gamedog0319/ImitationLearning" target="_blank" rel="noopener noreferrer">Launch ↗</a>
-              </div>
-              <div class="project-visual">
-                <img src="images/minecraft.png" alt="Human in the Loop RL for Minecraft screenshot" class="project-image" />
-              </div>
-            </div>
-          </article>
-
-          <article class="glass project-card tilt-card spotlight-card">
-            <div class="project-card-content">
-              <div>
-                <h3>VR Neck Exoskeleton</h3>
-                <p>Wearable neck assist prototype with posture cues, support logic, and adaptive controller selection.</p>
-                <a class="text-link" href="https://github.com/aria-lab-code/vr-exoskeleton/tree/master/vr_exoskeleton" target="_blank" rel="noopener noreferrer">Launch ↗</a>
-              </div>
-              <div class="project-visual">
-                <img src="images/vr-neck.png" alt="VR Neck Exoskeleton screenshot" class="project-image" />
-              </div>
-            </div>
-          </article>
-
-          <article class="glass project-card tilt-card spotlight-card">
-            <div class="project-card-content">
-              <div>
-                <h3>Indonesian VR History Shop Sim</h3>
-                <p>Interactive VR history shop experience with artifacts, interaction loops, and smooth standalone performance.</p>
-                <a class="text-link" href="https://github.com/Gamedog0319/ShopSim" target="_blank" rel="noopener noreferrer">Launch ↗</a>
-              </div>
-              <div class="project-visual">
-                <img src="images/shopsim.jpg" alt="Indonesian VR History Shop Sim screenshot" class="project-image" />
-              </div>
-            </div>
-          </article>
-
-          <article class="glass project-card tilt-card spotlight-card">
-            <div class="project-card-content">
-              <div>
-                <h3>Pompeii</h3>
-                <p>Unreal Engine FPS jam project with weapon mechanics, damage systems, and animation setup.</p>
-                <a class="text-link" href="https://github.com/Gamedogstudios/Pompeii" target="_blank" rel="noopener noreferrer">Launch ↗</a>
-              </div>
-              <div class="project-visual">
-                <img src="images/pompeii.jpg" alt="Pompeii project screenshot" class="project-image" />
-              </div>
-            </div>
-          </article>
-
-          <article class="glass project-card tilt-card spotlight-card">
-            <div class="project-card-content">
-              <div>
-                <h3>Howzzat!</h3>
-                <p>Unity cricket simulator using computer vision gesture batting, Blender stadium assets, and physics based ball behavior.</p>
-                <a class="text-link" href="https://github.com/Gamedog0319/Howzzat" target="_blank" rel="noopener noreferrer">Launch ↗</a>
-              </div>
-              <div class="project-visual">
-                <img src="images/Howzzatt.jpg" alt="Howzzat project screenshot" class="project-image" />
-              </div>
-            </div>
-          </article>
-
-          <article class="glass project-card tilt-card spotlight-card">
-            <div class="project-card-content">
-              <div>
-                <h3>VR/AR Molecular Simulation</h3>
-                <p>Interactive Unity molecular visualization and orientation prediction system for mixed reality research workflows.</p>
-                <a class="text-link" href="https://github.com/Gamedog0319/VR-AR-For-Molecular-Simulation" target="_blank" rel="noopener noreferrer">Launch ↗</a>
-              </div>
-              <div class="project-visual">
-                <img src="images/molecular-sim.jpg" alt="VR molecular simulation screenshot" class="project-image" />
-              </div>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="skills" class="section section-alt reveal section-track" data-section="skills">
-      <div class="container">
-        <div class="section-heading">
-          <p class="section-kicker">Skills</p>
-          <h2 class="sanskrit-quote">योगः कर्मसु कौशलम्</h2>
-          <p class="section-subtext">Skill is excellence in action.</p>
-        </div>
-
-        <div class="skills-grid skills-grid-three">
-          <article class="glass skill-card tilt-card spotlight-card">
-            <h3>Languages</h3>
-            <div class="skill-bar"><span style="--fill:92%"></span></div>
-            <div class="tag-row">
-              <span>C++</span><span>C#</span><span>Python</span><span>Java</span><span>HTML/CSS</span>
-            </div>
-          </article>
-
-          <article class="glass skill-card tilt-card spotlight-card">
-            <h3>Engines & Tools</h3>
-            <div class="skill-bar"><span style="--fill:95%"></span></div>
-            <div class="tag-row">
-              <span>Unity</span><span>Unreal Engine</span><span>Blender</span><span>Arduino</span><span>Jupyter</span>
-            </div>
-          </article>
-
-          <article class="glass skill-card tilt-card spotlight-card">
-            <h3>Game AI / ML Stack</h3>
-            <div class="skill-bar"><span style="--fill:88%"></span></div>
-            <div class="tag-row">
-              <span>Reinforcement Learning</span><span>DQN</span><span>Bandits</span><span>Imitation Learning</span><span>Behavior Trees</span>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="research" class="section reveal section-track" data-section="research">
-      <div class="container">
-        <div class="section-heading">
-          <p class="section-kicker">Research</p>
-          <h2>Research is where curiosity becomes contribution.</h2>
-          <p class="section-subtext">Publications.</p>
-        </div>
-
-        <div class="research-grid">
-          <article class="glass research-card tilt-card spotlight-card">
-            <h3>Evaluating Deep Q Networks Based Agents in Game Environments</h3>
-            <p>RamKumar, M. &amp; Rithvik, M. (2024). Reinforcement learning for Flappy Bird.</p>
-          </article>
-          <article class="glass research-card tilt-card spotlight-card">
-            <h3>Optimizing Lunar Lander Performance Using Dueling Deep Q Networks</h3>
-            <p>Poornima, S. &amp; Rithvik, M. (2023).</p>
-          </article>
-          <article class="glass research-card tilt-card spotlight-card">
-            <h3>Reinforcement Learning for Autonomous Agents in Unreal Engine</h3>
-            <p>Rajini, P. &amp; Rithvik, M. (2024). International Conference on Innovative Emerging Technologies, ICIET 2025.</p>
-          </article>
-          <article class="glass research-card tilt-card spotlight-card">
-            <h3>TEDx GRIET — Sponsorship Lead</h3>
-            <p>Leadership and external coordination alongside technical and research driven work.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="contact" class="section section-alt reveal section-track" data-section="contact">
-      <div class="container contact-shell">
-        <div class="section-heading">
-          <p class="section-kicker">Contact</p>
-          <h2>Let’s build something intelligent and playable.</h2>
-          <p class="section-subtext contact-payoff">
-            Open to internships and early career roles in gameplay, game AI, VR, and simulation.
-          </p>
-        </div>
-
-        <div class="contact-grid">
-          <article class="glass contact-card tilt-card spotlight-card">
-            <h3>Email</h3>
-            <p><a href="mailto:rithvikmandya@gmail.com">rithvikmandya@gmail.com</a></p>
-          </article>
-          <article class="glass contact-card tilt-card spotlight-card">
-            <h3>LinkedIn</h3>
-            <p><a href="https://www.linkedin.com/in/rithvik-mandya-49a59222b/" target="_blank" rel="noopener noreferrer">rithvik-mandya-49a59222b</a></p>
-          </article>
-          <article class="glass contact-card tilt-card spotlight-card">
-            <h3>GitHub</h3>
-            <p><a href="https://github.com/Gamedog0319" target="_blank" rel="noopener noreferrer">Gamedog0319</a></p>
-          </article>
-          <article class="glass contact-card tilt-card spotlight-card">
-            <h3>Resume</h3>
-            <p><a href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing" target="_blank" rel="noopener noreferrer">Open latest resume</a></p>
-          </article>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    const loadingScreen = document.getElementById("loadingScreen");
-    const loadingBarFill = document.getElementById("loadingBarFill");
-    const loadingPercent = document.getElementById("loadingPercent");
-    const loadingStatus = document.getElementById("loadingStatus");
-
-    const progressFill = document.getElementById("progressFill");
-    const menuToggle = document.querySelector(".menu-toggle");
-    const siteNav = document.querySelector(".site-nav");
-    const revealEls = document.querySelectorAll(".reveal");
-    const metricNums = document.querySelectorAll(".metric-number");
-    const heroSpotlight = document.getElementById("heroSpotlight");
-    const tiltCards = document.querySelectorAll(".tilt-card");
-    const magneticEls = document.querySelectorAll(".magnetic");
-    const sectionTracks = document.querySelectorAll(".section-track");
-    const navLinks = document.querySelectorAll(".site-nav a[data-nav]");
-    const spotlightCards = document.querySelectorAll(".spotlight-card");
-
-    const loadingPhases = [
-      { limit: 18, text: "Booting interface…" },
-      { limit: 42, text: "Loading visual systems…" },
-      { limit: 68, text: "Calibrating interaction layers…" },
-      { limit: 88, text: "Syncing portfolio modules…" },
-      { limit: 100, text: "Launch ready." }
-    ];
-
-    function runLoadingSequence() {
-      let progress = 0;
-
-      const tick = () => {
-        const increment = progress < 60 ? Math.random() * 10 : Math.random() * 6;
-        progress = Math.min(100, progress + increment);
-
-        const rounded = Math.floor(progress);
-        loadingBarFill.style.width = `${rounded}%`;
-        loadingPercent.textContent = `${rounded}%`;
-
-        const phase = loadingPhases.find(p => rounded <= p.limit);
-        if (phase) loadingStatus.textContent = phase.text;
-
-        if (progress < 100) {
-          setTimeout(tick, 80 + Math.random() * 120);
-        } else {
-          setTimeout(() => {
-            loadingScreen.classList.add("is-hidden");
-            document.body.classList.add("loaded");
-            setTimeout(() => {
-              loadingScreen.style.display = "none";
-            }, 900);
-          }, 450);
-        }
-      };
-
-      tick();
-    }
-
-    window.addEventListener("load", runLoadingSequence);
-
-    function updateProgressBar() {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      progressFill.style.width = progress + "%";
-    }
-
-    window.addEventListener("scroll", updateProgressBar);
-    updateProgressBar();
-
-    if (menuToggle && siteNav) {
-      menuToggle.addEventListener("click", () => {
-        const open = siteNav.classList.toggle("open");
-        menuToggle.setAttribute("aria-expanded", open ? "true" : "false");
-      });
-
-      siteNav.querySelectorAll("a").forEach(link => {
-        link.addEventListener("click", () => {
-          siteNav.classList.remove("open");
-          menuToggle.setAttribute("aria-expanded", "false");
-        });
-      });
-    }
-
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add("revealed");
-      });
-    }, { threshold: 0.15 });
-
-    revealEls.forEach(el => revealObserver.observe(el));
-
-    const metricObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        const el = entry.target;
-        const target = Number(el.dataset.target);
-        let count = 0;
-        const step = Math.max(1, Math.ceil(target / 28));
-
-        const interval = setInterval(() => {
-          count += step;
-          if (count >= target) {
-            el.textContent = target;
-            clearInterval(interval);
-          } else {
-            el.textContent = count;
-          }
-        }, 36);
-
-        observer.unobserve(el);
-      });
-    }, { threshold: 0.5 });
-
-    metricNums.forEach(el => metricObserver.observe(el));
-
-    document.querySelector(".hero")?.addEventListener("mousemove", (e) => {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      heroSpotlight.style.left = `${x}px`;
-      heroSpotlight.style.top = `${y}px`;
-    });
-
-    tiltCards.forEach(card => {
-      card.addEventListener("mousemove", (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const rotateX = ((y / rect.height) - 0.5) * -8;
-        const rotateY = ((x / rect.width) - 0.5) * 8;
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
-      });
-
-      card.addEventListener("mouseleave", () => {
-        card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)";
-      });
-    });
-
-    magneticEls.forEach(el => {
-      el.addEventListener("mousemove", (e) => {
-        const rect = el.getBoundingClientRect();
-        const x = e.clientX - (rect.left + rect.width / 2);
-        const y = e.clientY - (rect.top + rect.height / 2);
-        el.style.transform = `translate(${x * 0.08}px, ${y * 0.08}px)`;
-      });
-
-      el.addEventListener("mouseleave", () => {
-        el.style.transform = "translate(0,0)";
-      });
-    });
-
-    spotlightCards.forEach(card => {
-      card.addEventListener("mousemove", (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        card.style.setProperty("--spot-x", `${x}%`);
-        card.style.setProperty("--spot-y", `${y}%`);
-      });
-    });
-
-    const navObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        const activeSection = entry.target.dataset.section;
-        navLinks.forEach(link => {
-          link.classList.toggle("active", link.dataset.nav === activeSection);
-        });
-      });
-    }, { threshold: 0.45 });
-
-    sectionTracks.forEach(section => navObserver.observe(section));
-  </script>
+        <button type="button" class="section-nav-button" id="nextItem">NEXT →</button>
+      </footer>
+    </article>
+  </section>
+
+  <footer class="bottom-hud">
+    <div><span>CAMERA</span><strong>TACTICAL OVERVIEW</strong></div>
+    <div class="bottom-hud-center">MOVE CURSOR // HOVER DISTRICT // ENTER</div>
+    <div><span>BUILD</span><strong>2026.08</strong></div>
+  </footer>
+
+  <div class="custom-cursor" id="customCursor" aria-hidden="true"><span></span><span></span></div>
+
+  <noscript>
+    <div class="noscript">This interactive portfolio requires JavaScript.</div>
+  </noscript>
+
+  <!-- Classic Three.js build: works as a normal static GitHub Pages site. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+  <script src="./assets/js/main.js"></script>
 </body>
 </html>
