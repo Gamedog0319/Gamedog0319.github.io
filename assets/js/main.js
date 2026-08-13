@@ -481,6 +481,7 @@
   }
 
   function buildSearchIndex(){
+    if(cachedSearchIndex)return cachedSearchIndex;
     const rows=[];
     Object.entries(portfolioSections).forEach(([key,section])=>{
       rows.push({key,index:0,type:"DISTRICT",title:section.cityName,subtitle:section.cityDescription,search:`${key} ${section.cityName} ${section.cityDescription} ${section.panelTitle}`.toLowerCase()});
@@ -490,7 +491,8 @@
         rows.push({key,index,type:section.type==="showcase"?"PROJECT":"RECORD",title:item.title||item.company||section.cityName,subtitle:item.kicker||item.period||section.panelSubtitle,search:`${key} ${item.title||""} ${item.description||""} ${tags} ${meta} ${item.company||""}`.toLowerCase()});
       });
     });
-    return rows;
+    cachedSearchIndex=rows;
+    return cachedSearchIndex;
   }
 
   function renderCommandResults(query=""){
@@ -1053,7 +1055,24 @@
   const cameraRight = new THREE.Vector3();
   const cameraForward = new THREE.Vector3();
   const EDGE_ZONE = coarsePointer ? 0 : mobile ? .12 : .14;
-  const Runtime = window.RithvikRuntime || { frameBlend:(rate,delta)=>1-Math.exp(-rate*delta), preloadImages:()=>Promise.resolve([]) };
+  const Runtime = window.RithvikRuntime || {
+    frameBlend:(rate,delta)=>1-Math.exp(-rate*delta),
+    preloadImages:()=>Promise.resolve([]),
+    runIdleQueue:async(tasks=[])=>{for(const task of tasks)await task();},
+    registerServiceWorker:()=>Promise.resolve(null),
+    warmServiceWorkerCache:()=>Promise.resolve(false),
+    idle:(timeout=50)=>new Promise(resolve=>setTimeout(resolve,Math.min(timeout,50)))
+  };
+
+  // Portfolio content is generated once in the background and reused on first
+  // open. This removes the expensive first-tap DOM construction path on both
+  // desktop and mobile without blocking the initial Three.js city load.
+  const sectionMarkupCache = new Map();
+  const sectionTemplateCache = new Map();
+  let cachedSearchIndex = null;
+  let contentWarmupState = "idle";
+  let contentWarmupPromise = null;
+  const warmedSections = new Set();
   let mobileUiFreeze = false;
 
   const shared = {};
@@ -2160,6 +2179,7 @@
 
   function showDistrictHover(key,mouseX,mouseY){
     const data=portfolioSections[key];if(!data)return;
+    if(!warmedSections.has(key))warmPrioritySection(key);
     if(activeHoverKey!==key){
       highlightDistrict(activeHoverKey,false);
       document.querySelectorAll(".section-sidebar-item.is-map-hover").forEach(el=>el.classList.remove("is-map-hover"));
@@ -2274,6 +2294,7 @@
 
   function openSection(key){
     const data=portfolioSections[key];if(!data)return;
+    if(!warmedSections.has(key))warmSectionMarkup(key);
     
     setMobileMenu(false,false);
     if(mobile){mobileUiFreeze=true;resetMobileInputState();}
@@ -2342,11 +2363,89 @@
     if(!currentSectionKey)return;playClick();const data=portfolioSections[currentSectionKey];currentItemIndex=(currentItemIndex+direction+data.items.length)%data.items.length;sectionSlider.value=currentItemIndex;renderCurrentItem();
   }
 
+  function sectionCacheKey(sectionKey,index){
+    return `${sectionKey}:${index}`;
+  }
+
+  function buildShowcaseMarkup(item){
+    const extras=getProjectExtras(item.title);
+    return `<div class="showcase-layout content-enter"><div class="showcase-media"><img src="${item.media}" alt="${item.mediaAlt}" loading="eager" decoding="async" fetchpriority="auto" /><div class="media-overlay"></div><span class="media-label">PROJECT VISUAL // MEDIA FEED</span><div class="media-tech-overlay"><span>LIVE CASE STUDY</span><strong>${extras.blueprint.length} SYSTEM NODES</strong></div></div><div class="showcase-copy"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}${renderTags(item.tags)}<div class="project-tool-actions"><button type="button" id="projectDemoButton">▶ RUN VISUAL DEMO</button><button type="button" id="projectReplayButton">↻ SYSTEM REPLAY</button><button type="button" id="projectBlueprintButton">⌘ BLUEPRINT</button><button type="button" id="projectWorldButton">◎ PROJECT INTO CITY</button><a class="archive-link" href="${item.link}" target="_blank" rel="noopener noreferrer">${item.linkLabel}</a></div>${renderEvidenceCards(extras)}</div></div>${renderVisualDemo(item,extras)}${renderReplay(extras)}${renderBlueprint(extras)}`;
+  }
+
+  function buildExperienceMarkup(item){
+    return `<div class="timeline-record content-enter"><div class="timeline-side"><span class="timeline-year">${item.year}</span><div class="timeline-period">${item.period}</div><div class="timeline-marker"></div></div><div class="record-main"><span class="record-company">${item.company}</span><h3>${item.title}</h3><span class="record-role">${item.period}</span><p class="content-description">${item.description}</p><ul class="record-points">${item.points.map(p=>`<li>${p}</li>`).join("")}</ul>${renderTags(item.tags)}</div></div>`;
+  }
+
+  function buildEducationMarkup(item){
+    return `<div class="education-record content-enter"><div class="visual-card"><span class="visual-card-code">${item.code}</span><div class="visual-symbol">${item.symbol}</div></div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}</div></div>`;
+  }
+
+  function buildSkillsMarkup(item){
+    return `<div class="skill-record content-enter"><div class="visual-card"><div class="visual-symbol">${item.symbol}</div></div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p><div class="skill-list">${item.skills.map(s=>`<span class="skill-pill">${s}</span>`).join("")}</div><div class="used-in"><span>USED IN</span><div class="used-projects">${item.usedIn.map(p=>`<div class="used-project">${p}</div>`).join("")}</div></div></div></div>`;
+  }
+
+  function buildResearchMarkup(item){
+    return `<div class="research-record content-enter"><div class="research-file-number">${item.number}</div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p><div class="research-citation">${item.citation}</div>${renderTags(item.tags)}</div></div>`;
+  }
+
+  function buildAboutMarkup(item){
+    return `<div class="about-record content-enter"><div class="visual-card"><div class="visual-symbol">${item.symbol}</div></div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${item.meta?renderMeta(item.meta):""}${item.tags?renderTags(item.tags):""}</div></div>`;
+  }
+
+  function buildContactMarkup(item){
+    const target=item.link.startsWith("mailto:")?"":'target="_blank" rel="noopener noreferrer"';
+    return `<div class="contact-record content-enter"><div class="contact-inner"><div class="contact-signal">${item.icon}</div><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p><div class="contact-value">${item.value}</div><a class="archive-link" href="${item.link}" ${target}>${item.button}</a></div></div>`;
+  }
+
+  function buildItemMarkup(sectionKey,index){
+    const data=portfolioSections[sectionKey];
+    const item=data?.items?.[index];
+    if(!data||!item)return "";
+    if(data.type==="showcase")return buildShowcaseMarkup(item);
+    if(data.type==="experience")return buildExperienceMarkup(item);
+    if(data.type==="education")return buildEducationMarkup(item);
+    if(data.type==="skills")return buildSkillsMarkup(item);
+    if(data.type==="research")return buildResearchMarkup(item);
+    if(data.type==="about")return buildAboutMarkup(item);
+    if(data.type==="contact")return buildContactMarkup(item);
+    return "";
+  }
+
+  function getCachedItemMarkup(sectionKey,index){
+    const key=sectionCacheKey(sectionKey,index);
+    if(sectionMarkupCache.has(key))return sectionMarkupCache.get(key);
+    const markup=buildItemMarkup(sectionKey,index);
+    if(markup)sectionMarkupCache.set(key,markup);
+    return markup;
+  }
+
+  function getCachedItemTemplate(sectionKey,index){
+    const key=sectionCacheKey(sectionKey,index);
+    if(sectionTemplateCache.has(key))return sectionTemplateCache.get(key);
+    const markup=getCachedItemMarkup(sectionKey,index);
+    const template=document.createElement("template");
+    template.innerHTML=markup;
+    sectionTemplateCache.set(key,template);
+    return template;
+  }
+
+  function warmSectionMarkup(sectionKey){
+    const data=portfolioSections[sectionKey];
+    if(!data||warmedSections.has(sectionKey))return;
+    data.items.forEach((_item,index)=>getCachedItemTemplate(sectionKey,index));
+    warmedSections.add(sectionKey);
+  }
+
   function renderCurrentItem(){
     if(!currentSectionKey)return;
     if(mobile && sectionContent) sectionContent.scrollTop=0;
-    const data=portfolioSections[currentSectionKey],item=data.items[currentItemIndex];sliderCurrent.textContent=formatNumber(currentItemIndex+1);
-    if(data.type==="showcase")return renderShowcase(item);if(data.type==="experience")return renderExperience(item);if(data.type==="education")return renderEducation(item);if(data.type==="skills")return renderSkills(item);if(data.type==="research")return renderResearch(item);if(data.type==="about")return renderAbout(item);if(data.type==="contact")return renderContact(item);
+    const data=portfolioSections[currentSectionKey],item=data.items[currentItemIndex];
+    sliderCurrent.textContent=formatNumber(currentItemIndex+1);
+    stopProjectReplay();
+    stopProjectDemo();
+    const template=getCachedItemTemplate(currentSectionKey,currentItemIndex);
+    sectionContent.replaceChildren(template.content.cloneNode(true));
+    if(data.type==="showcase")bindProjectTools(item);
   }
 
   function stopProjectReplay(){
@@ -2607,25 +2706,118 @@
   }
 
   /* =========================================================
-     MEDIA WARMUP
+     BACKGROUND CONTENT WARMUP
+     City first; portfolio DOM, media decode, search data and repeat-visit
+     caches are prepared in idle slices after the initial scene is visible.
   ========================================================= */
 
-  function preloadPortfolioMedia(){
-    const urls=[];
-    if(mobile){
-      const priority=[
-        portfolioSections.projects?.items?.[0]?.media,
-        portfolioSections.projects?.items?.[1]?.media,
-        portfolioSections.featured?.items?.[0]?.media
-      ];
-      priority.filter(Boolean).forEach(url=>urls.push(url));
-    }else{
-      Object.values(portfolioSections).forEach(section=>section.items?.forEach(item=>{if(item.media)urls.push(item.media)}));
-    }
-    const run=()=>Runtime.preloadImages(urls).catch(()=>{});
-    if(mobile && "requestIdleCallback" in window){requestIdleCallback(run,{timeout:2400});}
-    else if(mobile){setTimeout(run,1400);}
-    else run();
+  function collectPortfolioMedia(){
+    const images=[];
+    const videos=[];
+    Object.values(portfolioSections).forEach(section=>section.items?.forEach(item=>{
+      if(item.media)images.push(item.media);
+      if(item.demoVideo)videos.push(item.demoVideo);
+    }));
+    return {
+      images:[...new Set(images)],
+      videos:[...new Set(videos)]
+    };
+  }
+
+  function collectLocalWarmUrls(){
+    const media=collectPortfolioMedia();
+    return [
+      "./index.html",
+      "./assets/css/style.css?v=21",
+      "./assets/css/mobile.css?v=21",
+      "./assets/js/modules/runtime.js?v=21",
+      "./assets/js/modules/world-boundaries.js?v=21",
+      "./assets/js/main.js?v=21",
+      "./favicon.png",
+      ...media.images,
+      ...media.videos
+    ];
+  }
+
+  function warmPrioritySection(sectionKey){
+    if(!portfolioSections[sectionKey])return;
+    warmSectionMarkup(sectionKey);
+    const images=portfolioSections[sectionKey].items.map(item=>item.media).filter(Boolean);
+    if(images.length)Runtime.preloadImages(images,{batchSize:1,retain:true,priority:"high",idleTimeout:80}).catch(()=>{});
+  }
+
+  function startPortfolioWarmup(){
+    if(contentWarmupPromise)return contentWarmupPromise;
+    contentWarmupState="warming";
+    document.documentElement.dataset.contentWarmup="warming";
+
+    const media=collectPortfolioMedia();
+    const priorityOrder=["projects","featured","experience","about","research","skills","education","contact"];
+    const tasks=[];
+    const firstImages=[
+      portfolioSections.projects?.items?.[0]?.media,
+      portfolioSections.projects?.items?.[1]?.media,
+      portfolioSections.featured?.items?.[0]?.media
+    ].filter(Boolean);
+    const remainingImages=media.images.filter(url=>!firstImages.includes(url));
+    const swRegistrationPromise=Runtime.registerServiceWorker();
+
+    // Start the three most likely recruiter-facing images immediately in the
+    // background. We intentionally do not await this task, so DOM warming keeps going.
+    tasks.push(async()=>{
+      Runtime.preloadImages(firstImages,{batchSize:3,retain:true,priority:"high",idleTimeout:40}).catch(()=>{});
+    });
+
+    // 1) Prebuild every section/item into detached <template> DOM. First open
+    // therefore clones already-parsed nodes instead of parsing large HTML strings.
+    priorityOrder.forEach(sectionKey=>{
+      tasks.push(async()=>warmSectionMarkup(sectionKey));
+    });
+
+    // 2) Build the command/search database once instead of on first search.
+    tasks.push(async()=>{buildSearchIndex();});
+
+    // 3) Decode the rest of the project imagery in small batches. Keeping the
+    // decoded Image objects alive avoids blank media frames on first open.
+    tasks.push(async()=>{
+      await Runtime.preloadImages(remainingImages,{batchSize:mobile?3:4,retain:true,priority:"low",idleTimeout:mobile?90:60});
+    });
+
+    // 4) Warm same-origin files in the service worker for repeat visits.
+    tasks.push(async()=>{
+      await swRegistrationPromise;
+      await Runtime.warmServiceWorkerCache(collectLocalWarmUrls());
+    });
+
+    contentWarmupPromise=Runtime.runIdleQueue(tasks,{
+      timeout:mobile?120:80,
+      pauseEvery:1
+    }).then(()=>{
+      contentWarmupState="ready";
+      document.documentElement.dataset.contentWarmup="ready";
+      window.dispatchEvent(new CustomEvent("rithvik:content-ready"));
+      return true;
+    }).catch(error=>{
+      console.warn("Portfolio background warm-up completed with errors",error);
+      contentWarmupState="partial";
+      document.documentElement.dataset.contentWarmup="partial";
+      return false;
+    });
+
+    return contentWarmupPromise;
+  }
+
+  function schedulePortfolioWarmup(){
+    // Give Three.js and the initial city paint first priority. The delay is short
+    // enough that content is normally ready before a visitor reaches a district.
+    const delay=mobile?300:220;
+    setTimeout(()=>{
+      if("requestIdleCallback" in window){
+        requestIdleCallback(()=>startPortfolioWarmup(),{timeout:mobile?250:180});
+      }else{
+        startPortfolioWarmup();
+      }
+    },delay);
   }
 
   /* =========================================================
@@ -2646,7 +2838,7 @@
         setTimeout(()=>{
           worldEntered=true;
           loadingScreen.classList.add("is-hidden");
-          setTimeout(preloadPortfolioMedia,mobile?900:220);
+          schedulePortfolioWarmup();
           setTimeout(()=>{
             exploreHint.classList.remove("hidden");
             if(mobile){
