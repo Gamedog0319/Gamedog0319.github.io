@@ -1,5 +1,5 @@
 /* =========================================================
-   RITHVIK CITY — Final Interactive V16
+   RITHVIK CITY — Mobile Portrait V18
    Uses the global THREE object loaded in index.html.
 ========================================================= */
 
@@ -1028,28 +1028,23 @@
   document.body.classList.toggle("mobile-mode", mobile);
 
   function isPhonePortrait(){
-    const shortSide=Math.min(window.innerWidth,window.innerHeight);
-    return coarsePointer && shortSide<=760 && window.innerHeight>window.innerWidth;
+    // V18 is portrait-first on mobile. Orientation never blocks the city.
+    return false;
   }
 
   function syncMobileOrientation(){
-    const portraitBlocked=isPhonePortrait();
-    const landscapeMobile=mobile && window.innerWidth>window.innerHeight;
-    document.body.classList.toggle("portrait-mobile-blocked",portraitBlocked);
-    document.body.classList.toggle("mobile-landscape",landscapeMobile);
+    const isLandscape=mobile && window.innerWidth>window.innerHeight;
+    document.body.classList.remove("portrait-mobile-blocked");
+    document.body.classList.toggle("mobile-landscape",isLandscape);
+    document.body.classList.toggle("mobile-portrait",mobile && !isLandscape);
     if(rotateDeviceOverlay){
-      const visuallyOpen=portraitBlocked && !document.body.classList.contains("recruiter-open");
-      rotateDeviceOverlay.setAttribute("aria-hidden",visuallyOpen?"false":"true");
-    }
-    if(portraitBlocked){
-      if(mobileMenuPanel?.classList.contains("open"))setMobileMenu(false,false);
+      rotateDeviceOverlay.setAttribute("aria-hidden","true");
+      rotateDeviceOverlay.style.display="none";
     }
     if(controlHintText && mobile){
-      controlHintText.textContent=landscapeMobile
-        ? "Drag to move • pinch to zoom • tap a district • use ⋮ for all sections and city tools."
-        : "Rotate your phone to landscape for the interactive city.";
+      controlHintText.textContent="Drag to move • pinch to zoom • tap a building • use ⋮ for sections • city tools stay on the left.";
     }
-    return portraitBlocked;
+    return false;
   }
 
   syncMobileOrientation();
@@ -2554,16 +2549,19 @@
 
     let viewHeight;
     let viewWidth;
-    if(mobile && width>height){
-      // Landscape phones use a closer tactical framing so buildings and tap targets
-      // are physically larger on screen. Wider phones get a little more context.
-      viewWidth=width>=900?108:width>=740?102:96;
-      viewHeight=viewWidth/aspect;
+    if(mobile){
+      if(width>height){
+        // Keep landscape comfortable, but mobile is no longer landscape-only.
+        viewWidth=width>=900?106:width>=740?100:94;
+        viewHeight=viewWidth/aspect;
+      }else{
+        // Portrait is intentionally closer: the city behaves like a map you pan through
+        // instead of shrinking the entire town into an unreadable thumbnail.
+        viewHeight=width<=390?84:width<=480?88:92;
+        viewWidth=viewHeight*aspect;
+      }
     }else{
-      if(width <= 390) viewHeight = aspect < .62 ? 112 : 102;
-      else if(width <= 480) viewHeight = aspect < .68 ? 108 : 99;
-      else if(width <= 820) viewHeight = aspect < .82 ? 98 : 91;
-      else viewHeight = 78;
+      viewHeight=78;
       viewWidth=viewHeight*aspect;
       if(aspect>1.8){viewWidth=122;viewHeight=viewWidth/aspect}
     }
@@ -2720,7 +2718,7 @@
       return;
     }
 
-    pointerOverUi=!!event.target.closest(".game-hud,.district-directory,.section-sidebar,.mobile-menu-panel,.mobile-menu-toggle,.mobile-menu-backdrop,.city-minimap,.section-modal,.command-palette,.completion-finale,.world-blueprint-hud,.scanner-hud,.explore-hint");
+    pointerOverUi=!!event.target.closest(".game-hud,.district-directory,.section-sidebar,.mobile-menu-panel,.mobile-menu-toggle,.mobile-menu-backdrop,.mobile-tool-rail,.mobile-landscape-dock,.city-minimap,.section-modal,.command-palette,.completion-finale,.world-blueprint-hud,.scanner-hud,.explore-hint");
     if(!worldEntered||sectionModal.classList.contains("open"))return;
     if(pointerOverUi)return;
     raycastDirty=true;
@@ -2735,7 +2733,7 @@
       if(isPhonePortrait()&&!document.body.classList.contains("recruiter-open"))return;
       if(mobile && event.target.closest("#threeContainer")) dismissMobileHint();
       if(!worldEntered||sectionModal.classList.contains("open"))return;
-      if(event.target.closest("button,a,.district-directory,.section-sidebar,.mobile-menu-panel,.mobile-menu-toggle,.mobile-menu-backdrop,.city-minimap,.section-modal,.command-palette,.completion-finale,.world-blueprint-hud,.scanner-hud"))return;
+      if(event.target.closest("button,a,.district-directory,.section-sidebar,.mobile-menu-panel,.mobile-menu-toggle,.mobile-menu-backdrop,.mobile-tool-rail,.mobile-landscape-dock,.city-minimap,.section-modal,.command-palette,.completion-finale,.world-blueprint-hud,.scanner-hud"))return;
       if(!event.target.closest("#threeContainer"))return;
 
       if(coarsePointer){

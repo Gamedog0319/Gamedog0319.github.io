@@ -33,20 +33,6 @@
       </div>
     </div>
   </section>
-
-  <section class="rotate-device-overlay" id="rotateDeviceOverlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="rotateDeviceTitle">
-    <div class="rotate-device-card">
-      <div class="rotate-device-visual" aria-hidden="true">
-        <div class="rotate-phone"><span></span></div>
-        <div class="rotate-arrow">↻</div>
-      </div>
-      <span class="rotate-device-kicker">MOBILE EXPERIENCE</span>
-      <h2 id="rotateDeviceTitle">Rotate to landscape</h2>
-      <p>The interactive city is designed for landscape on phones. Rotate your device for larger controls, easier navigation and a better view of the city.</p>
-      <small>Rotate your phone to continue.</small>
-    </div>
-  </section>
-
   <header class="game-hud">
     <div class="hud-brand">
       <div class="hud-brand-mark">RM</div>
@@ -102,7 +88,7 @@
         <span class="mobile-menu-brand-mark">RM</span>
         <div>
           <small>PORTFOLIO CITY</small>
-          <strong>MENU</strong>
+          <strong>EXPLORE</strong>
         </div>
       </div>
       <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Close mobile menu">×</button>
@@ -118,12 +104,6 @@
         <span><small>PDF</small><strong>Resume</strong><em>Open</em></span>
       </a>
     </div>
-
-    <div class="mobile-menu-tabs" role="tablist" aria-label="Mobile menu views">
-      <button class="mobile-menu-tab is-active" type="button" role="tab" aria-selected="true" data-mobile-menu-tab="explore">EXPLORE</button>
-      <button class="mobile-menu-tab" type="button" role="tab" aria-selected="false" data-mobile-menu-tab="tools">CITY TOOLS</button>
-    </div>
-
     <div class="mobile-menu-scroll">
       <section class="mobile-menu-group" data-mobile-menu-view="explore">
         <div class="mobile-menu-group-title"><span>EXPLORE</span><strong>SECTIONS</strong></div>
@@ -138,47 +118,43 @@
           <button class="mobile-section-item" style="--district:#ffa35f" type="button" data-open-section="contact"><span class="mobile-section-icon">◎</span><span class="mobile-section-copy"><strong>Contact</strong><small>Email • LinkedIn • GitHub</small></span><span class="mobile-section-index">08</span></button>
         </nav>
       </section>
-
-      <section class="mobile-menu-group mobile-map-group" data-mobile-menu-view="tools" hidden>
-        <div class="mobile-menu-group-title"><span>NAVIGATE</span><strong>CITY MAP</strong></div>
-        <div class="mobile-city-map" aria-label="City minimap">
-          <button type="button" data-map-section="research" style="--map:#b38cff"><span>⌬</span><small>Research</small></button>
-          <button type="button" data-map-section="education" style="--map:#7fa5ff"><span>⌂</span><small>Education</small></button>
-          <button type="button" data-map-section="skills" style="--map:#50d5a4"><span>⚙</span><small>Skills</small></button>
-          <button type="button" data-map-section="featured" style="--map:#ff7f7f"><span>✦</span><small>Featured</small></button>
-          <button type="button" data-map-section="projects" style="--map:#ff5f57"><span>◈</span><small>Projects</small></button>
-          <button type="button" data-map-section="experience" style="--map:#57bde3"><span>▥</span><small>Experience</small></button>
-          <button type="button" data-map-section="about" style="--map:#ff5f57"><span>RM</span><small>About</small></button>
-          <span class="mobile-map-center" aria-hidden="true">CITY</span>
-          <button type="button" data-map-section="contact" style="--map:#ffa35f"><span>◎</span><small>Contact</small></button>
-        </div>
-      </section>
-
-      <section class="mobile-menu-group" data-mobile-menu-view="tools" hidden>
-        <div class="mobile-menu-group-title"><span>CITY</span><strong>CONTROLS</strong></div>
-        <div class="mobile-action-grid">
-          <button class="mobile-action-card" id="mobileSoundToggle" type="button"><span class="mobile-action-icon">♫</span><span><strong>Sound</strong><small id="mobileSoundState">On • 88%</small></span></button>
-          <button class="mobile-action-card" id="mobileTimeModeButton" type="button"><span class="mobile-action-icon">☀</span><span><strong>World Mode</strong><small id="mobileTimeState">Day</small></span></button>
-          <button class="mobile-action-card" id="mobileTourButton" type="button"><span class="mobile-action-icon">▶</span><span><strong>Guided Tour</strong><small id="mobileTourState">Start</small></span></button>
-          <button class="mobile-action-card" id="mobileHomeViewButton" type="button"><span class="mobile-action-icon">⌂</span><span><strong>Home View</strong><small>Reset camera</small></span></button>
-          <button class="mobile-action-card" id="mobileCinematicButton" type="button"><span class="mobile-action-icon">◉</span><span><strong>Cinematic</strong><small id="mobileCinematicState">Off</small></span></button>
-          <button class="mobile-action-card" id="mobileScannerButton" type="button"><span class="mobile-action-icon">⌖</span><span><strong>Scanner</strong><small id="mobileScannerState">Off</small></span></button>
-          <button class="mobile-action-card" id="mobileCommandButton" type="button"><span class="mobile-action-icon">⌕</span><span><strong>Search City</strong><small>Projects • Skills • AI</small></span></button>
-        </div>
-      </section>
-    </div>
+</div>
 
     <div class="mobile-menu-footer">
       <div><span>EXPLORED</span><strong id="mobileExploredCount">0 / 8</strong></div>
       <div class="mobile-explored-track"><span id="mobileExploredFill"></span></div>
-      <small>Drag to move • pinch to zoom • tap a district</small>
+      <small>Drag to move • pinch to zoom • tap buildings • tools stay on the left</small>
     </div>
+  </aside>
+
+  <aside class="mobile-tool-rail" id="mobileToolRail" aria-label="City tools">
+    <span class="mobile-tool-rail-title">TOOLS</span>
+    <button class="mobile-tool-button" id="mobileSoundToggle" type="button" aria-label="Toggle sound">
+      <span class="mobile-tool-icon">♫</span><strong>Sound</strong><small id="mobileSoundState">On</small>
+    </button>
+    <button class="mobile-tool-button" id="mobileTimeModeButton" type="button" aria-label="Switch day and night mode">
+      <span class="mobile-tool-icon">☀</span><strong>Mode</strong><small id="mobileTimeState">Day</small>
+    </button>
+    <button class="mobile-tool-button" id="mobileTourButton" type="button" aria-label="Start guided tour">
+      <span class="mobile-tool-icon">▶</span><strong>Tour</strong><small id="mobileTourState">Start</small>
+    </button>
+    <button class="mobile-tool-button" id="mobileHomeViewButton" type="button" aria-label="Reset city camera">
+      <span class="mobile-tool-icon">⌂</span><strong>Home</strong><small>Reset</small>
+    </button>
+    <button class="mobile-tool-button" id="mobileCinematicButton" type="button" aria-label="Toggle cinematic mode">
+      <span class="mobile-tool-icon">◉</span><strong>Cinema</strong><small id="mobileCinematicState">Off</small>
+    </button>
+    <button class="mobile-tool-button" id="mobileScannerButton" type="button" aria-label="Toggle technical scanner">
+      <span class="mobile-tool-icon">⌖</span><strong>Scan</strong><small id="mobileScannerState">Off</small>
+    </button>
+    <button class="mobile-tool-button" id="mobileCommandButton" type="button" aria-label="Search portfolio city">
+      <span class="mobile-tool-icon">⌕</span><strong>Search</strong><small>Find</small>
+    </button>
   </aside>
 
   <nav class="mobile-landscape-dock" id="mobileLandscapeDock" aria-label="Quick portfolio navigation">
     <button class="mobile-dock-item mobile-dock-quick" id="mobileDockQuickView" type="button" aria-label="Open recruiter quick view"><span>★</span><strong>Quick</strong></button>
     <button class="mobile-dock-item" type="button" data-open-section="projects" aria-label="Open Projects"><span>◈</span><strong>Projects</strong></button>
-    <button class="mobile-dock-item" type="button" data-open-section="experience" aria-label="Open Experience"><span>▥</span><strong>Experience</strong></button>
     <button class="mobile-dock-item" type="button" data-open-section="contact" aria-label="Open Contact"><span>◎</span><strong>Contact</strong></button>
     <a class="mobile-dock-item mobile-dock-resume" href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing" target="_blank" rel="noopener noreferrer" aria-label="Open resume in a new tab"><span>↗</span><strong>Resume</strong></a>
   </nav>
