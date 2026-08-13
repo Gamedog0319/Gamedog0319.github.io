@@ -209,6 +209,7 @@
     mobileMenuBackdrop?.setAttribute("aria-hidden",open?"false":"true");
     mobileMenuToggle.setAttribute("aria-expanded",open?"true":"false");
     document.body.classList.toggle("mobile-menu-open",open);
+    if(mobile&&typeof resetMobileInputState==="function")resetMobileInputState();
     if(open&&typeof clearDistrictHover==="function")clearDistrictHover();
     if(open){
       window.setTimeout(()=>mobileMenuClose?.focus({preventScroll:true}),80);
@@ -1110,6 +1111,15 @@
   let pinchStartDistance = 0;
   let pinchStartZoom = 1;
 
+  function resetMobileInputState(){
+    activeTouchPointers.clear();
+    pinching=false;
+    pinchStartDistance=0;
+    dragPointerId=null;
+    dragMoved=false;
+    if(customCursor)customCursor.classList.remove("dragging");
+  }
+
   let renderPixelRatio = PERF.pixelRatio;
   let lastRenderStamp = 0;
   let perfWindowStart = performance.now();
@@ -1117,7 +1127,9 @@
 
   const cameraRight = new THREE.Vector3();
   const cameraForward = new THREE.Vector3();
-  const EDGE_ZONE = coarsePointer ? 0 : mobile ? .12 : .19;
+  const EDGE_ZONE = coarsePointer ? 0 : mobile ? .12 : .14;
+  const Runtime = window.RithvikRuntime || { frameBlend:(rate,delta)=>1-Math.exp(-rate*delta), preloadImages:()=>Promise.resolve([]) };
+  let mobileUiFreeze = false;
 
   const shared = {};
   const glassMaterials = [];
@@ -1131,8 +1143,9 @@
   let personBodyMesh, personHeadMesh;
 
   function clampPan(){
-    const maxX=mobile?23:15;
-    const maxZ=mobile?16:10;
+    const bounds=window.RithvikWorld?.NAV_BOUNDS;
+    const maxX=mobile?(bounds?.mobileX ?? 28):(bounds?.desktopX ?? 30);
+    const maxZ=mobile?(bounds?.mobileZ ?? 21):(bounds?.desktopZ ?? 23);
     cameraPanTarget.x = THREE.MathUtils.clamp(cameraPanTarget.x,-maxX,maxX);
     cameraPanTarget.y = THREE.MathUtils.clamp(cameraPanTarget.y,-maxZ,maxZ);
   }
@@ -1364,12 +1377,15 @@
     renderer.shadowMap.enabled = PERF.shadows;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     threeContainer.appendChild(renderer.domElement);
+    renderer.domElement.addEventListener("webglcontextlost",event=>{event.preventDefault();document.body.classList.add("webgl-context-lost");resetMobileInputState();},{passive:false});
+    renderer.domElement.addEventListener("webglcontextrestored",()=>{document.body.classList.remove("webgl-context-lost");resizeRenderer();raycastDirty=true;});
 
     raycaster = new THREE.Raycaster();
     makeSharedAssets();
     addDayLighting();
     createTerrain();
     createRoadNetwork();
+    window.RithvikWorld?.createNaturalBoundary?.({THREE,scene,shared,mobile,veryLowEnd,COLORS,animatedElements});
     createDistricts();
     createGreenery();
     createStreetFurniture();
@@ -1471,7 +1487,7 @@
   ========================================================= */
 
   function createTerrain(){
-    const outer = new THREE.Mesh(new THREE.PlaneGeometry(176,142),shared.grassDark);
+    const outer = new THREE.Mesh(new THREE.PlaneGeometry(190,154),shared.grassDark);
     outer.rotation.x=-Math.PI/2;outer.position.y=-.07;scene.add(outer);
 
     const city = new THREE.Mesh(new THREE.BoxGeometry(104,.42,78),new THREE.MeshStandardMaterial({color:0xbcb9ae,roughness:.96}));
@@ -2335,9 +2351,11 @@
     const data=portfolioSections[key];if(!data)return;
     stopGuidedTour();
     setMobileMenu(false,false);
+    if(mobile){mobileUiFreeze=true;resetMobileInputState();}
 
-    // Mobile-first response: render and reveal the content immediately, then
-    // run 3D reactions/audio on the next frame so a tap never feels delayed.
+    // Render the page completely before it becomes visible. On phones the
+    // WebGL loop is paused behind the opaque app page, leaving the main thread
+    // free to paint text/images immediately instead of showing a white shell.
     currentSectionKey=key;
     currentItemIndex=0;
     modalSectionIndex.textContent=data.cityIndex;
@@ -2352,7 +2370,13 @@
     districtDirectory.setAttribute("aria-hidden","true");
     document.querySelectorAll(".section-sidebar-item,.mobile-section-item").forEach(el=>el.classList.toggle("is-active",el.dataset.openSection===key));
 
-    renderCurrentItem();
+    try{
+      renderCurrentItem();
+    }catch(error){
+      console.error("Section render failed",error);
+      sectionContent.innerHTML=`<div class="mobile-render-error"><strong>Content failed to render.</strong><p>Please close this panel and try again.</p></div>`;
+    }
+    if(mobile && sectionContent){void sectionContent.offsetHeight;}
     sectionModal.classList.add("open");
     sectionModal.setAttribute("aria-hidden","false");
     document.body.classList.add("modal-open");
@@ -2372,7 +2396,7 @@
     };
 
     if(mobile){
-      requestAnimationFrame(()=>requestAnimationFrame(finishOpen));
+      requestAnimationFrame(()=>setTimeout(finishOpen,0));
     }else{
       finishOpen();
     }
@@ -2380,6 +2404,7 @@
 
   function closeSection(){
     stopProjectReplay();stopProjectDemo();
+    if(mobile){mobileUiFreeze=false;resetMobileInputState();}
     if(!sectionModal.classList.contains("open"))return;
     playCloseSound();duckMusic(false);
     sectionModal.classList.remove("open");sectionModal.setAttribute("aria-hidden","true");document.body.classList.remove("modal-open");
@@ -2413,7 +2438,7 @@
     if(item.demoVideo){
       return `<div class="project-tool-panel demo-panel" id="projectDemoPanel" hidden><div class="tool-panel-head"><div><span>PROJECT DEMO</span><strong>Running software</strong></div><span class="demo-state" id="demoState">READY</span></div><video class="project-demo-video" id="projectDemoVideo" muted playsinline preload="metadata" poster="${item.media}"><source src="${item.demoVideo}" type="video/mp4" /></video></div>`;
     }
-    return `<div class="project-tool-panel demo-panel" id="projectDemoPanel" hidden><div class="tool-panel-head"><div><span>VISUAL DEMO</span><strong>Animated system walkthrough</strong></div><span class="demo-state" id="demoState">READY</span></div><div class="demo-stage"><img src="${item.media}" alt="${item.mediaAlt}" loading="lazy" decoding="async" /><div class="demo-scanline"></div><div class="demo-node-layer">${extras.replay.slice(0,6).map((step,index)=>`<span class="demo-node" data-demo-step="${index}"><b>${String(index+1).padStart(2,"0")}</b>${step}</span>`).join("")}</div><div class="demo-reticle" aria-hidden="true"></div></div><p class="demo-note">Animated system visualization. Add a real MP4/WebM to <code>demoVideo</code> for this project and the player will use it automatically.</p></div>`;
+    return `<div class="project-tool-panel demo-panel" id="projectDemoPanel" hidden><div class="tool-panel-head"><div><span>VISUAL DEMO</span><strong>Animated system walkthrough</strong></div><span class="demo-state" id="demoState">READY</span></div><div class="demo-stage"><img src="${item.media}" alt="${item.mediaAlt}" loading="${mobile?"eager":"lazy"}" decoding="async" fetchpriority="${mobile?"high":"auto"}" /><div class="demo-scanline"></div><div class="demo-node-layer">${extras.replay.slice(0,6).map((step,index)=>`<span class="demo-node" data-demo-step="${index}"><b>${String(index+1).padStart(2,"0")}</b>${step}</span>`).join("")}</div><div class="demo-reticle" aria-hidden="true"></div></div><p class="demo-note">Animated system visualization. Add a real MP4/WebM to <code>demoVideo</code> for this project and the player will use it automatically.</p></div>`;
   }
 
   function startProjectDemo(item,extras){
@@ -2478,7 +2503,7 @@
   function renderShowcase(item){
     stopProjectReplay();stopProjectDemo();
     const extras=getProjectExtras(item.title);
-    sectionContent.innerHTML=`<div class="showcase-layout content-enter"><div class="showcase-media"><img src="${item.media}" alt="${item.mediaAlt}" loading="lazy" decoding="async" /><div class="media-overlay"></div><span class="media-label">PROJECT VISUAL // MEDIA FEED</span><div class="media-tech-overlay"><span>LIVE CASE STUDY</span><strong>${extras.blueprint.length} SYSTEM NODES</strong></div></div><div class="showcase-copy"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}${renderTags(item.tags)}<div class="project-tool-actions"><button type="button" id="projectDemoButton">▶ RUN VISUAL DEMO</button><button type="button" id="projectReplayButton">↻ SYSTEM REPLAY</button><button type="button" id="projectBlueprintButton">⌘ BLUEPRINT</button><button type="button" id="projectWorldButton">◎ PROJECT INTO CITY</button><a class="archive-link" href="${item.link}" target="_blank" rel="noopener noreferrer">${item.linkLabel}</a></div>${renderEvidenceCards(extras)}</div></div>${renderVisualDemo(item,extras)}${renderReplay(extras)}${renderBlueprint(extras)}`;
+    sectionContent.innerHTML=`<div class="showcase-layout content-enter"><div class="showcase-media"><img src="${item.media}" alt="${item.mediaAlt}" loading="${mobile?"eager":"lazy"}" decoding="async" fetchpriority="${mobile?"high":"auto"}" /><div class="media-overlay"></div><span class="media-label">PROJECT VISUAL // MEDIA FEED</span><div class="media-tech-overlay"><span>LIVE CASE STUDY</span><strong>${extras.blueprint.length} SYSTEM NODES</strong></div></div><div class="showcase-copy"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}${renderTags(item.tags)}<div class="project-tool-actions"><button type="button" id="projectDemoButton">▶ RUN VISUAL DEMO</button><button type="button" id="projectReplayButton">↻ SYSTEM REPLAY</button><button type="button" id="projectBlueprintButton">⌘ BLUEPRINT</button><button type="button" id="projectWorldButton">◎ PROJECT INTO CITY</button><a class="archive-link" href="${item.link}" target="_blank" rel="noopener noreferrer">${item.linkLabel}</a></div>${renderEvidenceCards(extras)}</div></div>${renderVisualDemo(item,extras)}${renderReplay(extras)}${renderBlueprint(extras)}`;
     bindProjectTools(item);
   }
 
@@ -2518,7 +2543,8 @@
       if(Math.abs(edgeX)>.01 || Math.abs(edgeY)>.01){
         cameraRight.set(1,0,0).applyQuaternion(camera.quaternion);cameraRight.y=0;cameraRight.normalize();
         cameraForward.set(0,0,-1).applyQuaternion(camera.quaternion);cameraForward.y=0;cameraForward.normalize();
-        const speed=(mobile?12.5:20.5)*delta/Math.max(.82,cameraZoom);
+        const edgeStrength=Math.max(Math.abs(edgeX),Math.abs(edgeY));
+        const speed=(mobile?14.5:34.0)*(0.72+edgeStrength*.62)*delta/Math.max(.82,cameraZoom);
         cameraPanTarget.x += (cameraRight.x*edgeX + cameraForward.x*(-edgeY))*speed;
         cameraPanTarget.y += (cameraRight.z*edgeX + cameraForward.z*(-edgeY))*speed;
         clampPan();
@@ -2526,10 +2552,13 @@
       }
     }
 
-    pointer.x=THREE.MathUtils.lerp(pointer.x,pointerTarget.x,.18);
-    pointer.y=THREE.MathUtils.lerp(pointer.y,pointerTarget.y,.18);
-    cameraPan.lerp(cameraPanTarget,.21);
-    cameraZoom=THREE.MathUtils.lerp(cameraZoom,cameraZoomTarget,.19);
+    const pointerBlend=Runtime.frameBlend(18,delta);
+    const panBlend=Runtime.frameBlend(dragPointerId!==null?18:11.5,delta);
+    const zoomBlend=Runtime.frameBlend(12,delta);
+    pointer.x=THREE.MathUtils.lerp(pointer.x,pointerTarget.x,pointerBlend);
+    pointer.y=THREE.MathUtils.lerp(pointer.y,pointerTarget.y,pointerBlend);
+    cameraPan.lerp(cameraPanTarget,panBlend);
+    cameraZoom=THREE.MathUtils.lerp(cameraZoom,cameraZoomTarget,zoomBlend);
     camera.zoom=cameraZoom;camera.updateProjectionMatrix();
 
     // Very small parallax keeps the city feeling alive without fighting hover.
@@ -2557,7 +2586,7 @@
       }else{
         // Portrait is intentionally closer: the city behaves like a map you pan through
         // instead of shrinking the entire town into an unreadable thumbnail.
-        viewHeight=width<=390?84:width<=480?88:92;
+        viewHeight=width<=390?78:width<=480?82:86;
         viewWidth=viewHeight*aspect;
       }
     }else{
@@ -2609,9 +2638,17 @@
     const mobileMenuOpen=!!mobileMenuPanel?.classList.contains("open");
     const commandIsOpen=!!commandPalette?.classList.contains("open");
     const finaleOpen=!!completionFinale?.classList.contains("open");
-    const portraitBlocked=isPhonePortrait()&&!recruiterOpen&&!commandIsOpen;
+    const portraitBlocked=false;
     const uiOverlayOpen=sectionOpen||recruiterOpen||mobileMenuOpen||commandIsOpen||finaleOpen;
-    const effectiveFps=portraitBlocked?8:(mobile&&uiOverlayOpen)?14:PERF.targetFps;
+
+    // Opaque mobile pages do not need a live 3D scene behind them. Completely
+    // pausing WebGL here removes a major source of delayed/blank panel paints.
+    if(mobile && (mobileUiFreeze||sectionOpen||recruiterOpen||commandIsOpen||finaleOpen)){
+      clock.getDelta();
+      return;
+    }
+
+    const effectiveFps=(mobile&&mobileMenuOpen)?12:PERF.targetFps;
     const minFrameMs=1000/effectiveFps;
     if(now-lastRenderStamp<minFrameMs)return;
     lastRenderStamp=now;
@@ -2645,6 +2682,16 @@
   }
 
   /* =========================================================
+     MEDIA WARMUP
+  ========================================================= */
+
+  function preloadPortfolioMedia(){
+    const urls=[];
+    Object.values(portfolioSections).forEach(section=>section.items?.forEach(item=>{if(item.media)urls.push(item.media)}));
+    Runtime.preloadImages(urls).catch(()=>{});
+  }
+
+  /* =========================================================
      LOADING
   ========================================================= */
 
@@ -2662,6 +2709,7 @@
         setTimeout(()=>{
           worldEntered=true;
           loadingScreen.classList.add("is-hidden");
+          setTimeout(preloadPortfolioMedia,220);
           setTimeout(()=>{
             exploreHint.classList.remove("hidden");
             if(mobile){
@@ -2711,8 +2759,9 @@
       const dx=event.clientX-dragStartScreenX,dy=event.clientY-dragStartScreenY;
       if(Math.hypot(dx,dy)>(coarsePointer?9:5))dragMoved=true;
       if(screenToGround(event.clientX,event.clientY,dragCurrentWorld)){
-        cameraPanTarget.x=dragPanStart.x+(dragStartWorld.x-dragCurrentWorld.x);
-        cameraPanTarget.y=dragPanStart.y+(dragStartWorld.z-dragCurrentWorld.z);clampPan();
+        const dragSensitivity=mobile?1:1.16;
+        cameraPanTarget.x=dragPanStart.x+(dragStartWorld.x-dragCurrentWorld.x)*dragSensitivity;
+        cameraPanTarget.y=dragPanStart.y+(dragStartWorld.z-dragCurrentWorld.z)*dragSensitivity;clampPan();
       }
       customCursor.classList.add("dragging");
       return;
@@ -2797,15 +2846,14 @@
       setTimeout(()=>{dragMoved=false},0);
     },{passive:true});
 
-    document.addEventListener("pointercancel",event=>{
-      activeTouchPointers.delete(event.pointerId);
-      if(activeTouchPointers.size<2)pinching=false;
-      if(dragPointerId===event.pointerId){
-        dragPointerId=null;
-        dragMoved=false;
-        if(customCursor)customCursor.classList.remove("dragging");
-      }
-    },{passive:true});
+    document.addEventListener("pointercancel",()=>{resetMobileInputState()},{passive:true});
+  }
+
+  if(mobile){
+    window.addEventListener("blur",resetMobileInputState,{passive:true});
+    window.addEventListener("pagehide",resetMobileInputState,{passive:true});
+    window.addEventListener("orientationchange",()=>setTimeout(resetMobileInputState,80),{passive:true});
+    document.addEventListener("visibilitychange",()=>{if(document.hidden)resetMobileInputState()},{passive:true});
   }
 
   if(sectionContent){

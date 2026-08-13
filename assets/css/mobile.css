@@ -1,0 +1,310 @@
+/* ==========================================================
+   V19 MOBILE APP LAYER
+   Loaded after style.css. Desktop is intentionally untouched.
+========================================================== */
+body.mobile-mode{
+  --mobile-top:82px;
+  --mobile-bottom:88px;
+  --mobile-rail:98px;
+  --mobile-pad:16px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif !important;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  font-synthesis:none;
+}
+
+body.mobile-mode *,
+body.mobile-mode *::before,
+body.mobile-mode *::after{
+  -webkit-tap-highlight-color:transparent;
+}
+
+body.mobile-mode .game-hud{
+  min-height:var(--mobile-top) !important;
+  height:var(--mobile-top) !important;
+  padding:calc(10px + env(safe-area-inset-top)) 12px 10px calc(12px + env(safe-area-inset-left)) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:12px !important;
+  background:rgba(248,251,255,.97) !important;
+  border-bottom:1px solid rgba(30,55,82,.09) !important;
+  box-shadow:0 8px 28px rgba(20,45,74,.10) !important;
+  backdrop-filter:none !important;
+  transform:none !important;
+}
+body.mobile-mode .hud-brand{display:flex !important;align-items:center !important;gap:11px !important;min-width:0 !important}
+body.mobile-mode .hud-brand-mark{
+  width:52px !important;height:52px !important;min-width:52px !important;
+  border-radius:16px !important;font-size:15px !important;
+}
+body.mobile-mode .hud-brand strong{
+  max-width:230px !important;font-size:17px !important;line-height:1.1 !important;letter-spacing:.01em !important;
+  white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important;
+}
+body.mobile-mode .hud-brand span{font-size:12px !important;line-height:1.15 !important;letter-spacing:.04em !important}
+body.mobile-mode .hud-status,body.mobile-mode .hud-actions{display:none !important}
+body.mobile-mode .mobile-menu-toggle{
+  display:grid !important;place-items:center !important;position:static !important;
+  width:60px !important;height:60px !important;min-width:60px !important;min-height:60px !important;
+  margin:0 !important;border-radius:18px !important;background:#fff !important;color:#17304a !important;
+  border:1px solid rgba(31,57,85,.12) !important;box-shadow:0 7px 22px rgba(29,57,89,.12) !important;
+  transform:none !important;filter:none !important;backdrop-filter:none !important;
+}
+body.mobile-mode .mobile-menu-toggle span{font-size:36px !important;line-height:1 !important;transform:none !important}
+
+/* Permanent left city tool rail. */
+body.mobile-mode .mobile-tool-rail{
+  display:flex !important;flex-direction:column !important;
+  position:fixed !important;z-index:96 !important;
+  left:8px !important;top:calc(var(--mobile-top) + 8px) !important;
+  bottom:calc(var(--mobile-bottom) + env(safe-area-inset-bottom) + 8px) !important;
+  width:var(--mobile-rail) !important;
+  gap:7px !important;padding:9px 7px !important;
+  overflow-y:auto !important;scrollbar-width:none !important;overscroll-behavior:contain !important;
+  border-radius:24px !important;border:1px solid rgba(29,56,86,.11) !important;
+  background:#f8fbff !important;box-shadow:0 12px 34px rgba(23,50,82,.15) !important;
+  backdrop-filter:none !important;transform:none !important;
+}
+body.mobile-mode .mobile-tool-rail::-webkit-scrollbar{display:none}
+body.mobile-mode .mobile-tool-rail-title{font-size:12px !important;line-height:1 !important;padding:5px 0 6px !important}
+body.mobile-mode .mobile-tool-button{
+  flex:0 0 auto !important;width:100% !important;min-height:72px !important;
+  display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;
+  gap:3px !important;padding:8px 4px !important;
+  border-radius:18px !important;background:#fff !important;color:#18324d !important;
+  border:1px solid rgba(30,55,82,.09) !important;box-shadow:0 4px 12px rgba(27,54,84,.06) !important;
+  transform:none !important;filter:none !important;backdrop-filter:none !important;
+}
+body.mobile-mode .mobile-tool-button:active{background:#eaf3fb !important}
+body.mobile-mode .mobile-tool-icon{width:36px !important;height:34px !important;font-size:30px !important;line-height:1 !important}
+body.mobile-mode .mobile-tool-button strong{font-size:13px !important;line-height:1.05 !important}
+body.mobile-mode .mobile-tool-button small{font-size:11px !important;line-height:1.05 !important;color:#64798f !important}
+
+/* Bottom app navigation. */
+body.mobile-mode .mobile-landscape-dock{
+  display:grid !important;grid-template-columns:repeat(4,1fr) !important;
+  position:fixed !important;z-index:98 !important;
+  left:8px !important;right:8px !important;bottom:calc(7px + env(safe-area-inset-bottom)) !important;
+  height:var(--mobile-bottom) !important;min-height:var(--mobile-bottom) !important;
+  gap:5px !important;padding:6px !important;
+  border-radius:24px !important;border:1px solid rgba(31,57,85,.11) !important;
+  background:#f8fbff !important;box-shadow:0 12px 34px rgba(23,50,82,.16) !important;
+  backdrop-filter:none !important;transform:none !important;
+}
+body.mobile-mode .mobile-dock-item{
+  min-width:0 !important;min-height:70px !important;
+  display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;
+  gap:5px !important;border-radius:18px !important;background:#fff !important;
+  border:1px solid rgba(30,55,82,.08) !important;color:#18324d !important;
+  transform:none !important;filter:none !important;
+}
+body.mobile-mode .mobile-dock-item span{font-size:29px !important;line-height:1 !important}
+body.mobile-mode .mobile-dock-item strong{font-size:13px !important;line-height:1 !important;white-space:nowrap !important}
+body.mobile-mode .mobile-dock-quick{background:#17304a !important;color:#fff !important}
+body.mobile-mode .mobile-dock-resume{background:#ff5f57 !important;color:#fff !important}
+
+/* Explore menu: sections only, large native-app cards. */
+body.mobile-mode .mobile-menu-backdrop{background:rgba(3,12,23,.58) !important;backdrop-filter:none !important}
+body.mobile-mode .mobile-menu-panel{
+  width:min(94vw,430px) !important;max-width:430px !important;height:100dvh !important;max-height:none !important;
+  top:0 !important;right:0 !important;bottom:0 !important;border-radius:0 !important;
+  display:flex !important;flex-direction:column !important;background:#fff !important;
+  box-shadow:-14px 0 44px rgba(5,18,34,.25) !important;
+  backdrop-filter:none !important;filter:none !important;
+}
+body.mobile-mode .mobile-menu-panel.open{transform:none !important}
+body.mobile-mode .mobile-menu-header{
+  min-height:82px !important;padding:calc(12px + env(safe-area-inset-top)) 14px 12px !important;
+  background:#fff !important;border-bottom:1px solid rgba(30,55,82,.08) !important;
+}
+body.mobile-mode .mobile-menu-brand-mark{width:54px !important;height:54px !important;font-size:15px !important;border-radius:17px !important}
+body.mobile-mode .mobile-menu-brand small{font-size:12px !important;line-height:1 !important}
+body.mobile-mode .mobile-menu-brand strong{font-size:24px !important;line-height:1 !important;margin-top:4px !important}
+body.mobile-mode .mobile-menu-close{width:58px !important;height:58px !important;min-width:58px !important;font-size:31px !important;border-radius:18px !important}
+body.mobile-mode .mobile-menu-priority{grid-template-columns:1fr 1fr !important;gap:10px !important;padding:14px !important}
+body.mobile-mode .mobile-priority-card{min-height:98px !important;padding:14px !important;border-radius:20px !important;grid-template-columns:42px minmax(0,1fr) !important}
+body.mobile-mode .mobile-priority-icon{font-size:29px !important}
+body.mobile-mode .mobile-priority-card small{font-size:11px !important}
+body.mobile-mode .mobile-priority-card strong{font-size:18px !important}
+body.mobile-mode .mobile-priority-card em{font-size:12px !important}
+body.mobile-mode .mobile-menu-tabs,body.mobile-mode [data-mobile-menu-view="tools"]{display:none !important}
+body.mobile-mode .mobile-menu-scroll{padding:7px 14px 16px !important;overflow-y:auto !important;-webkit-overflow-scrolling:touch !important}
+body.mobile-mode .mobile-menu-group-title span{font-size:12px !important}
+body.mobile-mode .mobile-menu-group-title strong{font-size:14px !important}
+body.mobile-mode .mobile-menu-sections{gap:10px !important}
+body.mobile-mode .mobile-section-item{
+  grid-template-columns:58px minmax(0,1fr) 34px !important;gap:12px !important;
+  min-height:88px !important;padding:13px !important;border-radius:20px !important;
+  transform:none !important;filter:none !important;
+}
+body.mobile-mode .mobile-section-icon{width:56px !important;height:56px !important;font-size:28px !important;border-radius:18px !important}
+body.mobile-mode .mobile-section-rm{font-size:15px !important}
+body.mobile-mode .mobile-section-copy strong{font-size:19px !important;line-height:1.12 !important}
+body.mobile-mode .mobile-section-copy small{font-size:14px !important;line-height:1.25 !important;margin-top:5px !important}
+body.mobile-mode .mobile-section-index{font-size:13px !important}
+body.mobile-mode .mobile-menu-footer{padding:14px 16px calc(15px + env(safe-area-inset-bottom)) !important;background:#fff !important}
+body.mobile-mode .mobile-menu-footer span{font-size:12px !important}
+body.mobile-mode .mobile-menu-footer strong{font-size:16px !important}
+body.mobile-mode .mobile-menu-footer>small{font-size:13px !important;line-height:1.35 !important}
+
+/* Full-screen content pages: render crisp and instantly. */
+body.mobile-mode .section-modal{
+  inset:0 !important;padding:0 !important;background:#f2f6fa !important;
+  transform:none !important;filter:none !important;backdrop-filter:none !important;
+}
+body.mobile-mode .section-modal.open{transform:none !important}
+body.mobile-mode .section-backdrop{display:none !important}
+body.mobile-mode .section-panel{
+  width:100% !important;height:100dvh !important;max-width:none !important;max-height:none !important;
+  grid-template-rows:92px minmax(0,1fr) 84px !important;
+  background:#f7fafc !important;border:0 !important;border-radius:0 !important;box-shadow:none !important;
+  transform:none !important;filter:none !important;backdrop-filter:none !important;transition:none !important;
+}
+body.mobile-mode .section-panel-header{
+  min-height:92px !important;padding:calc(12px + env(safe-area-inset-top)) 16px 12px !important;
+  background:#fff !important;border-bottom:1px solid rgba(30,55,82,.09) !important;
+  transform:none !important;filter:none !important;backdrop-filter:none !important;
+}
+body.mobile-mode .section-panel-index{font-size:12px !important;line-height:1.15 !important}
+body.mobile-mode .section-panel-header h2{font-size:27px !important;line-height:1.04 !important;max-width:72vw !important;margin-top:5px !important}
+body.mobile-mode .section-panel-header p{font-size:14px !important;line-height:1.2 !important;display:block !important;white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important;max-width:70vw !important}
+body.mobile-mode .section-close{width:60px !important;height:60px !important;min-width:60px !important;min-height:60px !important;font-size:32px !important;border-radius:19px !important}
+body.mobile-mode .section-content{
+  padding:18px 18px 24px !important;font-size:17px !important;line-height:1.6 !important;
+  background:#f7fafc !important;overflow-y:auto !important;overflow-x:hidden !important;
+  transform:none !important;filter:none !important;backdrop-filter:none !important;
+  -webkit-overflow-scrolling:touch !important;
+}
+body.mobile-mode .content-enter{animation:none !important;transform:none !important;opacity:1 !important}
+body.mobile-mode .showcase-layout,
+body.mobile-mode .education-record,
+body.mobile-mode .skill-record,
+body.mobile-mode .about-record,
+body.mobile-mode .timeline-record,
+body.mobile-mode .research-record{display:grid !important;grid-template-columns:1fr !important;gap:18px !important;min-height:0 !important}
+body.mobile-mode .showcase-media{
+  height:260px !important;min-height:260px !important;border-radius:22px !important;
+  background:linear-gradient(135deg,#d9e8f4,#edf4fa) !important;overflow:hidden !important;
+}
+body.mobile-mode .showcase-media img{width:100% !important;height:260px !important;min-height:260px !important;object-fit:cover !important;transform:none !important;filter:none !important}
+body.mobile-mode .media-label,body.mobile-mode .media-tech-overlay{font-size:11px !important}
+body.mobile-mode .content-kicker,body.mobile-mode .record-company{font-size:12px !important;letter-spacing:.08em !important}
+body.mobile-mode .showcase-copy h3,
+body.mobile-mode .record-main h3,
+body.mobile-mode .contact-inner h3{font-size:30px !important;line-height:1.08 !important;margin:5px 0 10px !important}
+body.mobile-mode .content-description,
+body.mobile-mode .record-points li,
+body.mobile-mode .research-citation,
+body.mobile-mode .contact-record p,
+body.mobile-mode .about-record p,
+body.mobile-mode .education-record p,
+body.mobile-mode .skill-record p{font-size:17px !important;line-height:1.62 !important}
+body.mobile-mode .meta-row{grid-template-columns:100px minmax(0,1fr) !important;gap:12px !important;padding-top:12px !important}
+body.mobile-mode .meta-row span{font-size:12px !important;line-height:1.35 !important}
+body.mobile-mode .meta-row strong{font-size:16px !important;line-height:1.45 !important}
+body.mobile-mode .tag-list{gap:8px !important;margin-top:15px !important}
+body.mobile-mode .tag-list span,body.mobile-mode .skill-pill{padding:9px 12px !important;font-size:14px !important;line-height:1.1 !important}
+body.mobile-mode .archive-link,
+body.mobile-mode .project-tool-actions button,
+body.mobile-mode .project-tech-button{min-height:56px !important;padding:13px 15px !important;font-size:14px !important;border-radius:15px !important}
+body.mobile-mode .project-tool-actions{display:grid !important;grid-template-columns:1fr 1fr !important;gap:9px !important}
+body.mobile-mode .evidence-grid{grid-template-columns:1fr !important;gap:10px !important}
+body.mobile-mode .evidence-card{min-height:88px !important;padding:14px !important;border-radius:18px !important}
+body.mobile-mode .evidence-card>span{font-size:25px !important}
+body.mobile-mode .evidence-card small{font-size:12px !important}
+body.mobile-mode .evidence-card strong{font-size:16px !important;line-height:1.25 !important}
+body.mobile-mode .project-tool-panel{padding:16px !important;border-radius:20px !important}
+body.mobile-mode .tool-panel-head strong{font-size:18px !important}
+body.mobile-mode .replay-step p,body.mobile-mode .blueprint-node strong,body.mobile-mode .demo-node{font-size:15px !important}
+body.mobile-mode .timeline-year{font-size:40px !important}
+body.mobile-mode .timeline-period,body.mobile-mode .record-role{font-size:16px !important}
+body.mobile-mode .visual-card{min-height:240px !important;border-radius:22px !important}
+body.mobile-mode .visual-symbol{font-size:78px !important}
+body.mobile-mode .research-file-number,body.mobile-mode .contact-signal{width:96px !important;height:96px !important;font-size:30px !important}
+body.mobile-mode .contact-value{font-size:21px !important}
+
+body.mobile-mode .section-navigation{
+  min-height:84px !important;padding:10px 12px calc(10px + env(safe-area-inset-bottom)) !important;
+  grid-template-columns:64px minmax(0,1fr) 64px !important;gap:10px !important;background:#fff !important;
+}
+body.mobile-mode .section-nav-button{width:64px !important;height:64px !important;min-width:64px !important;min-height:64px !important;border-radius:19px !important;font-size:0 !important}
+body.mobile-mode .section-nav-button:first-child::before{font-size:29px !important}
+body.mobile-mode .section-nav-button:last-child::before{font-size:29px !important}
+body.mobile-mode .slider-meta{font-size:13px !important}
+body.mobile-mode #sectionSlider{height:28px !important}
+
+/* Recruiter/search pages use the same crisp native typography. */
+body.mobile-mode .recruiter-panel,body.mobile-mode .command-panel{
+  transform:none !important;filter:none !important;backdrop-filter:none !important;background:#fff !important;
+}
+body.mobile-mode .recruiter-header{min-height:92px !important;padding:15px 17px !important;background:#fff !important}
+body.mobile-mode .recruiter-header h2{font-size:30px !important}
+body.mobile-mode .recruiter-header p{font-size:15px !important}
+body.mobile-mode .recruiter-close{width:60px !important;height:60px !important;font-size:31px !important}
+body.mobile-mode .recruiter-scroll{padding:18px !important;font-size:17px !important}
+body.mobile-mode .recruiter-hero-copy h3{font-size:29px !important}
+body.mobile-mode .recruiter-hero-copy p,body.mobile-mode .recruiter-section p{font-size:17px !important;line-height:1.6 !important}
+body.mobile-mode .recruiter-actions a{min-height:58px !important;font-size:15px !important}
+body.mobile-mode .recruiter-project-card h4{font-size:22px !important}
+body.mobile-mode .recruiter-project-card p{font-size:16px !important;line-height:1.55 !important}
+body.mobile-mode .command-panel header{min-height:88px !important;padding:15px 16px !important}
+body.mobile-mode .command-panel header h2{font-size:28px !important}
+body.mobile-mode .command-panel header button{width:58px !important;height:58px !important;font-size:29px !important}
+body.mobile-mode .command-search{min-height:64px !important;margin:12px 16px !important;padding:0 16px !important}
+body.mobile-mode .command-search input{font-size:18px !important}
+body.mobile-mode .command-result{min-height:86px !important;padding:14px 16px !important}
+body.mobile-mode .command-result strong{font-size:18px !important}
+body.mobile-mode .command-result small{font-size:13px !important}
+
+/* When an opaque app page is open, persistent city controls disappear. */
+body.mobile-mode.modal-open .mobile-tool-rail,
+body.mobile-mode.modal-open .mobile-landscape-dock,
+body.mobile-mode.recruiter-open .mobile-tool-rail,
+body.mobile-mode.recruiter-open .mobile-landscape-dock,
+body.mobile-mode.command-open .mobile-tool-rail,
+body.mobile-mode.command-open .mobile-landscape-dock,
+body.mobile-mode.finale-open .mobile-tool-rail,
+body.mobile-mode.finale-open .mobile-landscape-dock{display:none !important}
+
+/* Night chrome. */
+body.mobile-mode.time-night .game-hud,
+body.mobile-mode.time-night .mobile-tool-rail,
+body.mobile-mode.time-night .mobile-landscape-dock,
+body.mobile-mode.time-night .mobile-menu-panel,
+body.mobile-mode.time-night .mobile-menu-header,
+body.mobile-mode.time-night .mobile-menu-footer,
+body.mobile-mode.time-night .section-panel,
+body.mobile-mode.time-night .section-panel-header,
+body.mobile-mode.time-night .section-navigation,
+body.mobile-mode.time-night .section-content{
+  background:#0f1e2f !important;color:#eef7ff !important;border-color:rgba(165,204,238,.12) !important;
+}
+body.mobile-mode.time-night .mobile-menu-toggle,
+body.mobile-mode.time-night .mobile-tool-button,
+body.mobile-mode.time-night .mobile-dock-item,
+body.mobile-mode.time-night .mobile-section-item,
+body.mobile-mode.time-night .section-close{background:#172c42 !important;color:#eef7ff !important;border-color:rgba(165,204,238,.12) !important}
+body.mobile-mode.time-night .showcase-media{background:linear-gradient(135deg,#173047,#25445d) !important}
+
+body.mobile-mode button:focus-visible,body.mobile-mode a:focus-visible,body.mobile-mode input:focus-visible{
+  outline:3px solid #278bd4 !important;outline-offset:3px !important;
+}
+
+/* Phones with very little vertical room scroll the rail instead of shrinking it. */
+@media (max-height:680px){
+  body.mobile-mode .mobile-tool-button{min-height:68px !important}
+  body.mobile-mode .mobile-tool-icon{font-size:28px !important}
+}
+
+@media (max-width:390px){
+  body.mobile-mode{--mobile-rail:92px}
+  body.mobile-mode .hud-brand strong{max-width:190px !important;font-size:16px !important}
+  body.mobile-mode .showcase-media,body.mobile-mode .showcase-media img{height:230px !important;min-height:230px !important}
+  body.mobile-mode .project-tool-actions{grid-template-columns:1fr !important}
+}
+body.mobile-mode .mobile-render-error{
+  margin:18px;padding:20px;border-radius:20px;background:#fff3f3;border:1px solid rgba(200,55,65,.18);color:#7f2027;
+}
+body.mobile-mode .mobile-render-error strong{font-size:20px !important}
+body.mobile-mode .mobile-render-error p{font-size:16px !important;line-height:1.5 !important}
