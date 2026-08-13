@@ -4796,3 +4796,136 @@ body.time-night .night-stars{opacity:.92}
 
 /* V20 mobile-only navigation helper. Hidden on desktop. */
 .mobile-back-map{display:none}
+
+/* ==========================================================
+   V23 — FINAL CONTRAST + SECTION LAYOUT SAFETY
+   Desktop-only theme/readability cleanup. Mobile has its own file.
+========================================================== */
+
+/* Day mode: readable dark chrome/text on light surfaces. */
+body.time-day{
+  --text:#142235;
+  --muted:#526579;
+  --muted-2:#6d8092;
+}
+body.time-day .hud-brand,
+body.time-day .hud-status,
+body.time-day .hud-button:not(.hud-button-primary),
+body.time-day .section-sidebar,
+body.time-day .district-hover-card,
+body.time-day .objective-card,
+body.time-day .section-panel,
+body.time-day .section-panel-header,
+body.time-day .section-navigation,
+body.time-day .recruiter-panel,
+body.time-day .recruiter-header,
+body.time-day .recruiter-block,
+body.time-day .recruiter-project-card,
+body.time-day .command-panel,
+body.time-day .command-result,
+body.time-day .directory-item{color:#142235 !important}
+body.time-day .hud-brand span,
+body.time-day .hud-status span,
+body.time-day .content-description,
+body.time-day .record-points li,
+body.time-day .recruiter-header p,
+body.time-day .recruiter-project-card p,
+body.time-day .recruiter-record p,
+body.time-day .command-result em,
+body.time-day .district-hover-card p,
+body.time-day .objective-card p{color:#526579 !important}
+body.time-day .hud-button:not(.hud-button-primary),
+body.time-day .section-nav-button,
+body.time-day .directory-item,
+body.time-day .project-tool-actions button,
+body.time-day .project-tech-button,
+body.time-day .recruiter-block-head button,
+body.time-day .recruiter-project-card button{background:#f4f7fa !important;color:#193149 !important;border-color:rgba(31,58,84,.12) !important}
+
+/* Night mode: never leave dark text/icons on dark surfaces. */
+body.time-night{
+  --text:#f0f6fd;
+  --muted:#b7c8d8;
+  --muted-2:#91a7bb;
+}
+body.time-night .hud-brand,
+body.time-night .hud-status,
+body.time-night .hud-button:not(.hud-button-primary),
+body.time-night .section-sidebar,
+body.time-night .section-sidebar-item,
+body.time-night .district-hover-card,
+body.time-night .objective-card,
+body.time-night .section-panel,
+body.time-night .section-panel-header,
+body.time-night .section-navigation,
+body.time-night .record-main,
+body.time-night .showcase-copy,
+body.time-night .recruiter-panel,
+body.time-night .recruiter-header,
+body.time-night .recruiter-block,
+body.time-night .recruiter-project-card,
+body.time-night .recruiter-value-grid article,
+body.time-night .recruiter-skill-groups div,
+body.time-night .command-panel,
+body.time-night .command-result,
+body.time-night .directory-item{color:#f0f6fd !important}
+body.time-night .hud-brand span,
+body.time-night .hud-status span,
+body.time-night .content-description,
+body.time-night .record-points li,
+body.time-night .meta-row span,
+body.time-night .research-citation,
+body.time-night .recruiter-header p,
+body.time-night .recruiter-project-card p,
+body.time-night .recruiter-record p,
+body.time-night .recruiter-value-grid p,
+body.time-night .recruiter-skill-groups p,
+body.time-night .command-result em,
+body.time-night .district-hover-card p,
+body.time-night .objective-card p{color:#b7c8d8 !important}
+body.time-night .meta-row strong,
+body.time-night .recruiter-project-card strong,
+body.time-night .recruiter-value-grid strong,
+body.time-night .contact-value,
+body.time-night .used-project{color:#eaf3fb !important}
+body.time-night .hud-button:not(.hud-button-primary),
+body.time-night .world-button,
+body.time-night .section-nav-button,
+body.time-night .directory-item,
+body.time-night .project-tool-actions button,
+body.time-night .project-tech-button,
+body.time-night .recruiter-block-head button,
+body.time-night .recruiter-project-card button{background:#183149 !important;color:#eef7ff !important;border-color:rgba(162,201,234,.16) !important}
+body.time-night .tag-list span,
+body.time-night .skill-pill,
+body.time-night .visual-card,
+body.time-night .research-citation,
+body.time-night .evidence-card,
+body.time-night .project-tool-panel{background:#13283d !important;color:#eef7ff !important;border-color:rgba(162,201,234,.12) !important}
+
+/* Section/action layout safety: long labels must wrap instead of colliding. */
+.section-panel-header>div,
+.showcase-copy,
+.record-main,
+.project-tool-actions,
+.recruiter-block-head,
+.recruiter-project-card>div{min-width:0}
+.project-tool-actions button,
+.project-tech-button,
+.archive-link,
+.section-nav-button,
+.recruiter-actions a,
+.recruiter-block-head button,
+.recruiter-project-card button{
+  max-width:100%;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:normal;
+  line-height:1.25;
+}
+.project-tool-actions{align-items:stretch}
+.project-tool-actions>*{min-width:0}
+.content-description,
+.meta-row strong,
+.contact-value,
+.research-citation{overflow-wrap:anywhere}

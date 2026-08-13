@@ -86,8 +86,6 @@
   const mobileHomeViewButton = $("mobileHomeViewButton");
   const mobileCinematicButton = $("mobileCinematicButton");
   const mobileCinematicState = $("mobileCinematicState");
-  const mobileExploredCount = $("mobileExploredCount");
-  const mobileExploredFill = $("mobileExploredFill");
   const mobileDockQuickView = $("mobileDockQuickView");
   const mobileLandscapeDock = $("mobileLandscapeDock");
   const scannerButton = $("scannerButton");
@@ -220,8 +218,6 @@
     if(mobileTimeState) mobileTimeState.textContent=(timeModes[timeModeIndex]||"day").replace(/^./,c=>c.toUpperCase());
     if(mobileCinematicState) mobileCinematicState.textContent=cinematicMode?"On":"Off";
     if(mobileScannerState) mobileScannerState.textContent=scannerMode?"On":"Off";
-    if(mobileExploredCount) mobileExploredCount.textContent=`${visitedSections.size} / ${sectionOrder.length}`;
-    if(mobileExploredFill) mobileExploredFill.style.width=`${(visitedSections.size/sectionOrder.length)*100}%`;
   }
 
   function createAudioContext(){
@@ -395,13 +391,24 @@
   function updateExploredUi(){
     const count=visitedSections.size;
     const pct=(count/sectionOrder.length)*100;
-    if(exploredCount) exploredCount.textContent=`${count} / ${sectionOrder.length}`;
-    if(exploredFill) exploredFill.style.width=`${pct}%`;
-    if(objectiveFill) objectiveFill.style.width=`${pct}%`;
+
+    // Visited styling is useful everywhere, but mission/progress UI is desktop-only.
     visitedSections.forEach(key=>{
       document.querySelectorAll(`[data-open-section="${key}"]`).forEach(el=>el.classList.add("is-visited"));
     });
     syncMobileMenuUi();
+
+    if(mobile){
+      // Mobile is intentionally portfolio-first: no objective card, progress mission,
+      // mission toasts, or completion finale. Tapping content stays direct and calm.
+      finalePending=false;
+      return;
+    }
+
+    if(exploredCount) exploredCount.textContent=`${count} / ${sectionOrder.length}`;
+    if(exploredFill) exploredFill.style.width=`${pct}%`;
+    if(objectiveFill) objectiveFill.style.width=`${pct}%`;
+
     const next=sectionOrder.find(key=>!visitedSections.has(key));
     if(cityStatus){
       cityStatus.textContent=count===sectionOrder.length?"CITY COMPLETE // ALL DISTRICTS EXPLORED":`${count} / ${sectionOrder.length} DISTRICTS EXPLORED`;
@@ -411,7 +418,10 @@
         objectiveTitle.textContent="Profile analysis complete";
         objectiveText.textContent="Game AI + Gameplay + XR + Research profile mapped.";
         objectiveCard?.classList.add("is-complete");
-        if(!finaleShown){finalePending=true;window.setTimeout(()=>{if(!sectionModal.classList.contains("open"))showCompletionFinale()},700);}
+        if(!finaleShown){
+          finalePending=true;
+          window.setTimeout(()=>{if(!sectionModal.classList.contains("open"))showCompletionFinale()},700);
+        }
       }else{
         objectiveCard?.classList.remove("is-complete");
         if(count<2){
@@ -450,7 +460,7 @@
   function getDistrictConfig(key){return districtConfigs.find(d=>d.key===key)||null}
 
   function showMissionToast(title,text){
-    if(!toastStack)return;
+    if(mobile||!toastStack)return;
     const toast=document.createElement("div");
     toast.className="discovery-toast mission-toast";
     toast.style.setProperty("--toast-accent","#73d9ff");
@@ -533,7 +543,7 @@
 
 
   function showCompletionFinale(){
-    if(finaleShown||!completionFinale)return;
+    if(mobile||finaleShown||!completionFinale)return;
     finaleShown=true;finalePending=false;clearDistrictHover();resetCamera();
     districtVisuals.forEach(v=>{v.activation=1;});
     startAmbientEvent("signal",true);
@@ -979,20 +989,20 @@
   syncMobileOrientation();
 
   const PERF = {
-    pixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? (veryLowEnd ? .60 : largeMobile ? .86 : .76) : lowCpu ? 1.16 : 1.35),
-    minPixelRatio: mobile ? (veryLowEnd ? .46 : .52) : .95,
+    pixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? (veryLowEnd ? .56 : largeMobile ? .82 : .72) : lowCpu ? 1.16 : 1.35),
+    minPixelRatio: mobile ? (veryLowEnd ? .44 : .48) : .95,
     antialias: !mobile && !lowCpu,
     shadows: !mobile && !lowCpu,
     shadowMap: lowCpu ? 512 : 1024,
-    people: reducedMotion ? 4 : mobile ? (veryLowEnd ? 4 : largeMobile ? 8 : 6) : lowCpu ? 16 : 28,
-    movingCars: reducedMotion ? 3 : mobile ? (veryLowEnd ? 2 : largeMobile ? 5 : 4) : lowCpu ? 9 : 14,
-    parkedCars: mobile ? (largeMobile ? 5 : 4) : 12,
-    trees: mobile ? (veryLowEnd ? 14 : largeMobile ? 25 : 21) : lowCpu ? 44 : 62,
-    lamps: mobile ? (largeMobile ? 17 : 14) : 42,
-    benches: mobile ? 3 : 13,
-    birds: reducedMotion ? 0 : mobile ? 1 : 6,
+    people: reducedMotion ? 4 : mobile ? (veryLowEnd ? 3 : largeMobile ? 7 : 5) : lowCpu ? 16 : 28,
+    movingCars: reducedMotion ? 3 : mobile ? (veryLowEnd ? 2 : largeMobile ? 4 : 3) : lowCpu ? 9 : 14,
+    parkedCars: mobile ? (largeMobile ? 4 : 3) : 12,
+    trees: mobile ? (veryLowEnd ? 12 : largeMobile ? 22 : 18) : lowCpu ? 44 : 62,
+    lamps: mobile ? (largeMobile ? 15 : 12) : 42,
+    benches: mobile ? 2 : 13,
+    birds: reducedMotion ? 0 : mobile ? 0 : 6,
     clouds: mobile ? 1 : lowCpu ? 3 : 5,
-    targetFps: mobile ? (veryLowEnd ? 28 : 36) : 60,
+    targetFps: mobile ? (veryLowEnd ? 26 : 34) : 60,
     animate: !reducedMotion
   };
 
@@ -1387,6 +1397,8 @@
   function applyTimeMode(mode,withSound=true){
     document.body.classList.remove("time-day","time-night");
     document.body.classList.add(`time-${mode}`);
+    const themeMeta=document.querySelector('meta[name="theme-color"]');
+    if(themeMeta)themeMeta.setAttribute("content",mode==="night"?"#081522":"#f4f7fb");
     if(!scene||!renderer)return;
     const target=WORLD_PRESETS[mode]||WORLD_PRESETS.day;
     if(!withSound||reducedMotion){
@@ -2360,7 +2372,7 @@
     sectionModal.classList.remove("open");sectionModal.setAttribute("aria-hidden","true");document.body.classList.remove("modal-open");
     document.querySelectorAll(".section-sidebar-item.is-active,.mobile-section-item.is-active").forEach(el=>el.classList.remove("is-active"));
     syncMinimap(null);
-    if(finalePending&&!finaleShown){finalePending=false;setTimeout(showCompletionFinale,380);}
+    if(!mobile&&finalePending&&!finaleShown){finalePending=false;setTimeout(showCompletionFinale,380);}
   }
 
   function navigateItem(direction){
@@ -2732,11 +2744,11 @@
     const media=collectPortfolioMedia();
     return [
       "./index.html",
-      "./assets/css/style.css?v=21",
-      "./assets/css/mobile.css?v=21",
-      "./assets/js/modules/runtime.js?v=21",
-      "./assets/js/modules/world-boundaries.js?v=21",
-      "./assets/js/main.js?v=21",
+      "./assets/css/style.css?v=23",
+      "./assets/css/mobile.css?v=23",
+      "./assets/js/modules/runtime.js?v=23",
+      "./assets/js/modules/world-boundaries.js?v=23",
+      "./assets/js/main.js?v=23",
       "./favicon.png",
       ...media.images,
       ...media.videos
@@ -2784,7 +2796,10 @@
     // 3) Decode the rest of the project imagery in small batches. Keeping the
     // decoded Image objects alive avoids blank media frames on first open.
     tasks.push(async()=>{
-      await Runtime.preloadImages(remainingImages,{batchSize:mobile?3:4,retain:true,priority:"low",idleTimeout:mobile?90:60});
+      const connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+      const constrained=!!connection?.saveData || /(^|-)2g/i.test(connection?.effectiveType||"");
+      if(constrained)return;
+      await Runtime.preloadImages(remainingImages,{batchSize:mobile?2:4,retain:!veryLowEnd,priority:"low",idleTimeout:mobile?120:60});
     });
 
     // 4) Warm same-origin files in the service worker for repeat visits.
@@ -2863,13 +2878,13 @@
   ========================================================= */
 
   window.addEventListener("pointermove",event=>{
-    if(customCursor){
+    if(!mobile&&customCursor){
       customCursor.style.left=`${event.clientX}px`;
       customCursor.style.top=`${event.clientY}px`;
     }
     latestPointerX=event.clientX;latestPointerY=event.clientY;
     pointerTarget.x=(event.clientX/window.innerWidth)*2-1;pointerTarget.y=-(event.clientY/window.innerHeight)*2+1;
-    if(coordinateReadout) coordinateReadout.textContent=`X ${String(Math.round(event.clientX)).padStart(3,"0")} // Y ${String(Math.round(event.clientY)).padStart(3,"0")}`;
+    if(!mobile&&coordinateReadout) coordinateReadout.textContent=`X ${String(Math.round(event.clientX)).padStart(3,"0")} // Y ${String(Math.round(event.clientY)).padStart(3,"0")}`;
 
     if(coarsePointer && activeTouchPointers.has(event.pointerId)){
       activeTouchPointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
