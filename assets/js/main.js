@@ -1,5 +1,5 @@
 /* =========================================================
-   RITHVIK CITY — Recruiter Optimized V13
+   RITHVIK CITY — Landscape Mobile V15
    Uses the global THREE object loaded in index.html.
 ========================================================= */
 
@@ -88,6 +88,10 @@
   const mobileCinematicState = $("mobileCinematicState");
   const mobileExploredCount = $("mobileExploredCount");
   const mobileExploredFill = $("mobileExploredFill");
+  const rotateDeviceOverlay = $("rotateDeviceOverlay");
+  const rotateQuickViewButton = $("rotateQuickViewButton");
+  const mobileDockQuickView = $("mobileDockQuickView");
+  const mobileLandscapeDock = $("mobileLandscapeDock");
 
   /* =========================================================
      LIGHTWEIGHT PROCEDURAL AUDIO
@@ -389,9 +393,9 @@
 
   function focusDistrict(key,zoom=1.13){
     const cfg=getDistrictConfig(key);if(!cfg)return;
-    cameraPanTarget.x=THREE.MathUtils.clamp(cfg.x*.58,-15,15);
-    cameraPanTarget.y=THREE.MathUtils.clamp(cfg.z*.48,-10,10);
-    cameraZoomTarget=mobile?Math.min(zoom,1.09):zoom;
+    cameraPanTarget.x=cfg.x*(mobile?.64:.58);
+    cameraPanTarget.y=cfg.z*(mobile?.54:.48);
+    cameraZoomTarget=mobile?Math.min(zoom+.08,1.20):zoom;
     clampPan();
   }
 
@@ -841,6 +845,33 @@
   document.body.classList.toggle("touch-mode", coarsePointer);
   document.body.classList.toggle("mobile-mode", mobile);
 
+  function isPhonePortrait(){
+    const shortSide=Math.min(window.innerWidth,window.innerHeight);
+    return coarsePointer && shortSide<=760 && window.innerHeight>window.innerWidth;
+  }
+
+  function syncMobileOrientation(){
+    const portraitBlocked=isPhonePortrait();
+    const landscapeMobile=mobile && window.innerWidth>window.innerHeight;
+    document.body.classList.toggle("portrait-mobile-blocked",portraitBlocked);
+    document.body.classList.toggle("mobile-landscape",landscapeMobile);
+    if(rotateDeviceOverlay){
+      const visuallyOpen=portraitBlocked && !document.body.classList.contains("recruiter-open");
+      rotateDeviceOverlay.setAttribute("aria-hidden",visuallyOpen?"false":"true");
+    }
+    if(portraitBlocked){
+      if(mobileMenuPanel?.classList.contains("open"))setMobileMenu(false,false);
+    }
+    if(controlHintText && mobile){
+      controlHintText.textContent=landscapeMobile
+        ? "Drag to move • pinch to zoom • tap a district • use ⋮ for all sections and city tools."
+        : "Rotate your phone to landscape for the interactive city.";
+    }
+    return portraitBlocked;
+  }
+
+  syncMobileOrientation();
+
   const PERF = {
     pixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? (veryLowEnd ? .72 : largeMobile ? 1.0 : .90) : lowCpu ? 1.16 : 1.35),
     minPixelRatio: mobile ? (veryLowEnd ? .56 : .62) : .95,
@@ -882,8 +913,8 @@
   let latestPointerX = window.innerWidth * .5;
   let latestPointerY = window.innerHeight * .5;
 
-  let cameraZoomTarget = 1;
-  let cameraZoom = 1;
+  let cameraZoomTarget = mobile ? 1.06 : 1;
+  let cameraZoom = mobile ? 1.06 : 1;
   const cameraPan = new THREE.Vector2(0,0);
   const cameraPanTarget = new THREE.Vector2(0,0);
   const baseCamera = new THREE.Vector3(48,72,52);
@@ -923,8 +954,10 @@
   let personBodyMesh, personHeadMesh;
 
   function clampPan(){
-    cameraPanTarget.x = THREE.MathUtils.clamp(cameraPanTarget.x,-15,15);
-    cameraPanTarget.y = THREE.MathUtils.clamp(cameraPanTarget.y,-10,10);
+    const maxX=mobile?23:15;
+    const maxZ=mobile?16:10;
+    cameraPanTarget.x = THREE.MathUtils.clamp(cameraPanTarget.x,-maxX,maxX);
+    cameraPanTarget.y = THREE.MathUtils.clamp(cameraPanTarget.y,-maxZ,maxZ);
   }
 
   function makeSharedAssets(){
@@ -1188,7 +1221,7 @@
       const architecture = createDistrictArchitecture(config.key,config.accent);
       district.add(architecture);
 
-      const hitbox = new THREE.Mesh(new THREE.BoxGeometry(config.width*(mobile?1.18:1.08),24,config.depth*(mobile?1.18:1.08)),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+      const hitbox = new THREE.Mesh(new THREE.BoxGeometry(config.width*(mobile?1.24:1.08),24,config.depth*(mobile?1.24:1.08)),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
       hitbox.position.y=12;hitbox.userData.section=config.key;district.add(hitbox);interactiveDistricts.push(hitbox);
 
       districtVisuals.set(config.key,{root:district,architecture,pad,border,hoverPlate,hoverRing,districtGlow,hoverBeacon,beaconBeam,beaconGem,beaconHalo,config,targetLift:0,targetScale:1});
@@ -1902,6 +1935,7 @@
     recruiterModal.classList.add("open");
     recruiterModal.setAttribute("aria-hidden","false");
     document.body.classList.add("recruiter-open");
+    if(rotateDeviceOverlay)rotateDeviceOverlay.setAttribute("aria-hidden","true");
     if(bgmGain&&audioCtx){
       bgmGain.gain.cancelScheduledValues(audioCtx.currentTime);
       bgmGain.gain.linearRampToValueAtTime(.22,audioCtx.currentTime+.12);
@@ -1914,6 +1948,7 @@
     recruiterModal.classList.remove("open");
     recruiterModal.setAttribute("aria-hidden","true");
     document.body.classList.remove("recruiter-open");
+    syncMobileOrientation();
     if(bgmGain&&audioCtx){
       bgmGain.gain.cancelScheduledValues(audioCtx.currentTime);
       bgmGain.gain.linearRampToValueAtTime(.52,audioCtx.currentTime+.18);
@@ -2102,13 +2137,20 @@
     const aspect=width/height;
 
     let viewHeight;
-    if(width <= 390) viewHeight = aspect < .62 ? 112 : 102;
-    else if(width <= 480) viewHeight = aspect < .68 ? 108 : 99;
-    else if(width <= 820) viewHeight = aspect < .82 ? 98 : 91;
-    else viewHeight = 78;
-
-    let viewWidth=viewHeight*aspect;
-    if(aspect>1.8){viewWidth=122;viewHeight=viewWidth/aspect}
+    let viewWidth;
+    if(mobile && width>height){
+      // Landscape phones use a closer tactical framing so buildings and tap targets
+      // are physically larger on screen. Wider phones get a little more context.
+      viewWidth=width>=900?116:width>=740?112:108;
+      viewHeight=viewWidth/aspect;
+    }else{
+      if(width <= 390) viewHeight = aspect < .62 ? 112 : 102;
+      else if(width <= 480) viewHeight = aspect < .68 ? 108 : 99;
+      else if(width <= 820) viewHeight = aspect < .82 ? 98 : 91;
+      else viewHeight = 78;
+      viewWidth=viewHeight*aspect;
+      if(aspect>1.8){viewWidth=122;viewHeight=viewWidth/aspect}
+    }
 
     camera.left=-viewWidth/2;
     camera.right=viewWidth/2;
@@ -2151,8 +2193,9 @@
     const sectionOpen=sectionModal.classList.contains("open");
     const recruiterOpen=!!recruiterModal?.classList.contains("open");
     const mobileMenuOpen=!!mobileMenuPanel?.classList.contains("open");
+    const portraitBlocked=isPhonePortrait()&&!recruiterOpen;
     const uiOverlayOpen=sectionOpen||recruiterOpen||mobileMenuOpen;
-    const effectiveFps=(mobile&&uiOverlayOpen)?20:PERF.targetFps;
+    const effectiveFps=portraitBlocked?8:(mobile&&uiOverlayOpen)?20:PERF.targetFps;
     const minFrameMs=1000/effectiveFps;
     if(now-lastRenderStamp<minFrameMs)return;
     lastRenderStamp=now;
@@ -2164,19 +2207,19 @@
 
     // Pause nonessential world simulation behind large mobile UI and recruiter overlays.
     // The city remains rendered, but actors stop consuming CPU/GPU while obscured.
-    if(!(mobile&&uiOverlayOpen) && !recruiterOpen){
+    if(!portraitBlocked && !(mobile&&uiOverlayOpen) && !recruiterOpen){
       updateTraffic(delta);
       updatePedestrians(delta,elapsed);
       updateAmbient(elapsed,delta);
       updateDistrictHoverMotion();
     }
 
-    if(raycastDirty&&!dragMoved&&!pinching&&worldEntered&&!uiOverlayOpen){
+    if(!portraitBlocked&&raycastDirty&&!dragMoved&&!pinching&&worldEntered&&!uiOverlayOpen){
       raycastDirty=false;
       updateRaycast(latestPointerX,latestPointerY);
     }
 
-    if(!(mobile&&uiOverlayOpen)) adaptMobileQuality(now);
+    if(!portraitBlocked&&!(mobile&&uiOverlayOpen)) adaptMobileQuality(now);
     renderer.render(scene,camera);
   }
 
@@ -2266,6 +2309,7 @@
   function rendererEventSetup(){
     document.addEventListener("pointerdown",event=>{
       if(worldEntered && audioEnabled) ensureAudio();
+      if(isPhonePortrait()&&!document.body.classList.contains("recruiter-open"))return;
       if(mobile && event.target.closest("#threeContainer")) dismissMobileHint();
       if(!worldEntered||sectionModal.classList.contains("open"))return;
       if(event.target.closest("button,a,.district-directory,.section-sidebar,.mobile-menu-panel,.mobile-menu-toggle,.mobile-menu-backdrop,.city-minimap,.section-modal"))return;
@@ -2372,6 +2416,16 @@
 
 
   window.addEventListener("keydown",event=>{
+    // Keep keyboard/switch navigation inside the open mobile menu dialog.
+    if(event.key==="Tab" && mobileMenuPanel?.classList.contains("open")){
+      const focusable=[...mobileMenuPanel.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),[tabindex]:not([tabindex="-1"])')]
+        .filter(el=>!el.closest('[hidden]') && el.offsetParent!==null);
+      if(focusable.length){
+        const first=focusable[0],last=focusable[focusable.length-1];
+        if(event.shiftKey && document.activeElement===first){event.preventDefault();last.focus();}
+        else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}
+      }
+    }
     // Escape is kept only as a conventional close shortcut; city navigation is mouse-only.
     if(event.key==="Escape"){
       if(recruiterModal?.classList.contains("open"))closeRecruiterView();
@@ -2401,6 +2455,8 @@
   if(timeModeButton)timeModeButton.addEventListener("click",event=>{event.stopPropagation();ensureAudio();cycleTimeMode()});
   recruiterViewButton?.addEventListener("click",event=>{event.stopPropagation();ensureAudio();openRecruiterView()});
   mobileRecruiterViewButton?.addEventListener("click",event=>{event.stopPropagation();ensureAudio();openRecruiterView()});
+  rotateQuickViewButton?.addEventListener("click",event=>{event.stopPropagation();ensureAudio();openRecruiterView();});
+  mobileDockQuickView?.addEventListener("click",event=>{event.stopPropagation();ensureAudio();openRecruiterView();});
   recruiterClose?.addEventListener("click",closeRecruiterView);
   recruiterBackdrop?.addEventListener("click",closeRecruiterView);
   document.querySelectorAll("[data-recruiter-section]").forEach(button=>button.addEventListener("click",()=>openFromRecruiter(button.dataset.recruiterSection)));
@@ -2511,9 +2567,13 @@
     if(pageVisible){clock.getDelta();if(audioEnabled&&audioCtx?.state==="suspended")audioCtx.resume().catch(()=>{});}
     else if(audioCtx?.state==="running")audioCtx.suspend().catch(()=>{});
   });
-  window.addEventListener("resize",resizeRenderer,{passive:true});
-  window.addEventListener("orientationchange",()=>setTimeout(resizeRenderer,120),{passive:true});
-  if(window.visualViewport) window.visualViewport.addEventListener("resize",resizeRenderer,{passive:true});
+  function handleViewportChange(){
+    syncMobileOrientation();
+    resizeRenderer();
+  }
+  window.addEventListener("resize",handleViewportChange,{passive:true});
+  window.addEventListener("orientationchange",()=>setTimeout(handleViewportChange,120),{passive:true});
+  if(window.visualViewport) window.visualViewport.addEventListener("resize",handleViewportChange,{passive:true});
 
   setMasterVolume(.88);updateExploredUi();syncMobileMenuUi();setMobileMenuView("explore");
   initWorld();

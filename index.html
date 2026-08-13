@@ -34,6 +34,22 @@
     </div>
   </section>
 
+  <section class="rotate-device-overlay" id="rotateDeviceOverlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="rotateDeviceTitle">
+    <div class="rotate-device-card">
+      <div class="rotate-device-visual" aria-hidden="true">
+        <div class="rotate-phone"><span></span></div>
+        <div class="rotate-arrow">↻</div>
+      </div>
+      <span class="rotate-device-kicker">MOBILE EXPERIENCE</span>
+      <h2 id="rotateDeviceTitle">Rotate to landscape</h2>
+      <p>The interactive city is designed for landscape on phones. Rotate your device for larger controls, easier navigation and a better view of the city.</p>
+      <div class="rotate-device-actions">
+        <button type="button" id="rotateQuickViewButton">★ QUICK VIEW</button>
+      </div>
+      <small>Can’t rotate? Quick View gives you the recruiter-friendly portfolio in portrait.</small>
+    </div>
+  </section>
+
   <header class="game-hud">
     <div class="hud-brand">
       <div class="hud-brand-mark">RM</div>
@@ -157,6 +173,14 @@
       <small>Drag to move • pinch to zoom • tap a district</small>
     </div>
   </aside>
+
+  <nav class="mobile-landscape-dock" id="mobileLandscapeDock" aria-label="Quick portfolio navigation">
+    <button class="mobile-dock-item mobile-dock-quick" id="mobileDockQuickView" type="button" aria-label="Open recruiter quick view"><span>★</span><strong>Quick</strong></button>
+    <button class="mobile-dock-item" type="button" data-open-section="projects" aria-label="Open Projects"><span>◈</span><strong>Projects</strong></button>
+    <button class="mobile-dock-item" type="button" data-open-section="experience" aria-label="Open Experience"><span>▥</span><strong>Experience</strong></button>
+    <button class="mobile-dock-item" type="button" data-open-section="contact" aria-label="Open Contact"><span>◎</span><strong>Contact</strong></button>
+    <a class="mobile-dock-item mobile-dock-resume" href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing" target="_blank" rel="noopener noreferrer" aria-label="Open resume in a new tab"><span>↗</span><strong>Resume</strong></a>
+  </nav>
 
   <aside class="section-sidebar" id="sectionSidebar" aria-label="Portfolio sections" role="navigation">
     <div class="section-sidebar-head">
