@@ -1,16 +1,16 @@
 /* Rithvik City service worker — fast repeat visits without stale HTML. */
-const CACHE_VERSION = "rithvik-city-v21";
+const CACHE_VERSION = "rithvik-city-v22";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./assets/css/style.css?v=21",
-  "./assets/css/mobile.css?v=21",
-  "./assets/js/modules/runtime.js?v=21",
-  "./assets/js/modules/world-boundaries.js?v=21",
-  "./assets/js/main.js?v=21",
+  "./assets/css/style.css?v=22",
+  "./assets/css/mobile.css?v=22",
+  "./assets/js/modules/runtime.js?v=22",
+  "./assets/js/modules/world-boundaries.js?v=22",
+  "./assets/js/main.js?v=22",
   "./favicon.png"
 ];
 

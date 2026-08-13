@@ -1,3 +1,4 @@
+/* V22: mobile section opens skip first-visit district discovery toast; desktop retains it. */
 /* =========================================================
    RITHVIK CITY — Mobile Portrait V18
    Uses the global THREE object loaded in index.html.
@@ -2337,7 +2338,10 @@
       const firstVisit=!visitedSections.has(key);
       visitedSections.add(key);
       updateExploredUi();
-      if(firstVisit){showDiscoveryToast(key);playNavChime();}
+      if(firstVisit){
+        if(!mobile) showDiscoveryToast(key);
+        playNavChime();
+      }
       duckMusic(true);
     };
 
