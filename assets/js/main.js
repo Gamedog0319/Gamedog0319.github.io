@@ -1055,8 +1055,8 @@
   syncMobileOrientation();
 
   const PERF = {
-    pixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? (veryLowEnd ? .72 : largeMobile ? 1.0 : .90) : lowCpu ? 1.16 : 1.35),
-    minPixelRatio: mobile ? (veryLowEnd ? .56 : .62) : .95,
+    pixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? (veryLowEnd ? .66 : largeMobile ? .92 : .82) : lowCpu ? 1.16 : 1.35),
+    minPixelRatio: mobile ? (veryLowEnd ? .50 : .56) : .95,
     antialias: !mobile && !lowCpu,
     shadows: !mobile && !lowCpu,
     shadowMap: lowCpu ? 512 : 1024,
@@ -2340,21 +2340,47 @@
     const data=portfolioSections[key];if(!data)return;
     stopGuidedTour();
     setMobileMenu(false,false);
-    ensureAudio();
-    playOpenSound();
-    focusDistrict(key,1.12);
-    syncMinimap(key);
-    triggerDistrictReaction(key);
-    const firstVisit=!visitedSections.has(key);
-    visitedSections.add(key);updateExploredUi();
-    if(firstVisit){showDiscoveryToast(key);playTourChime();}
-    duckMusic(true);
-    currentSectionKey=key;currentItemIndex=0;modalSectionIndex.textContent=data.cityIndex;modalSectionTitle.textContent=data.panelTitle;modalSectionSubtitle.textContent=data.panelSubtitle;sliderLabel.textContent=data.panelTitle;
-    sectionSlider.min=0;sectionSlider.max=Math.max(0,data.items.length-1);sectionSlider.value=0;sliderTotal.textContent=formatNumber(data.items.length);
-    sectionModal.classList.add("open");sectionModal.setAttribute("aria-hidden","false");document.body.classList.add("modal-open");
-    districtDirectory.classList.remove("open");districtDirectory.setAttribute("aria-hidden","true");
+
+    // Mobile-first response: render and reveal the content immediately, then
+    // run 3D reactions/audio on the next frame so a tap never feels delayed.
+    currentSectionKey=key;
+    currentItemIndex=0;
+    modalSectionIndex.textContent=data.cityIndex;
+    modalSectionTitle.textContent=data.panelTitle;
+    modalSectionSubtitle.textContent=data.panelSubtitle;
+    sliderLabel.textContent=data.panelTitle;
+    sectionSlider.min=0;
+    sectionSlider.max=Math.max(0,data.items.length-1);
+    sectionSlider.value=0;
+    sliderTotal.textContent=formatNumber(data.items.length);
+    districtDirectory.classList.remove("open");
+    districtDirectory.setAttribute("aria-hidden","true");
     document.querySelectorAll(".section-sidebar-item,.mobile-section-item").forEach(el=>el.classList.toggle("is-active",el.dataset.openSection===key));
+
     renderCurrentItem();
+    sectionModal.classList.add("open");
+    sectionModal.setAttribute("aria-hidden","false");
+    document.body.classList.add("modal-open");
+    if(sectionContent) sectionContent.scrollTop=0;
+
+    const finishOpen=()=>{
+      ensureAudio();
+      playOpenSound();
+      focusDistrict(key,mobile?1.08:1.12);
+      syncMinimap(key);
+      triggerDistrictReaction(key);
+      const firstVisit=!visitedSections.has(key);
+      visitedSections.add(key);
+      updateExploredUi();
+      if(firstVisit){showDiscoveryToast(key);playTourChime();}
+      duckMusic(true);
+    };
+
+    if(mobile){
+      requestAnimationFrame(()=>requestAnimationFrame(finishOpen));
+    }else{
+      finishOpen();
+    }
   }
 
   function closeSection(){
@@ -2531,7 +2557,7 @@
     if(mobile && width>height){
       // Landscape phones use a closer tactical framing so buildings and tap targets
       // are physically larger on screen. Wider phones get a little more context.
-      viewWidth=width>=900?116:width>=740?112:108;
+      viewWidth=width>=900?108:width>=740?102:96;
       viewHeight=viewWidth/aspect;
     }else{
       if(width <= 390) viewHeight = aspect < .62 ? 112 : 102;
@@ -2587,7 +2613,7 @@
     const finaleOpen=!!completionFinale?.classList.contains("open");
     const portraitBlocked=isPhonePortrait()&&!recruiterOpen&&!commandIsOpen;
     const uiOverlayOpen=sectionOpen||recruiterOpen||mobileMenuOpen||commandIsOpen||finaleOpen;
-    const effectiveFps=portraitBlocked?8:(mobile&&uiOverlayOpen)?20:PERF.targetFps;
+    const effectiveFps=portraitBlocked?8:(mobile&&uiOverlayOpen)?14:PERF.targetFps;
     const minFrameMs=1000/effectiveFps;
     if(now-lastRenderStamp<minFrameMs)return;
     lastRenderStamp=now;
