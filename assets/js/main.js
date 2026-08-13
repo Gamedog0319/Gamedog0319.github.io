@@ -21,6 +21,7 @@
 
   const districtHoverCard = $("districtHoverCard");
   const hoverIndex = $("hoverIndex");
+  const hoverGlyph = $("hoverGlyph");
   const hoverTitle = $("hoverTitle");
   const hoverDescription = $("hoverDescription");
   const customCursor = $("customCursor");
@@ -54,6 +55,17 @@
   const exploredFill = $("exploredFill");
   const cityStatus = $("cityStatus");
   const sectionSidebar = $("sectionSidebar");
+  const timeModeButton = $("timeModeButton");
+  const cinematicButton = $("cinematicButton");
+  const objectiveTitle = $("objectiveTitle");
+  const objectiveText = $("objectiveText");
+  const objectiveFill = $("objectiveFill");
+  const objectiveCard = $("objectiveCard");
+  const toastStack = $("toastStack");
+  const telemetryReadout = $("telemetryReadout");
+  const controlHintText = $("controlHintText");
+  const hudStatusPrimary = $("hudStatusPrimary");
+  const hudStatusSecondary = $("hudStatusSecondary");
 
   /* =========================================================
      LIGHTWEIGHT PROCEDURAL AUDIO
@@ -73,13 +85,17 @@
   let compressor = null;
   let ambientNoiseSource = null;
   let ambientNoiseGain = null;
-  let masterVolume = .88;
+  let masterVolume = .95;
 
   const visitedSections = new Set();
   let tourActive = false;
   let tourTimer = null;
   let tourIndex = 0;
   const tourOrder = ["about","featured","projects","experience","education","research","skills","contact"];
+  const districtGlyphs = {projects:"◈",featured:"✦",experience:"▥",education:"⌂",skills:"⚙",research:"⌬",about:"RM",contact:"◎"};
+  const timeModes = ["day","golden","night"];
+  let timeModeIndex = 0;
+  let cinematicMode = false;
 
   function createAudioContext(){
     if(audioCtx) return audioCtx;
@@ -93,8 +109,8 @@
     compressor = audioCtx.createDynamicsCompressor();
 
     masterGain.gain.value = audioEnabled ? masterVolume : 0;
-    bgmGain.gain.value = .38;
-    sfxGain.gain.value = .58;
+    bgmGain.gain.value = .52;
+    sfxGain.gain.value = .72;
 
     compressor.threshold.value = -10;
     compressor.knee.value = 18;
@@ -243,17 +259,43 @@
   function duckMusic(ducked){
     if(!bgmGain||!audioCtx)return;
     bgmGain.gain.cancelScheduledValues(audioCtx.currentTime);
-    bgmGain.gain.setTargetAtTime(ducked?.25:.38,audioCtx.currentTime,.12);
+    bgmGain.gain.setTargetAtTime(ducked?.31:.52,audioCtx.currentTime,.12);
   }
 
   function updateExploredUi(){
     const count=visitedSections.size;
+    const pct=(count/tourOrder.length)*100;
     if(exploredCount) exploredCount.textContent=`${count} / ${tourOrder.length}`;
-    if(exploredFill) exploredFill.style.width=`${(count/tourOrder.length)*100}%`;
+    if(exploredFill) exploredFill.style.width=`${pct}%`;
+    if(objectiveFill) objectiveFill.style.width=`${pct}%`;
     visitedSections.forEach(key=>document.querySelector(`.section-sidebar-item[data-open-section="${key}"]`)?.classList.add("is-visited"));
+    const next=tourOrder.find(key=>!visitedSections.has(key));
     if(cityStatus){
       cityStatus.textContent=count===tourOrder.length?"CITY COMPLETE // ALL DISTRICTS EXPLORED":`${count} / ${tourOrder.length} DISTRICTS EXPLORED`;
     }
+    if(objectiveTitle && objectiveText){
+      if(count===tourOrder.length){
+        objectiveTitle.textContent="Portfolio city complete";
+        objectiveText.textContent="All districts discovered. Thanks for exploring.";
+        objectiveCard?.classList.add("is-complete");
+      }else{
+        objectiveCard?.classList.remove("is-complete");
+        objectiveTitle.textContent=`Explore the city • ${count}/${tourOrder.length}`;
+        objectiveText.textContent=next?`Suggested next: ${portfolioSections[next].cityName}`:"Discover the portfolio districts.";
+      }
+    }
+  }
+
+  function showDiscoveryToast(key){
+    if(!toastStack)return;
+    const data=portfolioSections[key];if(!data)return;
+    const toast=document.createElement("div");
+    toast.className="discovery-toast";
+    toast.style.setProperty("--toast-accent",`#${new THREE.Color(getDistrictConfig(key)?.accent||COLORS.accent).getHexString()}`);
+    toast.innerHTML=`<span class="discovery-glyph">${districtGlyphs[key]||"◈"}</span><div><small>DISTRICT DISCOVERED</small><strong>${data.cityName}</strong><span>${visitedSections.size} / ${tourOrder.length} explored</span></div>`;
+    toastStack.appendChild(toast);
+    requestAnimationFrame(()=>toast.classList.add("show"));
+    setTimeout(()=>{toast.classList.remove("show");setTimeout(()=>toast.remove(),360)},3200);
   }
 
   function getDistrictConfig(key){return districtConfigs.find(d=>d.key===key)||null}
@@ -281,7 +323,8 @@
     focusDistrict(key,1.08);
     highlightDistrict(key,true);activeHoverKey=key;
     const data=portfolioSections[key];
-    hoverIndex.textContent=data.cityIndex;hoverTitle.textContent=data.cityName;hoverDescription.textContent=data.cityDescription;
+    hoverIndex.textContent=data.cityIndex;if(hoverGlyph)hoverGlyph.textContent=districtGlyphs[key]||"◈";hoverTitle.textContent=data.cityName;hoverDescription.textContent=data.cityDescription;
+    districtHoverCard.style.setProperty("--hover-accent",`#${new THREE.Color(getDistrictConfig(key)?.accent||COLORS.accent).getHexString()}`);
     districtHoverCard.style.left="50%";districtHoverCard.style.top="96px";districtHoverCard.style.transform="translateX(-50%)";
     districtHoverCard.classList.add("visible");districtHoverCard.setAttribute("aria-hidden","false");
     document.querySelector(`.section-sidebar-item[data-open-section="${key}"]`)?.classList.add("is-map-hover");
@@ -558,19 +601,19 @@
   ========================================================= */
 
   const COLORS = {
-    accent: 0xe14a39,
-    accentSoft: 0xf27b69,
-    sky: 0xc8e5fb,
-    fog: 0xddeef8,
-    grass: 0x8eb56f,
-    grassDark: 0x74975d,
-    road: 0x4a4f53,
-    roadLine: 0xf5e7b5,
-    sidewalk: 0xd3d0c6,
-    concrete: 0xd0d0ca,
-    concreteDark: 0x969b9e,
-    glass: 0x80afbf,
-    roof: 0x737a7d,
+    accent: 0xff5f57,
+    accentSoft: 0xff8b7d,
+    sky: 0x9fd1ff,
+    fog: 0xdff0fb,
+    grass: 0x8ac26c,
+    grassDark: 0x679954,
+    road: 0x474d58,
+    roadLine: 0xffecb2,
+    sidewalk: 0xd9d4ca,
+    concrete: 0xd4d8df,
+    concreteDark: 0x818c98,
+    glass: 0x7fbfcb,
+    roof: 0x6d7681,
     tree: 0x5f914e,
     treeDark: 0x47783c,
     trunk: 0x78583d,
@@ -579,36 +622,51 @@
 
   const districtConfigs = [
     {key:"projects",x:0,z:0,width:21,depth:16,accent:COLORS.accent},
-    {key:"featured",x:-24,z:-1,width:17,depth:15,accent:0xd76b69},
-    {key:"experience",x:24,z:-1,width:17,depth:16,accent:0x5aa7bd},
-    {key:"education",x:0,z:21,width:20,depth:14,accent:0x7a93c9},
-    {key:"research",x:-24,z:21,width:17,depth:14,accent:0x9277bd},
-    {key:"skills",x:24,z:21,width:17,depth:14,accent:0x4c9b82},
+    {key:"featured",x:-24,z:-1,width:17,depth:15,accent:0xff7f7f},
+    {key:"experience",x:24,z:-1,width:17,depth:16,accent:0x57bde3},
+    {key:"education",x:0,z:21,width:20,depth:14,accent:0x7fa5ff},
+    {key:"research",x:-24,z:21,width:17,depth:14,accent:0xb38cff},
+    {key:"skills",x:24,z:21,width:17,depth:14,accent:0x50d5a4},
     {key:"about",x:-14,z:-21,width:19,depth:14,accent:COLORS.accent},
-    {key:"contact",x:14,z:-21,width:19,depth:14,accent:0xd8824f}
+    {key:"contact",x:14,z:-21,width:19,depth:14,accent:0xffa35f}
   ];
 
-  const mobile = window.matchMedia("(max-width: 720px)").matches;
-  const lowCpu = (navigator.hardwareConcurrency || 8) <= 4;
+  const coarsePointer = window.matchMedia("(pointer: coarse)").matches || (navigator.maxTouchPoints || 0) > 0;
+  const mobile = window.matchMedia("(max-width: 820px)").matches || coarsePointer;
+  const cpuCores = navigator.hardwareConcurrency || 8;
+  const deviceMemory = navigator.deviceMemory || 8;
+  const lowCpu = cpuCores <= 4 || deviceMemory <= 4;
+  const veryLowEnd = cpuCores <= 2 || deviceMemory <= 2;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  document.body.classList.toggle("touch-mode", coarsePointer);
+  document.body.classList.toggle("mobile-mode", mobile);
+
   const PERF = {
-    pixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? 1.05 : lowCpu ? 1.25 : 1.5),
+    pixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? (veryLowEnd ? .82 : .98) : lowCpu ? 1.2 : 1.45),
+    minPixelRatio: mobile ? .72 : 1,
     antialias: !mobile && !lowCpu,
     shadows: !mobile && !lowCpu,
     shadowMap: lowCpu ? 512 : 1024,
-    people: reducedMotion ? 8 : mobile ? 12 : lowCpu ? 18 : 30,
-    movingCars: reducedMotion ? 5 : mobile ? 7 : lowCpu ? 10 : 16,
-    parkedCars: mobile ? 7 : 14,
-    trees: mobile ? 36 : lowCpu ? 48 : 66,
-    lamps: mobile ? 28 : 46,
-    benches: mobile ? 7 : 15,
-    birds: reducedMotion ? 0 : mobile ? 2 : 7,
-    clouds: mobile || lowCpu ? 3 : 6,
+    people: reducedMotion ? 5 : mobile ? (veryLowEnd ? 6 : 9) : lowCpu ? 16 : 28,
+    movingCars: reducedMotion ? 4 : mobile ? (veryLowEnd ? 4 : 6) : lowCpu ? 9 : 14,
+    parkedCars: mobile ? 6 : 12,
+    trees: mobile ? (veryLowEnd ? 22 : 30) : lowCpu ? 44 : 62,
+    lamps: mobile ? 20 : 42,
+    benches: mobile ? 5 : 13,
+    birds: reducedMotion ? 0 : mobile ? 1 : 6,
+    clouds: mobile ? 2 : lowCpu ? 3 : 5,
+    targetFps: mobile ? (veryLowEnd ? 36 : 45) : 60,
     animate: !reducedMotion
   };
 
-  let scene, camera, renderer, raycaster, sunLight;
+  if(controlHintText){
+    controlHintText.textContent = coarsePointer
+      ? "Drag to move • pinch to zoom • tap any district to open."
+      : "Move near the screen edge to glide • drag to pan • wheel to zoom • hover to identify • click a district to open.";
+  }
+
+  let scene, camera, renderer, raycaster, sunLight, hemiLight, ambientLight, sunDisc;
   const clock = new THREE.Clock();
   const pointer = new THREE.Vector2();
   const pointerTarget = new THREE.Vector2();
@@ -639,11 +697,23 @@
   let dragStartScreenY = 0;
   let dragMoved = false;
   let pointerOverUi = false;
+
+  const activeTouchPointers = new Map();
+  let pinching = false;
+  let pinchStartDistance = 0;
+  let pinchStartZoom = 1;
+
+  let renderPixelRatio = PERF.pixelRatio;
+  let lastRenderStamp = 0;
+  let perfWindowStart = performance.now();
+  let perfFrames = 0;
+
   const cameraRight = new THREE.Vector3();
   const cameraForward = new THREE.Vector3();
-  const EDGE_ZONE = mobile ? .12 : .19;
+  const EDGE_ZONE = coarsePointer ? 0 : mobile ? .12 : .19;
 
   const shared = {};
+  const glassMaterials = [];
   const movingCars = [];
   const parkedCars = [];
   const pedestrians = [];
@@ -663,6 +733,7 @@
     shared.buildingWarm = new THREE.MeshStandardMaterial({color:0xd9d4c8,roughness:.72,metalness:.05});
     shared.buildingDark = new THREE.MeshStandardMaterial({color:COLORS.concreteDark,roughness:.6,metalness:.16});
     shared.glass = new THREE.MeshStandardMaterial({color:COLORS.glass,roughness:.18,metalness:.22,transparent:true,opacity:.84});
+    glassMaterials.push(shared.glass);
     shared.roof = new THREE.MeshStandardMaterial({color:COLORS.roof,roughness:.55,metalness:.25});
     shared.sidewalk = new THREE.MeshStandardMaterial({color:COLORS.sidewalk,roughness:.96,metalness:.01});
     shared.road = new THREE.MeshStandardMaterial({color:COLORS.road,roughness:.94,metalness:.03});
@@ -717,6 +788,9 @@
     createAmbientLife();
     createPublicSpaces();
     createEnvironmentDesign();
+    if(telemetryReadout) telemetryReadout.textContent=`${PERF.people} PEOPLE • ${PERF.movingCars + PERF.parkedCars} VEHICLES`;
+    applyTimeMode("day",false);
+    updateExploredUi();
     resizeRenderer();
     animate();
   }
@@ -726,8 +800,10 @@
   ========================================================= */
 
   function addDayLighting(){
-    scene.add(new THREE.HemisphereLight(0xf5fbff,0x769162,1.75));
-    scene.add(new THREE.AmbientLight(0xffffff,.34));
+    hemiLight = new THREE.HemisphereLight(0xf5fbff,0x769162,1.75);
+    scene.add(hemiLight);
+    ambientLight = new THREE.AmbientLight(0xffffff,.34);
+    scene.add(ambientLight);
 
     sunLight = new THREE.DirectionalLight(0xffedc0,3.15);
     sunLight.position.set(-48,75,-28);
@@ -745,12 +821,54 @@
     }
     scene.add(sunLight);
 
-    const sunDisc = new THREE.Mesh(
+    sunDisc = new THREE.Mesh(
       new THREE.SphereGeometry(4.5,14,10),
       new THREE.MeshBasicMaterial({color:0xfff0a7,fog:false})
     );
     sunDisc.position.set(-78,72,-105);
     scene.add(sunDisc);
+  }
+
+  function applyTimeMode(mode,withSound=true){
+    document.body.classList.remove("time-day","time-golden","time-night");
+    document.body.classList.add(`time-${mode}`);
+    if(!scene||!renderer)return;
+    const presets={
+      day:{sky:0x9fd1ff,fog:0xdff0fb,sun:0xffe4a1,sunI:3.25,hemiSky:0xf5fbff,hemiGround:0x7da26a,hemiI:1.78,ambient:0xffffff,ambientI:.36,exposure:1.04,sunPos:[-48,75,-28],disc:0xffefaa},
+      golden:{sky:0xf0b184,fog:0xf2d0ae,sun:0xffa85d,sunI:3.6,hemiSky:0xffddb7,hemiGround:0x7a7057,hemiI:1.4,ambient:0xffddc1,ambientI:.31,exposure:1.03,sunPos:[-62,39,-22],disc:0xffc06c},
+      night:{sky:0x0d1a2b,fog:0x22374f,sun:0x7fb0ff,sunI:.74,hemiSky:0x6385b3,hemiGround:0x1c3041,hemiI:.85,ambient:0x9ec0ff,ambientI:.27,exposure:.88,sunPos:[-45,62,-32],disc:0xdce9ff}
+    };
+    const p=presets[mode]||presets.day;
+    scene.background.setHex(p.sky);scene.fog.color.setHex(p.fog);
+    sunLight.color.setHex(p.sun);sunLight.intensity=p.sunI;sunLight.position.set(...p.sunPos);
+    hemiLight.color.setHex(p.hemiSky);hemiLight.groundColor.setHex(p.hemiGround);hemiLight.intensity=p.hemiI;
+    ambientLight.color.setHex(p.ambient);ambientLight.intensity=p.ambientI;
+    renderer.toneMappingExposure=p.exposure;
+    glassMaterials.forEach(mat=>{
+      if(!mat.emissive)return;
+      mat.emissive.setHex(mode==="night"?0x244e6b:0x000000);
+      mat.emissiveIntensity=mode==="night"?.62:0;
+      mat.needsUpdate=true;
+    });
+    if(sunDisc){sunDisc.material.color.setHex(p.disc);sunDisc.visible=mode!=="night";}
+    if(timeModeButton)timeModeButton.textContent=`MODE: ${mode.toUpperCase()}`;
+    if(hudStatusPrimary) hudStatusPrimary.textContent = mode==="night" ? "NIGHT MODE ONLINE" : mode==="golden" ? "GOLDEN HOUR ONLINE" : "DAY MODE ONLINE";
+    if(hudStatusSecondary) hudStatusSecondary.textContent = mode==="night" ? "CITY LIGHTS ACTIVE" : mode==="golden" ? "SUNSET ATMOSPHERE ACTIVE" : "CLEAR SKIES ACTIVE";
+    if(cityStatus) cityStatus.textContent = mode==="night" ? "NIGHT CITY // LIGHTS AND AMBIENCE ACTIVE" : mode==="golden" ? "GOLDEN HOUR // WARM EVENING LIGHT" : "DAY CITY // BRIGHT AND READABLE";
+    if(withSound){playTone(mode==="night"?340:mode==="golden"?520:690,mode==="night"?220:mode==="golden"?680:860,.12,.09,"sine");}
+  }
+
+  function cycleTimeMode(){
+    timeModeIndex=(timeModeIndex+1)%timeModes.length;
+    applyTimeMode(timeModes[timeModeIndex]);
+  }
+
+  function toggleCinematic(){
+    cinematicMode=!cinematicMode;
+    document.body.classList.toggle("cinematic-mode",cinematicMode);
+    cinematicButton?.setAttribute("aria-pressed",cinematicMode?"true":"false");
+    if(cinematicButton)cinematicButton.textContent=cinematicMode?"HUD ON":"CINEMATIC";
+    playClick();
   }
 
   /* =========================================================
@@ -833,17 +951,17 @@
 
       const pad = new THREE.Mesh(
         new THREE.PlaneGeometry(config.width,config.depth),
-        new THREE.MeshBasicMaterial({color:config.accent,transparent:true,opacity:0,depthWrite:false})
+        new THREE.MeshBasicMaterial({color:config.accent,transparent:true,opacity:.06,depthWrite:false})
       );
       pad.rotation.x=-Math.PI/2;pad.position.y=.09;district.add(pad);
 
       const pts=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([sx,sz])=>new THREE.Vector3(sx*config.width/2,.14,sz*config.depth/2));
-      const border = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:config.accent,transparent:true,opacity:0}));
+      const border = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:config.accent,transparent:true,opacity:.28}));
       district.add(border);
 
       const hoverPlate = new THREE.Mesh(
         new THREE.PlaneGeometry(config.width * .96, config.depth * .96),
-        new THREE.MeshBasicMaterial({color:config.accent,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide})
+        new THREE.MeshBasicMaterial({color:config.accent,transparent:true,opacity:.02,depthWrite:false,side:THREE.DoubleSide})
       );
       hoverPlate.rotation.x=-Math.PI/2;hoverPlate.position.y=.115;district.add(hoverPlate);
 
@@ -852,6 +970,20 @@
         new THREE.MeshBasicMaterial({color:config.accent,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide})
       );
       hoverRing.rotation.x=-Math.PI/2;hoverRing.position.y=.16;district.add(hoverRing);
+      const districtGlow = new THREE.Mesh(
+        new THREE.CircleGeometry(Math.max(config.width,config.depth)*.38,40),
+        new THREE.MeshBasicMaterial({color:config.accent,transparent:true,opacity:.08,depthWrite:false,side:THREE.DoubleSide})
+      );
+      districtGlow.rotation.x=-Math.PI/2;districtGlow.position.y=.095;district.add(districtGlow);
+
+      const hoverBeacon = new THREE.Group();
+      const beaconBeam = new THREE.Mesh(new THREE.CylinderGeometry(.055,.055,6.5,6),new THREE.MeshBasicMaterial({color:config.accent,transparent:true,opacity:0,depthWrite:false}));
+      beaconBeam.position.y=17.6;hoverBeacon.add(beaconBeam);
+      const beaconGem = new THREE.Mesh(new THREE.OctahedronGeometry(.58,0),new THREE.MeshBasicMaterial({color:config.accent,transparent:true,opacity:0,depthWrite:false}));
+      beaconGem.position.y=21.2;hoverBeacon.add(beaconGem);
+      const beaconHalo = new THREE.Mesh(new THREE.TorusGeometry(.95,.055,6,24),new THREE.MeshBasicMaterial({color:config.accent,transparent:true,opacity:0,depthWrite:false}));
+      beaconHalo.rotation.x=Math.PI/2;beaconHalo.position.y=21.2;hoverBeacon.add(beaconHalo);
+      district.add(hoverBeacon);
 
       const architecture = createDistrictArchitecture(config.key,config.accent);
       district.add(architecture);
@@ -859,7 +991,7 @@
       const hitbox = new THREE.Mesh(new THREE.BoxGeometry(config.width*1.08,24,config.depth*1.08),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
       hitbox.position.y=12;hitbox.userData.section=config.key;district.add(hitbox);interactiveDistricts.push(hitbox);
 
-      districtVisuals.set(config.key,{root:district,architecture,pad,border,hoverPlate,hoverRing,config,targetLift:0,targetScale:1});
+      districtVisuals.set(config.key,{root:district,architecture,pad,border,hoverPlate,hoverRing,districtGlow,hoverBeacon,beaconBeam,beaconGem,beaconHalo,config,targetLift:0,targetScale:1});
     });
   }
 
@@ -1050,7 +1182,9 @@
   }
 
   function makeGlassMaterial(color=COLORS.glass,opacity=.84){
-    return new THREE.MeshStandardMaterial({color,roughness:.18,metalness:.22,transparent:true,opacity});
+    const material=new THREE.MeshStandardMaterial({color,roughness:.18,metalness:.22,transparent:true,opacity});
+    glassMaterials.push(material);
+    return material;
   }
 
   function createBuilding({x=0,z=0,w=4,d=4,h=8,accent=COLORS.accent,hero=false,warm=false,style="tower",label="",baseColor=null,glassColor=COLORS.glass}={}){
@@ -1202,7 +1336,7 @@
     for(let z=-34;z<=34;z+=9){lampPositions.push([-6.2,z],[6.2,z])}
     const lampCount=Math.min(PERF.lamps,lampPositions.length);
     const poles=new THREE.InstancedMesh(new THREE.CylinderGeometry(.045,.06,2.5,6),shared.metal,lampCount);
-    const heads=new THREE.InstancedMesh(new THREE.BoxGeometry(.5,.1,.18),new THREE.MeshLambertMaterial({color:0xf2ead1}),lampCount);
+    const heads=new THREE.InstancedMesh(new THREE.BoxGeometry(.5,.1,.18),new THREE.MeshBasicMaterial({color:0xfff2c4}),lampCount);
     for(let i=0;i<lampCount;i++){
       const [x,z]=lampPositions[i];matrixDummy.position.set(x,1.25,z);matrixDummy.rotation.set(0,0,0);matrixDummy.scale.set(1,1,1);matrixDummy.updateMatrix();poles.setMatrixAt(i,matrixDummy.matrix);
       matrixDummy.position.y=2.5;matrixDummy.updateMatrix();heads.setMatrixAt(i,matrixDummy.matrix);
@@ -1342,6 +1476,7 @@
     const pavedMat = new THREE.MeshStandardMaterial({color:0xe4ddd1,roughness:.95});
     const hedgeMat = new THREE.MeshLambertMaterial({color:0x6a9756});
     const flowerPalette=[0xe9829b,0xffce68,0x7fa7d9,0xf6f0da];
+    const environmentDetail = veryLowEnd ? .28 : mobile ? .48 : 1;
 
     // Reflecting pool near the northern academic districts
     const poolBorder = new THREE.Mesh(new THREE.BoxGeometry(14,.32,5.8), new THREE.MeshStandardMaterial({color:0xc7c1b7,roughness:.88}));
@@ -1365,8 +1500,9 @@
     // Decorative promenade ring around the fountain plaza
     const ring = new THREE.Mesh(new THREE.RingGeometry(6.6,8.7,48), pavedMat);
     ring.rotation.x=-Math.PI/2; ring.position.set(0,.081,-34); scene.add(ring);
-    for(let i=0;i<8;i++){
-      const a=(i/8)*Math.PI*2;
+    const planterCount = mobile ? 4 : 8;
+    for(let i=0;i<planterCount;i++){
+      const a=(i/planterCount)*Math.PI*2;
       const px=Math.cos(a)*7.65;
       const pz=-34+Math.sin(a)*7.65;
       const planter = new THREE.Mesh(new THREE.CylinderGeometry(.45,.52,.28,10), new THREE.MeshLambertMaterial({color:0xb18a65}));
@@ -1404,7 +1540,8 @@
     }
 
     function addFlowerBed(x,z,count,spread,palette){
-      for(let i=0;i<count;i++){
+      const actualCount=Math.max(2,Math.round(count*environmentDetail));
+      for(let i=0;i<actualCount;i++){
         const px = x + (((i*37)%100)/100-.5)*spread;
         const pz = z + (((i*53)%100)/100-.5)*spread*.6;
         const flower = new THREE.Mesh(new THREE.CircleGeometry(.14 + (i%3)*.03,8), new THREE.MeshBasicMaterial({color:palette[i%palette.length]}));
@@ -1492,7 +1629,8 @@
       activeHoverKey=key;
       if(audioCtx?.state==="running") playHoverTick();
     }
-    hoverIndex.textContent=data.cityIndex;hoverTitle.textContent=data.cityName;hoverDescription.textContent=data.cityDescription;sectorReadout.textContent=data.cityName;
+    hoverIndex.textContent=data.cityIndex;if(hoverGlyph)hoverGlyph.textContent=districtGlyphs[key]||"◈";hoverTitle.textContent=data.cityName;hoverDescription.textContent=data.cityDescription;sectorReadout.textContent=data.cityName;
+    districtHoverCard.style.setProperty("--hover-accent",`#${new THREE.Color(getDistrictConfig(key)?.accent||COLORS.accent).getHexString()}`);
     positionHoverCard(mouseX,mouseY);districtHoverCard.classList.add("visible");districtHoverCard.setAttribute("aria-hidden","false");customCursor.classList.add("active");exploreHint.classList.add("hidden");
   }
 
@@ -1514,10 +1652,14 @@
   function highlightDistrict(key,active){
     if(!key||!districtVisuals.has(key))return;
     const v=districtVisuals.get(key);
-    v.pad.material.opacity=active?.18:0;
-    v.border.material.opacity=active?1:0;
-    v.hoverPlate.material.opacity=active?.16:0;
+    v.pad.material.opacity=active?.20:.06;
+    v.border.material.opacity=active?.95:.28;
+    v.hoverPlate.material.opacity=active?.18:.02;
+    if(v.districtGlow) v.districtGlow.material.opacity=active?.20:.08;
     v.hoverRing.material.opacity=active?.82:0;
+    if(v.beaconBeam)v.beaconBeam.material.opacity=active?.42:0;
+    if(v.beaconGem)v.beaconGem.material.opacity=active?.95:0;
+    if(v.beaconHalo)v.beaconHalo.material.opacity=active?.72:0;
     v.targetLift=active?.32:0;
     v.targetScale=active?1.035:1;
   }
@@ -1535,6 +1677,15 @@
       }else{
         v.hoverRing.scale.setScalar(1);
       }
+      if(v.districtGlow){
+        const baseGlow = v.targetScale > 1 ? .16 : .08;
+        v.districtGlow.material.opacity = baseGlow + pulse*.018;
+      }
+      if(v.beaconGem && v.beaconGem.material.opacity>0){
+        v.beaconGem.position.y=21.2+Math.sin(clock.elapsedTime*3.2)*.28;
+        v.beaconGem.rotation.y+=.025;
+        const halo=.92+pulse*.18;v.beaconHalo.scale.setScalar(halo);
+      }
     });
   }
 
@@ -1548,7 +1699,10 @@
     ensureAudio();
     playOpenSound();
     focusDistrict(key,1.12);
-    visitedSections.add(key);updateExploredUi();duckMusic(true);
+    const firstVisit=!visitedSections.has(key);
+    visitedSections.add(key);updateExploredUi();
+    if(firstVisit){showDiscoveryToast(key);playTourChime();}
+    duckMusic(true);
     currentSectionKey=key;currentItemIndex=0;modalSectionIndex.textContent=data.cityIndex;modalSectionTitle.textContent=data.panelTitle;modalSectionSubtitle.textContent=data.panelSubtitle;sliderLabel.textContent=data.panelTitle;
     sectionSlider.min=0;sectionSlider.max=Math.max(0,data.items.length-1);sectionSlider.value=0;sliderTotal.textContent=formatNumber(data.items.length);
     sectionModal.classList.add("open");sectionModal.setAttribute("aria-hidden","false");document.body.classList.add("modal-open");
@@ -1573,7 +1727,7 @@
     if(data.type==="showcase")return renderShowcase(item);if(data.type==="experience")return renderExperience(item);if(data.type==="education")return renderEducation(item);if(data.type==="skills")return renderSkills(item);if(data.type==="research")return renderResearch(item);if(data.type==="about")return renderAbout(item);if(data.type==="contact")return renderContact(item);
   }
 
-  function renderShowcase(item){sectionContent.innerHTML=`<div class="showcase-layout content-enter"><div class="showcase-media"><img src="${item.media}" alt="${item.mediaAlt}" /><div class="media-overlay"></div><span class="media-label">PROJECT VISUAL // MEDIA FEED</span></div><div class="showcase-copy"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}${renderTags(item.tags)}<a class="archive-link" href="${item.link}" target="_blank" rel="noopener noreferrer">${item.linkLabel}</a></div></div>`}
+  function renderShowcase(item){sectionContent.innerHTML=`<div class="showcase-layout content-enter"><div class="showcase-media"><img src="${item.media}" alt="${item.mediaAlt}" loading="lazy" decoding="async" /><div class="media-overlay"></div><span class="media-label">PROJECT VISUAL // MEDIA FEED</span></div><div class="showcase-copy"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}${renderTags(item.tags)}<a class="archive-link" href="${item.link}" target="_blank" rel="noopener noreferrer">${item.linkLabel}</a></div></div>`}
   function renderExperience(item){sectionContent.innerHTML=`<div class="timeline-record content-enter"><div class="timeline-side"><span class="timeline-year">${item.year}</span><div class="timeline-period">${item.period}</div><div class="timeline-marker"></div></div><div class="record-main"><span class="record-company">${item.company}</span><h3>${item.title}</h3><span class="record-role">${item.period}</span><p class="content-description">${item.description}</p><ul class="record-points">${item.points.map(p=>`<li>${p}</li>`).join("")}</ul>${renderTags(item.tags)}</div></div>`}
   function renderEducation(item){sectionContent.innerHTML=`<div class="education-record content-enter"><div class="visual-card"><span class="visual-card-code">${item.code}</span><div class="visual-symbol">${item.symbol}</div></div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}</div></div>`}
   function renderSkills(item){sectionContent.innerHTML=`<div class="skill-record content-enter"><div class="visual-card"><div class="visual-symbol">${item.symbol}</div></div><div class="record-main"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p><div class="skill-list">${item.skills.map(s=>`<span class="skill-pill">${s}</span>`).join("")}</div><div class="used-in"><span>USED IN</span><div class="used-projects">${item.usedIn.map(p=>`<div class="used-project">${p}</div>`).join("")}</div></div></div></div>`}
@@ -1598,7 +1752,7 @@
     // Mouse-only navigation: moving the pointer into the outer edge zones
     // glides the camera.  Dragging still gives precise panning and the wheel
     // controls zoom. Camera movement is fully mouse-driven.
-    if(worldEntered && !sectionModal.classList.contains("open") && dragPointerId===null && !pointerOverUi){
+    if(!coarsePointer && worldEntered && !sectionModal.classList.contains("open") && dragPointerId===null && !pointerOverUi){
       const zoneX=window.innerWidth*EDGE_ZONE;
       const zoneY=window.innerHeight*EDGE_ZONE;
       let edgeX=0,edgeY=0;
@@ -1610,7 +1764,7 @@
       if(Math.abs(edgeX)>.01 || Math.abs(edgeY)>.01){
         cameraRight.set(1,0,0).applyQuaternion(camera.quaternion);cameraRight.y=0;cameraRight.normalize();
         cameraForward.set(0,0,-1).applyQuaternion(camera.quaternion);cameraForward.y=0;cameraForward.normalize();
-        const speed=(mobile?10.5:16.5)*delta/Math.max(.82,cameraZoom);
+        const speed=(mobile?12.5:20.5)*delta/Math.max(.82,cameraZoom);
         cameraPanTarget.x += (cameraRight.x*edgeX + cameraForward.x*(-edgeY))*speed;
         cameraPanTarget.y += (cameraRight.z*edgeX + cameraForward.z*(-edgeY))*speed;
         clampPan();
@@ -1618,15 +1772,16 @@
       }
     }
 
-    pointer.x=THREE.MathUtils.lerp(pointer.x,pointerTarget.x,.13);
-    pointer.y=THREE.MathUtils.lerp(pointer.y,pointerTarget.y,.13);
-    cameraPan.lerp(cameraPanTarget,.18);
-    cameraZoom=THREE.MathUtils.lerp(cameraZoom,cameraZoomTarget,.16);
+    pointer.x=THREE.MathUtils.lerp(pointer.x,pointerTarget.x,.18);
+    pointer.y=THREE.MathUtils.lerp(pointer.y,pointerTarget.y,.18);
+    cameraPan.lerp(cameraPanTarget,.21);
+    cameraZoom=THREE.MathUtils.lerp(cameraZoom,cameraZoomTarget,.19);
     camera.zoom=cameraZoom;camera.updateProjectionMatrix();
 
     // Very small parallax keeps the city feeling alive without fighting hover.
-    const parallaxX=mobile?0:pointer.x*.42;
-    const parallaxZ=mobile?0:pointer.y*-.32;
+    const cinematicDrift=cinematicMode?Math.sin(clock.elapsedTime*.22)*.65:0;
+    const parallaxX=mobile?0:pointer.x*.42+cinematicDrift;
+    const parallaxZ=mobile?0:pointer.y*-.32+(cinematicMode?Math.cos(clock.elapsedTime*.18)*.45:0);
     camera.position.set(baseCamera.x+cameraPan.x+parallaxX,baseCamera.y,baseCamera.z+cameraPan.y+parallaxZ);
     camera.lookAt(cameraPan.x+parallaxX*.12,0,cameraPan.y+parallaxZ*.12);
     cameraReadout.textContent=`${Math.round(cameraZoom*100)}%`;
@@ -1634,23 +1789,81 @@
 
   function resizeRenderer(){
     if(!renderer||!camera)return;
-    const width=window.innerWidth,height=window.innerHeight,aspect=width/height;
-    let viewHeight=width<720?96:78;let viewWidth=viewHeight*aspect;
+    const width=Math.max(1,window.innerWidth);
+    const height=Math.max(1,window.innerHeight);
+    const aspect=width/height;
+
+    let viewHeight;
+    if(width <= 480) viewHeight = aspect < .65 ? 116 : 105;
+    else if(width <= 820) viewHeight = aspect < .82 ? 102 : 94;
+    else viewHeight = 78;
+
+    let viewWidth=viewHeight*aspect;
     if(aspect>1.8){viewWidth=122;viewHeight=viewWidth/aspect}
-    camera.left=-viewWidth/2;camera.right=viewWidth/2;camera.top=viewHeight/2;camera.bottom=-viewHeight/2;camera.updateProjectionMatrix();
-    renderer.setSize(width,height);renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,mobile?1.05:lowCpu?1.25:1.5));
+
+    camera.left=-viewWidth/2;
+    camera.right=viewWidth/2;
+    camera.top=viewHeight/2;
+    camera.bottom=-viewHeight/2;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(width,height,false);
+    renderer.setPixelRatio(renderPixelRatio);
+    raycastDirty=true;
+  }
+
+  function adaptMobileQuality(now){
+    if(!mobile || reducedMotion) return;
+    perfFrames++;
+    const elapsed=now-perfWindowStart;
+    if(elapsed<2600) return;
+
+    const fps=(perfFrames*1000)/elapsed;
+    perfFrames=0;
+    perfWindowStart=now;
+
+    if(fps < 29 && renderPixelRatio > PERF.minPixelRatio){
+      renderPixelRatio=Math.max(PERF.minPixelRatio,renderPixelRatio-.08);
+      renderer.setPixelRatio(renderPixelRatio);
+    }else if(fps > 41 && renderPixelRatio < PERF.pixelRatio){
+      renderPixelRatio=Math.min(PERF.pixelRatio,renderPixelRatio+.04);
+      renderer.setPixelRatio(renderPixelRatio);
+    }
   }
 
   /* =========================================================
      MAIN LOOP
   ========================================================= */
 
-  function animate(){
+  function animate(now=performance.now()){
     requestAnimationFrame(animate);
     if(!pageVisible)return;
-    const delta=Math.min(clock.getDelta(),.04),elapsed=clock.elapsedTime;
-    updateCamera(delta);updateTraffic(delta);updatePedestrians(delta,elapsed);updateAmbient(elapsed,delta);updateDistrictHoverMotion();
-    if(raycastDirty&&!dragMoved&&worldEntered&&!sectionModal.classList.contains("open")){raycastDirty=false;updateRaycast(latestPointerX,latestPointerY)}
+
+    const minFrameMs=1000/PERF.targetFps;
+    if(now-lastRenderStamp<minFrameMs)return;
+    lastRenderStamp=now;
+
+    const delta=Math.min(clock.getDelta(),.045);
+    const elapsed=clock.elapsedTime;
+    const modalOpen=sectionModal.classList.contains("open");
+
+    updateCamera(delta);
+
+    // The map behind a mobile modal is mostly obscured, so pausing its busy
+    // simulation saves battery/GPU without changing the visible experience.
+    if(!(mobile && modalOpen)){
+      updateTraffic(delta);
+      updatePedestrians(delta,elapsed);
+      updateAmbient(elapsed,delta);
+      updateDistrictHoverMotion();
+    }
+
+    if(raycastDirty&&!dragMoved&&!pinching&&worldEntered&&!modalOpen){
+      raycastDirty=false;
+      updateRaycast(latestPointerX,latestPointerY);
+    }
+
+    adaptMobileQuality(now);
     renderer.render(scene,camera);
   }
 
@@ -1686,10 +1899,29 @@
 
   window.addEventListener("pointermove",event=>{
     if(tourActive && event.isTrusted) stopGuidedTour();
-    customCursor.style.left=`${event.clientX}px`;customCursor.style.top=`${event.clientY}px`;
+    if(customCursor){
+      customCursor.style.left=`${event.clientX}px`;
+      customCursor.style.top=`${event.clientY}px`;
+    }
     latestPointerX=event.clientX;latestPointerY=event.clientY;
     pointerTarget.x=(event.clientX/window.innerWidth)*2-1;pointerTarget.y=-(event.clientY/window.innerHeight)*2+1;
-    coordinateReadout.textContent=`X ${String(Math.round(event.clientX)).padStart(3,"0")} // Y ${String(Math.round(event.clientY)).padStart(3,"0")}`;
+    if(coordinateReadout) coordinateReadout.textContent=`X ${String(Math.round(event.clientX)).padStart(3,"0")} // Y ${String(Math.round(event.clientY)).padStart(3,"0")}`;
+
+    if(coarsePointer && activeTouchPointers.has(event.pointerId)){
+      activeTouchPointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+
+      if(pinching && activeTouchPointers.size>=2){
+        event.preventDefault();
+        const pts=[...activeTouchPointers.values()].slice(0,2);
+        const distance=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+        if(pinchStartDistance>0){
+          const scale=distance/pinchStartDistance;
+          cameraZoomTarget=THREE.MathUtils.clamp(pinchStartZoom*scale,.78,1.34);
+          raycastDirty=true;
+        }
+        return;
+      }
+    }
 
     if(dragPointerId===event.pointerId){
       const dx=event.clientX-dragStartScreenX,dy=event.clientY-dragStartScreenY;
@@ -1706,7 +1938,7 @@
     if(!worldEntered||sectionModal.classList.contains("open"))return;
     if(pointerOverUi)return;
     raycastDirty=true;
-  },{passive:true});
+  },{passive:false});
 
   window.addEventListener("pointerleave",()=>{pointerTarget.set(0,0);pointerOverUi=false});
 
@@ -1717,35 +1949,83 @@
       if(!worldEntered||sectionModal.classList.contains("open"))return;
       if(event.target.closest("button,a,.district-directory,.section-sidebar,.section-modal"))return;
       if(!event.target.closest("#threeContainer"))return;
-      dragPointerId=event.pointerId;dragStartScreenX=event.clientX;dragStartScreenY=event.clientY;dragMoved=false;dragPanStart.copy(cameraPanTarget);
+
+      if(coarsePointer){
+        activeTouchPointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+
+        if(activeTouchPointers.size===2){
+          const pts=[...activeTouchPointers.values()].slice(0,2);
+          pinchStartDistance=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+          pinchStartZoom=cameraZoomTarget;
+          pinching=true;
+          dragPointerId=null;
+          dragMoved=true;
+          clearDistrictHover();
+          return;
+        }
+      }
+
+      if(pinching)return;
+
+      dragPointerId=event.pointerId;
+      dragStartScreenX=event.clientX;
+      dragStartScreenY=event.clientY;
+      dragMoved=false;
+      dragPanStart.copy(cameraPanTarget);
       screenToGround(event.clientX,event.clientY,dragStartWorld);
-      if(event.target.setPointerCapture)try{event.target.setPointerCapture(event.pointerId)}catch(_e){}
-    });
+
+      if(event.target.setPointerCapture){
+        try{event.target.setPointerCapture(event.pointerId)}catch(_e){}
+      }
+    },{passive:true});
 
     document.addEventListener("pointerup",event=>{
+      if(coarsePointer && activeTouchPointers.has(event.pointerId)){
+        activeTouchPointers.delete(event.pointerId);
+        if(pinching){
+          if(activeTouchPointers.size<2){
+            pinching=false;
+            pinchStartDistance=0;
+            dragPointerId=null;
+            setTimeout(()=>{dragMoved=false},60);
+          }
+          return;
+        }
+      }
+
       if(dragPointerId!==event.pointerId)return;
+
       if(!dragMoved){
         const key=getDistrictAt(event.clientX,event.clientY);
         if(key){
-          showDistrictHover(key,event.clientX,event.clientY);
+          // Desktop gets hover feedback first; touch opens immediately.
+          if(!coarsePointer) showDistrictHover(key,event.clientX,event.clientY);
           openSection(key);
         }else{
           clearDistrictHover();
         }
       }
-      dragPointerId=null;customCursor.classList.remove("dragging");
+
+      dragPointerId=null;
+      if(customCursor) customCursor.classList.remove("dragging");
       setTimeout(()=>{dragMoved=false},0);
-    });
+    },{passive:true});
 
     document.addEventListener("pointercancel",event=>{
-      if(dragPointerId===event.pointerId){dragPointerId=null;dragMoved=false;customCursor.classList.remove("dragging")}
-    });
+      activeTouchPointers.delete(event.pointerId);
+      if(activeTouchPointers.size<2)pinching=false;
+      if(dragPointerId===event.pointerId){
+        dragPointerId=null;
+        dragMoved=false;
+        if(customCursor)customCursor.classList.remove("dragging");
+      }
+    },{passive:true});
   }
 
   window.addEventListener("wheel",event=>{
     if(tourActive)stopGuidedTour();
     if(!worldEntered||sectionModal.classList.contains("open"))return;
-    cameraZoomTarget=THREE.MathUtils.clamp(cameraZoomTarget-event.deltaY*.0007,.82,1.32);
+    cameraZoomTarget=THREE.MathUtils.clamp(cameraZoomTarget-event.deltaY*.0008,.78,1.34);
   },{passive:true});
 
 
@@ -1774,6 +2054,8 @@
       await ensureAudio();setMasterVolume(Number(volumeSlider.value)/100);
     });
   }
+  if(timeModeButton)timeModeButton.addEventListener("click",event=>{event.stopPropagation();ensureAudio();cycleTimeMode()});
+  if(cinematicButton)cinematicButton.addEventListener("click",event=>{event.stopPropagation();toggleCinematic()});
   if(tourButton)tourButton.addEventListener("click",event=>{event.stopPropagation();startGuidedTour()});
 
   document.querySelectorAll(".section-sidebar-item").forEach(button=>{
@@ -1807,14 +2089,16 @@
   directoryToggle.addEventListener("click",()=>{const open=districtDirectory.classList.toggle("open");districtDirectory.setAttribute("aria-hidden",open?"false":"true")});
   directoryClose.addEventListener("click",()=>{districtDirectory.classList.remove("open");districtDirectory.setAttribute("aria-hidden","true")});
   document.querySelectorAll("[data-open-section]").forEach(button=>button.addEventListener("click",()=>openSection(button.dataset.openSection)));
-  homeViewButton.addEventListener("click",resetCamera);
+  homeViewButton?.addEventListener("click",()=>{playClick();resetCamera()});
 
   document.addEventListener("visibilitychange",()=>{
     pageVisible=!document.hidden;
     if(pageVisible){clock.getDelta();if(audioEnabled&&audioCtx?.state==="suspended")audioCtx.resume().catch(()=>{});}
     else if(audioCtx?.state==="running")audioCtx.suspend().catch(()=>{});
   });
-  window.addEventListener("resize",resizeRenderer);
+  window.addEventListener("resize",resizeRenderer,{passive:true});
+  window.addEventListener("orientationchange",()=>setTimeout(resizeRenderer,120),{passive:true});
+  if(window.visualViewport) window.visualViewport.addEventListener("resize",resizeRenderer,{passive:true});
 
   setMasterVolume(.88);updateExploredUi();
   initWorld();

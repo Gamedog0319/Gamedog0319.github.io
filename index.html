@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="description" content="Interactive portfolio city of Rithvik Mandya — gameplay programming, game AI, VR and simulation." />
-  <meta name="theme-color" content="#dcecff" />
+  <meta name="theme-color" content="#101b2d" />
   <title>Rithvik City | Interactive Portfolio</title>
 
   <link rel="icon" href="./favicon.png" />
@@ -14,10 +14,11 @@
   <link rel="stylesheet" href="./assets/css/style.css" />
 </head>
 <body>
-  <main id="cityWorld" aria-label="Interactive daytime portfolio city">
+  <main id="cityWorld" aria-label="Interactive portfolio city">
     <div id="threeContainer"></div>
     <div class="sky-wash"></div>
     <div class="sun-glare" aria-hidden="true"><span></span></div>
+    <div class="night-stars" aria-hidden="true"></div>
     <div class="atmosphere-haze"></div>
     <div class="city-vignette"></div>
   </main>
@@ -45,8 +46,8 @@
     <div class="hud-status">
       <span class="status-dot"></span>
       <div>
-        <strong>DAYLIGHT ONLINE</strong>
-        <span>EXPLORE THE CITY</span>
+        <strong id="hudStatusPrimary">CITY ONLINE</strong>
+        <span id="hudStatusSecondary">DAY MODE ACTIVE</span>
       </div>
     </div>
 
@@ -58,10 +59,12 @@
         </button>
         <div class="volume-popover" aria-label="Audio volume">
           <span>VOLUME</span>
-          <input id="volumeSlider" type="range" min="0" max="100" step="1" value="88" aria-label="Portfolio audio volume" />
-          <strong id="volumeValue">88%</strong>
+          <input id="volumeSlider" type="range" min="0" max="100" step="1" value="95" aria-label="Portfolio audio volume" />
+          <strong id="volumeValue">95%</strong>
         </div>
       </div>
+      <button class="hud-button world-button" id="timeModeButton" type="button" title="Switch between Day, Golden Hour and Night modes">MODE: DAY</button>
+      <button class="hud-button cinematic-button" id="cinematicButton" type="button" aria-pressed="false" title="Hide nonessential HUD">CINEMATIC</button>
       <button class="hud-button tour-button" id="tourButton" type="button" aria-pressed="false" title="Start a guided city tour">GUIDED TOUR</button>
       <button class="hud-button" id="homeViewButton" type="button" title="Reset camera">HOME VIEW</button>
       <button class="hud-button hidden-directory-toggle" id="directoryToggle" type="button" aria-hidden="true" tabindex="-1">DISTRICTS</button>
@@ -71,20 +74,20 @@
     </div>
   </header>
 
-  <aside class="section-sidebar" id="sectionSidebar" aria-label="Portfolio sections">
+  <aside class="section-sidebar" id="sectionSidebar" aria-label="Portfolio sections" role="navigation">
     <div class="section-sidebar-head">
       <span>EXPLORE</span>
       <strong>SECTIONS</strong>
     </div>
     <nav class="section-sidebar-nav">
-      <button class="section-sidebar-item" type="button" data-open-section="projects"><span class="sidebar-index">01</span><span class="sidebar-name">Projects</span></button>
-      <button class="section-sidebar-item" type="button" data-open-section="featured"><span class="sidebar-index">02</span><span class="sidebar-name">Featured Work</span></button>
-      <button class="section-sidebar-item" type="button" data-open-section="experience"><span class="sidebar-index">03</span><span class="sidebar-name">Experience</span></button>
-      <button class="section-sidebar-item" type="button" data-open-section="education"><span class="sidebar-index">04</span><span class="sidebar-name">Education</span></button>
-      <button class="section-sidebar-item" type="button" data-open-section="skills"><span class="sidebar-index">05</span><span class="sidebar-name">Skills</span></button>
-      <button class="section-sidebar-item" type="button" data-open-section="research"><span class="sidebar-index">06</span><span class="sidebar-name">Research</span></button>
-      <button class="section-sidebar-item" type="button" data-open-section="about"><span class="sidebar-index">07</span><span class="sidebar-name">About</span></button>
-      <button class="section-sidebar-item" type="button" data-open-section="contact"><span class="sidebar-index">08</span><span class="sidebar-name">Contact</span></button>
+      <button class="section-sidebar-item" style="--district:#e14a39" type="button" data-open-section="projects"><span class="sidebar-index">01</span><span class="sidebar-glyph">◈</span><span class="sidebar-name">Projects</span></button>
+      <button class="section-sidebar-item" style="--district:#d76b69" type="button" data-open-section="featured"><span class="sidebar-index">02</span><span class="sidebar-glyph">✦</span><span class="sidebar-name">Featured Work</span></button>
+      <button class="section-sidebar-item" style="--district:#5aa7bd" type="button" data-open-section="experience"><span class="sidebar-index">03</span><span class="sidebar-glyph">▥</span><span class="sidebar-name">Experience</span></button>
+      <button class="section-sidebar-item" style="--district:#7a93c9" type="button" data-open-section="education"><span class="sidebar-index">04</span><span class="sidebar-glyph">⌂</span><span class="sidebar-name">Education</span></button>
+      <button class="section-sidebar-item" style="--district:#4c9b82" type="button" data-open-section="skills"><span class="sidebar-index">05</span><span class="sidebar-glyph">⚙</span><span class="sidebar-name">Skills</span></button>
+      <button class="section-sidebar-item" style="--district:#9277bd" type="button" data-open-section="research"><span class="sidebar-index">06</span><span class="sidebar-glyph">⌬</span><span class="sidebar-name">Research</span></button>
+      <button class="section-sidebar-item" style="--district:#e14a39" type="button" data-open-section="about"><span class="sidebar-index">07</span><span class="sidebar-glyph">RM</span><span class="sidebar-name">About</span></button>
+      <button class="section-sidebar-item" style="--district:#d8824f" type="button" data-open-section="contact"><span class="sidebar-index">08</span><span class="sidebar-glyph">◎</span><span class="sidebar-name">Contact</span></button>
     </nav>
     <div class="section-sidebar-foot">
       <div class="explored-row"><span>EXPLORED</span><strong id="exploredCount">0 / 8</strong></div>
@@ -103,7 +106,7 @@
     <span class="explore-icon">+</span>
     <div>
       <strong>EXPLORE</strong>
-      <p>Move near the screen edge to glide • drag to pan • wheel to zoom • hover to identify • click a district to open.</p>
+      <p id="controlHintText">Move near the screen edge to glide • drag to pan • wheel to zoom • hover to identify • click a district to open.</p>
     </div>
   </div>
 
@@ -125,11 +128,20 @@
   </aside>
 
   <div class="district-hover-card" id="districtHoverCard" aria-hidden="true">
-    <span class="hover-index" id="hoverIndex">DISTRICT 01</span>
+    <div class="hover-topline"><span class="hover-glyph" id="hoverGlyph">◈</span><span class="hover-index" id="hoverIndex">DISTRICT 01</span></div>
     <h2 id="hoverTitle">PROJECT DISTRICT</h2>
     <p id="hoverDescription">Games • AI • VR • Simulation</p>
     <span class="hover-click-hint">CLICK DISTRICT TO OPEN</span>
   </div>
+
+  <aside class="objective-card" id="objectiveCard" aria-live="polite">
+    <span class="objective-kicker">CURRENT OBJECTIVE</span>
+    <strong id="objectiveTitle">Explore the city</strong>
+    <p id="objectiveText">Discover the eight portfolio districts.</p>
+    <div class="objective-progress"><span id="objectiveFill"></span></div>
+  </aside>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
 
   <section class="section-modal" id="sectionModal" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="section-backdrop" id="sectionBackdrop"></div>
@@ -161,7 +173,7 @@
   <footer class="bottom-hud">
     <div><span>NAVIGATION</span><strong>MOUSE • EDGE PAN • DRAG • WHEEL</strong></div>
     <div class="bottom-hud-center" id="cityStatus">CITY ONLINE // EXPLORE AT YOUR OWN PACE</div>
-    <div><span>MODE</span><strong>DAYLIGHT / LIVE CITY</strong></div>
+    <div><span>CITY ACTIVITY</span><strong id="telemetryReadout">LIVE</strong></div>
   </footer>
 
   <div class="custom-cursor" id="customCursor" aria-hidden="true"><span></span><span></span></div>
