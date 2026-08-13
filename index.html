@@ -10,8 +10,9 @@
   <link rel="icon" href="./favicon.png" />
   <link rel="dns-prefetch" href="//cdnjs.cloudflare.com" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
-  <link rel="stylesheet" href="./assets/css/style.css?v=31" />
-  <link rel="stylesheet" href="./assets/css/mobile.css?v=31" />
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js" as="script" crossorigin />
+  <link rel="stylesheet" href="./assets/css/style.css?v=33" />
+  <link rel="stylesheet" href="./assets/css/mobile.css?v=33" />
 </head>
 <body>
   <main id="cityWorld" aria-label="Interactive portfolio">
@@ -66,7 +67,6 @@
       <button class="hud-button cinematic-button" id="cinematicButton" type="button" aria-pressed="false" title="Hide nonessential HUD">CINEMATIC</button>
       <button class="hud-button" id="homeViewButton" type="button" title="Reset camera">HOME VIEW</button>
       <button class="hud-button hidden-directory-toggle" id="directoryToggle" type="button" aria-hidden="true" tabindex="-1">DISTRICTS</button>
-      <button class="hud-button scanner-button" id="scannerButton" type="button" aria-pressed="false" title="Toggle technical scanner mode">SCAN</button>
       <button class="hud-button search-button" id="commandButton" type="button" title="Search projects, skills and districts">SEARCH</button>
       <button class="hud-button recruiter-button" id="recruiterViewButton" type="button" title="Open a 30-second recruiter overview">QUICK VIEW</button>
       <a class="hud-button hud-button-primary resume-button" aria-label="Open resume in a new tab"
@@ -99,9 +99,6 @@
     </button>
     <button class="mobile-tool-button" id="mobileCinematicButton" type="button" aria-label="Toggle cinematic mode">
       <span class="mobile-tool-icon">◉</span><strong>Cinema</strong><small id="mobileCinematicState">Off</small>
-    </button>
-    <button class="mobile-tool-button" id="mobileScannerButton" type="button" aria-label="Toggle technical scanner">
-      <span class="mobile-tool-icon">⌖</span><strong>Scan</strong><small id="mobileScannerState">Off</small>
     </button>
     <button class="mobile-tool-button" id="mobileCommandButton" type="button" aria-label="Search portfolio">
       <span class="mobile-tool-icon">⌕</span><strong>Search</strong><small>Find</small>
@@ -206,24 +203,7 @@
   </aside>
 
   <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
-
-  <aside class="scanner-hud" id="scannerHud" aria-live="polite" aria-hidden="true">
-    <div class="scanner-hud-line"><span>TECHNICAL SCANNER</span><strong id="scannerStateText">ACTIVE</strong></div>
-    <div class="scanner-crosshair" aria-hidden="true"><span></span><span></span></div>
-    <div class="scanner-readout">
-      <small id="scannerDistrictIndex">CITY // CENTRAL</small>
-      <strong id="scannerDistrictName">Move across the city</strong>
-      <p id="scannerDistrictMeta">Interactive districts will expose their technical role and portfolio data.</p>
-    </div>
-  </aside>
-
-
-  <aside class="world-blueprint-hud" id="worldBlueprintHud" aria-hidden="true">
-    <div><span>3D SYSTEM BLUEPRINT</span><strong id="worldBlueprintTitle">SYSTEM</strong><p id="worldBlueprintSubtitle">Technical architecture projected into the city.</p></div>
-    <div class="world-blueprint-actions"><button type="button" id="worldBlueprintReturn">RETURN TO PROJECT</button><button type="button" id="worldBlueprintClose" aria-label="Close world blueprint">×</button></div>
-  </aside>
-
-  <section class="command-palette" id="commandPalette" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="commandPaletteTitle">
+<section class="command-palette" id="commandPalette" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="commandPaletteTitle">
     <div class="command-backdrop" id="commandBackdrop"></div>
     <article class="command-panel">
       <header><button class="mobile-back-map" id="commandBackToMap" type="button" aria-label="Back to city map">← <span>Map</span></button><div><span>PORTFOLIO SEARCH</span><h2 id="commandPaletteTitle">Find anything</h2></div><button id="commandClose" type="button" aria-label="Close search">×</button></header>
@@ -384,8 +364,8 @@
   <noscript><div class="noscript">This interactive portfolio requires JavaScript.</div></noscript>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
-  <script src="./assets/js/modules/runtime.js?v=31"></script>
-  <script src="./assets/js/modules/world-boundaries.js?v=31"></script>
-  <script src="./assets/js/main.js?v=31"></script>
+  <script src="./assets/js/modules/runtime.js?v=33"></script>
+  <script src="./assets/js/modules/world-boundaries.js?v=33"></script>
+  <script src="./assets/js/main.js?v=33"></script>
 </body>
 </html>

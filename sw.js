@@ -1,7 +1,8 @@
-/* Rithvik Portfolio service worker — V31 lean first-visit cache + fast repeats. */
-const CACHE_VERSION = "rithvik-portfolio-v31";
+/* Rithvik Portfolio service worker — V33 lean cache strategy. */
+const CACHE_VERSION = "rithvik-portfolio-v33";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
+const THREE_CDN = "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js";
 
 self.addEventListener("install", event => {
   event.waitUntil(self.skipWaiting());
@@ -23,22 +24,21 @@ async function networkFirst(request, event) {
   try {
     const preload = event?.preloadResponse ? await event.preloadResponse : null;
     const response = preload || await fetch(request);
-    if (response && response.ok) await cache.put(request, response.clone());
+    if (response && response.ok) cache.put(request, response.clone()).catch(() => {});
     return response;
   } catch (_error) {
     return (await cache.match(request)) || (await cache.match("./index.html")) || Response.error();
   }
 }
 
-async function cacheFirst(request) {
-  const cached = await caches.match(request);
+async function cacheFirst(request, { allowOpaque = false } = {}) {
+  const cache = await caches.open(RUNTIME_CACHE);
+  const cached = await cache.match(request);
   if (cached) return cached;
   try {
     const response = await fetch(request);
-    if (response && response.ok) {
-      const cache = await caches.open(RUNTIME_CACHE);
-      await cache.put(request, response.clone());
-    }
+    const cacheable = response && (response.ok || (allowOpaque && response.type === "opaque"));
+    if (cacheable) cache.put(request, response.clone()).catch(() => {});
     return response;
   } catch (_error) {
     return cached || Response.error();
@@ -48,8 +48,14 @@ async function cacheFirst(request) {
 self.addEventListener("fetch", event => {
   const request = event.request;
   if (request.method !== "GET") return;
-
   const url = new URL(request.url);
+
+  // Cache the pinned Three.js build after the first controlled visit.
+  if (url.href === THREE_CDN) {
+    event.respondWith(cacheFirst(request, { allowOpaque: true }));
+    return;
+  }
+
   if (url.origin !== self.location.origin) return;
 
   if (request.mode === "navigate" || request.destination === "document") {
@@ -68,18 +74,16 @@ self.addEventListener("message", event => {
 
   event.waitUntil((async () => {
     const cache = await caches.open(RUNTIME_CACHE);
-    const batchSize = 2;
-    for (let i = 0; i < urls.length; i += batchSize) {
-      const batch = urls.slice(i, i + batchSize);
-      await Promise.allSettled(batch.map(async url => {
-        try {
-          const request = new Request(url, { credentials: "same-origin", cache: "default" });
-          if (await cache.match(request)) return;
-          const response = await fetch(request);
-          if (response && response.ok) await cache.put(request, response.clone());
-        } catch (_error) {}
-      }));
-      await new Promise(resolve => setTimeout(resolve, 40));
+    // Keep background cache warming intentionally serial/light so it never
+    // competes with the live portfolio interaction.
+    for (const url of urls) {
+      try {
+        const request = new Request(url, { credentials: "same-origin", cache: "default" });
+        if (await cache.match(request)) continue;
+        const response = await fetch(request);
+        if (response && response.ok) await cache.put(request, response.clone());
+      } catch (_error) {}
+      await new Promise(resolve => setTimeout(resolve, 55));
     }
   })());
 });

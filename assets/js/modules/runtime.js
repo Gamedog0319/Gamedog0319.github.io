@@ -10,6 +10,7 @@
   }
 
   function afterPaint() {
+    if (document.hidden) return Promise.resolve();
     return new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   }
 
@@ -22,7 +23,7 @@
       if ("requestIdleCallback" in window) {
         requestIdleCallback(() => resolve(), { timeout });
       } else {
-        setTimeout(resolve, Math.min(timeout, 90));
+        setTimeout(resolve, Math.min(timeout, 60));
       }
     });
   }
@@ -96,7 +97,7 @@
   async function registerServiceWorker() {
     if (!("serviceWorker" in navigator) || location.protocol === "file:") return null;
     try {
-      const registration = await navigator.serviceWorker.register("./sw.js?v=31", { scope: "./" });
+      const registration = await navigator.serviceWorker.register("./sw.js?v=33", { scope: "./", updateViaCache: "none" });
       return registration;
     } catch (error) {
       console.warn("Service worker registration skipped", error);

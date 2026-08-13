@@ -1,4 +1,4 @@
-/* V22: mobile section opens skip first-visit district discovery toast; desktop retains it. */
+/* V33: lean runtime, faster input response, throttled background simulation and staged caching. */
 /* =========================================================
    RITHVIK PORTFOLIO — Mobile Portrait V18
    Uses the global THREE object loaded in index.html.
@@ -88,13 +88,6 @@
   const mobileCinematicState = $("mobileCinematicState");
   const mobileDockQuickView = $("mobileDockQuickView");
   const mobileLandscapeDock = $("mobileLandscapeDock");
-  const scannerButton = $("scannerButton");
-  const mobileScannerButton = $("mobileScannerButton");
-  const mobileScannerState = $("mobileScannerState");
-  const scannerHud = $("scannerHud");
-  const scannerDistrictIndex = $("scannerDistrictIndex");
-  const scannerDistrictName = $("scannerDistrictName");
-  const scannerDistrictMeta = $("scannerDistrictMeta");
   const commandButton = $("commandButton");
   const mobileCommandButton = $("mobileCommandButton");
   const commandPalette = $("commandPalette");
@@ -103,15 +96,12 @@
   const commandBackToMap = $("commandBackToMap");
   const commandInput = $("commandInput");
   const commandResults = $("commandResults");
-  const worldBlueprintHud = $("worldBlueprintHud");
-  const worldBlueprintTitle = $("worldBlueprintTitle");
-  const worldBlueprintSubtitle = $("worldBlueprintSubtitle");
-  const worldBlueprintReturn = $("worldBlueprintReturn");
-  const worldBlueprintClose = $("worldBlueprintClose");
   const completionFinale = $("completionFinale");
   const completionBackdrop = $("completionBackdrop");
   const completionClose = $("completionClose");
   const completionContinue = $("completionContinue");
+  const allSectionNavItems = [...document.querySelectorAll(".section-sidebar-item,.mobile-section-item")];
+  const desktopSidebarItems = [...document.querySelectorAll(".section-sidebar-item")];
 
   /* =========================================================
      LIGHTWEIGHT PROCEDURAL AUDIO
@@ -145,13 +135,9 @@
   let mobileMenuView = "explore";
   let mobileHintTimer = null;
   let mobileSectionSwipeStart = null;
-  let scannerMode = false;
   let commandOpen = false;
-  let worldBlueprintGroup = null;
-  let worldBlueprintReturnState = null;
   let worldTransition = null;
   let nightLightGroup = null;
-  let scannerLabelGroup = null;
   const nightGlowMaterials = [];
   const nightHeadlights = [];
   const storytellingGroups = new Map();
@@ -217,7 +203,6 @@
     if(mobileSoundState) mobileSoundState.textContent=audioEnabled?`On • ${Math.round(masterVolume*100)}%`:"Off";
     if(mobileTimeState) mobileTimeState.textContent=(timeModes[timeModeIndex]||"day").replace(/^./,c=>c.toUpperCase());
     if(mobileCinematicState) mobileCinematicState.textContent=cinematicMode?"On":"Off";
-    if(mobileScannerState) mobileScannerState.textContent=scannerMode?"On":"Off";
   }
 
   function createAudioContext(){
@@ -468,27 +453,6 @@
     toastStack.appendChild(toast);
     requestAnimationFrame(()=>toast.classList.add("show"));
     setTimeout(()=>{toast.classList.remove("show");setTimeout(()=>toast.remove(),360)},3600);
-  }
-
-  function updateScannerReadout(key=null){
-    if(!scannerMode)return;
-    const data=key?portfolioSections[key]:null;
-    if(scannerDistrictIndex)scannerDistrictIndex.textContent=data?`${data.cityIndex} // ANALYZED`:"CITY // CENTRAL";
-    if(scannerDistrictName)scannerDistrictName.textContent=data?data.cityName:"Move across the city";
-    if(scannerDistrictMeta)scannerDistrictMeta.textContent=data?`${data.cityDescription} • ${data.items.length} records available.`:"Interactive districts expose their technical role and portfolio data.";
-  }
-
-  function toggleScanner(force){
-    scannerMode=typeof force==="boolean"?force:!scannerMode;
-    document.body.classList.toggle("scanner-mode",scannerMode);
-    scannerButton?.classList.toggle("is-active",scannerMode);
-    scannerButton?.setAttribute("aria-pressed",scannerMode?"true":"false");
-    if(scannerButton)scannerButton.textContent=scannerMode?"SCAN ON":"SCAN";
-    if(scannerHud){scannerHud.setAttribute("aria-hidden",scannerMode?"false":"true");scannerHud.classList.toggle("visible",scannerMode)}
-    scannerLabelGroup && (scannerLabelGroup.visible=scannerMode);
-    if(scannerMode)updateScannerReadout(activeHoverKey);
-    syncMobileMenuUi();
-    if(audioCtx?.state==="running")playOpenSound();
   }
 
   function buildSearchIndex(){
@@ -1008,15 +972,17 @@
     antialias: !mobile && !lowCpu,
     shadows: !mobile && !lowCpu,
     shadowMap: lowCpu || hosted ? 512 : 1024,
-    people: reducedMotion ? 4 : mobile ? (veryLowEnd ? 3 : largeMobile ? 6 : 4) : lowCpu ? 14 : hosted ? 22 : 28,
-    movingCars: reducedMotion ? 3 : mobile ? (veryLowEnd ? 2 : largeMobile ? 4 : 3) : lowCpu ? 8 : hosted ? 11 : 14,
-    parkedCars: mobile ? (largeMobile ? 4 : 3) : hosted ? 10 : 12,
-    trees: mobile ? (veryLowEnd ? 11 : largeMobile ? 20 : 16) : lowCpu ? 40 : hosted ? 52 : 62,
-    lamps: mobile ? (largeMobile ? 14 : 11) : hosted ? 34 : 42,
-    benches: mobile ? 2 : hosted ? 10 : 13,
-    birds: reducedMotion ? 0 : mobile ? 0 : hosted ? 4 : 6,
-    clouds: mobile ? 1 : lowCpu ? 3 : hosted ? 4 : 5,
-    targetFps: mobile ? (veryLowEnd ? 26 : 34) : hosted ? 55 : 60,
+    people: reducedMotion ? 4 : mobile ? (veryLowEnd ? 3 : largeMobile ? 5 : 4) : lowCpu ? 13 : hosted ? 20 : 28,
+    movingCars: reducedMotion ? 3 : mobile ? (veryLowEnd ? 2 : largeMobile ? 4 : 3) : lowCpu ? 7 : hosted ? 10 : 14,
+    parkedCars: mobile ? (largeMobile ? 4 : 3) : hosted ? 9 : 12,
+    trees: mobile ? (veryLowEnd ? 11 : largeMobile ? 18 : 15) : lowCpu ? 38 : hosted ? 48 : 62,
+    lamps: mobile ? (largeMobile ? 13 : 10) : hosted ? 32 : 42,
+    benches: mobile ? 2 : hosted ? 9 : 13,
+    birds: reducedMotion ? 0 : mobile ? 0 : hosted ? 3 : 6,
+    clouds: mobile ? 1 : lowCpu ? 2 : hosted ? 3 : 5,
+    targetFps: mobile ? (veryLowEnd ? 28 : 36) : 60,
+    idleFps: mobile ? (veryLowEnd ? 18 : 24) : hosted ? 36 : 42,
+    actorFps: mobile ? (veryLowEnd ? 16 : 20) : 30,
     animate: !reducedMotion
   };
 
@@ -1052,6 +1018,7 @@
   const dragStartWorld = new THREE.Vector3();
   const dragCurrentWorld = new THREE.Vector3();
   const dragPanStart = new THREE.Vector2();
+  const groundPointer = new THREE.Vector2();
   let dragPointerId = null;
   let dragStartScreenX = 0;
   let dragStartScreenY = 0;
@@ -1076,6 +1043,14 @@
   let lastRenderStamp = 0;
   let perfWindowStart = performance.now();
   let perfFrames = 0;
+  let lastInteractionAt = performance.now();
+  let actorAccumulator = 0;
+  let ambientAccumulator = 0;
+  let lastCameraPercent = -1;
+
+  function markInteraction(){
+    lastInteractionAt = performance.now();
+  }
 
   const cameraRight = new THREE.Vector3();
   const cameraForward = new THREE.Vector3();
@@ -1148,65 +1123,6 @@
     night:{sky:0x0d1a2b,fog:0x22374f,sun:0x7fb0ff,sunI:.74,hemiSky:0x6385b3,hemiGround:0x1c3041,hemiI:.85,ambient:0x9ec0ff,ambientI:.27,exposure:.88,sunPos:[-45,62,-32],disc:0xdce9ff,night:1}
   };
 
-  function makeTextSprite(text,color=0xffffff,scale=1){
-    // Scanner labels are canvas textures. A 512×128 texture looked soft on
-    // high-density mobile screens once it was projected into the 3D world.
-    // Keep the desktop path lightweight, but rasterize a substantially larger
-    // texture on phones and prevent mipmap downsampling from blurring it.
-    const mobileLabel = mobile || window.matchMedia("(pointer: coarse)").matches;
-    const width = mobileLabel ? 1280 : 512;
-    const height = mobileLabel ? 320 : 128;
-    const px = width / 512;
-
-    const canvas=document.createElement("canvas");
-    canvas.width=width;canvas.height=height;
-    const ctx=canvas.getContext("2d",{alpha:true});
-    ctx.clearRect(0,0,width,height);
-    ctx.imageSmoothingEnabled=true;
-    ctx.imageSmoothingQuality="high";
-
-    ctx.fillStyle="rgba(8,18,30,.94)";
-    ctx.strokeStyle=`#${new THREE.Color(color).getHexString()}`;
-    ctx.lineWidth=4*px;
-    ctx.beginPath();
-    const inset=8*px, radius=18*px;
-    if(ctx.roundRect)ctx.roundRect(inset,inset,width-inset*2,height-inset*2,radius);
-    else ctx.rect(inset,inset,width-inset*2,height-inset*2);
-    ctx.fill();ctx.stroke();
-
-    ctx.fillStyle="#ffffff";
-    const fontSize=mobileLabel ? 92 : 38;
-    const fontFamily=mobileLabel
-      ? '-apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif'
-      : 'Inter, Arial, sans-serif';
-    ctx.font=`800 ${fontSize}px ${fontFamily}`;
-    ctx.textAlign="center";ctx.textBaseline="middle";
-    const clipped=text.length>24?`${text.slice(0,23)}…`:text;
-    ctx.fillText(clipped,width/2,height/2+1*px);
-
-    const texture=new THREE.CanvasTexture(canvas);
-    texture.colorSpace=THREE.SRGBColorSpace;
-    texture.generateMipmaps=false;
-    texture.minFilter=THREE.LinearFilter;
-    texture.magFilter=THREE.LinearFilter;
-    if(renderer?.capabilities?.getMaxAnisotropy){
-      texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
-    }
-    texture.needsUpdate=true;
-
-    const material=new THREE.SpriteMaterial({
-      map:texture,
-      transparent:true,
-      depthWrite:false,
-      depthTest:false,
-      alphaTest:.012
-    });
-    const sprite=new THREE.Sprite(material);
-    const mobileSizeBoost=mobileLabel?1.22:1;
-    sprite.scale.set(7.5*scale*mobileSizeBoost,1.875*scale*mobileSizeBoost,1);
-    return sprite;
-  }
-
   function createDistrictStorytelling(){
     districtConfigs.forEach((cfg,index)=>{
       const g=new THREE.Group();g.position.set(cfg.x,0,cfg.z);scene.add(g);storytellingGroups.set(cfg.key,g);
@@ -1232,16 +1148,6 @@
     });
   }
 
-  function createScannerLabels(){
-    scannerLabelGroup=new THREE.Group();scannerLabelGroup.visible=scannerMode;scene.add(scannerLabelGroup);
-    districtConfigs.forEach(cfg=>{
-      const label=makeTextSprite(portfolioSections[cfg.key].cityName,cfg.accent,.68);
-      label.position.set(cfg.x,15,cfg.z);label.userData.key=cfg.key;scannerLabelGroup.add(label);
-      const lineMat=new THREE.LineBasicMaterial({color:cfg.accent,transparent:true,opacity:.48,depthTest:false});
-      const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(cfg.x,1,cfg.z),new THREE.Vector3(cfg.x,13.7,cfg.z)]),lineMat);scannerLabelGroup.add(line);
-    });
-  }
-
   function createNightLighting(){
     nightLightGroup=new THREE.Group();nightLightGroup.visible=false;scene.add(nightLightGroup);
     const lampPositions=[];
@@ -1264,8 +1170,8 @@
 
   function setNightLightAlpha(alpha){
     const a=THREE.MathUtils.clamp(alpha,0,1);if(nightLightGroup)nightLightGroup.visible=a>.015;
-    nightGlowMaterials.forEach((mat,index)=>{const stagger=THREE.MathUtils.clamp((a-(index/nightGlowMaterials.length)*.28)/.72,0,1);mat.opacity=stagger*(mat.color.getHex()===0xff4f56?.72:.88);mat.needsUpdate=true});
-    glassMaterials.forEach(mat=>{if(!mat.emissive)return;mat.emissive.setHex(0x244e6b);mat.emissiveIntensity=a*.68;mat.needsUpdate=true});
+    nightGlowMaterials.forEach((mat,index)=>{const stagger=THREE.MathUtils.clamp((a-(index/nightGlowMaterials.length)*.28)/.72,0,1);mat.opacity=stagger*(mat.color.getHex()===0xff4f56?.72:.88)});
+    glassMaterials.forEach(mat=>{if(!mat.emissive)return;mat.emissive.setHex(0x244e6b);mat.emissiveIntensity=a*.68});
   }
 
   function updateNightTraffic(elapsed){
@@ -1282,8 +1188,6 @@
     const body=new THREE.Mesh(new THREE.BoxGeometry(1.2,.22,.55),new THREE.MeshStandardMaterial({color:0x303d4b,metalness:.55,roughness:.3}));drone.add(body);
     [-.7,.7].forEach(x=>{[-.48,.48].forEach(z=>{const rotor=new THREE.Mesh(new THREE.TorusGeometry(.28,.035,5,14),new THREE.MeshBasicMaterial({color:0x91dfff,transparent:true,opacity:.65}));rotor.position.set(x,.12,z);rotor.rotation.x=Math.PI/2;drone.add(rotor)})});
     drone.visible=false;drone.userData.role="drone";ambientEventRig.add(drone);
-    const scanMat=new THREE.MeshBasicMaterial({color:0x8fe7ff,transparent:true,opacity:.0,depthWrite:false,side:THREE.DoubleSide});
-    const beam=new THREE.Mesh(new THREE.CylinderGeometry(.55,2.4,22,16,1,true),scanMat);beam.position.set(-24,11,21);beam.visible=false;beam.userData.role="scan";ambientEventRig.add(beam);
     const signalMat=new THREE.MeshBasicMaterial({color:0xffa35f,transparent:true,opacity:0,depthWrite:false});
     const signal=new THREE.Mesh(new THREE.TorusGeometry(2.2,.08,6,40),signalMat);signal.rotation.x=Math.PI/2;signal.position.set(14,18,-21);signal.visible=false;signal.userData.role="signal";ambientEventRig.add(signal);
   }
@@ -1295,11 +1199,10 @@
 
   function startAmbientEvent(type=null,forced=false){
     if(reducedMotion||veryLowEnd&&!forced||!ambientEventRig)return;
-    const options=["drone","scan","signal"];type=type||options[Math.floor(Math.random()*options.length)];
+    const options=["drone","signal"];type=type||options[Math.floor(Math.random()*options.length)];
     ambientEventRig.children.forEach(o=>o.visible=false);ambientEventState={type,start:clock.elapsedTime,duration:type==="drone"?7:5};
     const obj=ambientEventRig.children.find(o=>o.userData.role===type);if(obj)obj.visible=true;
     if(type==="drone")cityEventToast("DRONE TRANSIT","Autonomous city traffic crossing the skyline.");
-    if(type==="scan")cityEventToast("RESEARCH SCAN","Research Complex is running a visualization sweep.");
     if(type==="signal")cityEventToast("COMMS PULSE","Communications Array broadcast detected.");
   }
 
@@ -1310,14 +1213,12 @@
     if(!obj){ambientEventState=null;return}
     if(t>=1){obj.visible=false;ambientEventState=null;nextAmbientEventAt=elapsed+22+Math.random()*18;return}
     if(state.type==="drone"){obj.position.set(-65+t*130,22+Math.sin(t*Math.PI)*4,-32+t*56);obj.rotation.y=.25;obj.children.forEach((c,i)=>{if(i>0)c.rotation.z+=.35})}
-    if(state.type==="scan"){obj.material.opacity=Math.sin(Math.PI*t)*.18;obj.rotation.y=t*Math.PI*2}
     if(state.type==="signal"){obj.material.opacity=(1-t)*.65;obj.scale.setScalar(1+t*6)}
   }
 
   function triggerDistrictReaction(key){
     const v=districtVisuals.get(key);if(!v)return;v.activation=1;v.activationStart=clock.elapsedTime;
     const story=storytellingGroups.get(key);if(story){story.visible=true;story.userData.activation=1}
-    if(scannerMode)updateScannerReadout(key);
   }
 
   function updateDistrictReactions(elapsed){
@@ -1329,31 +1230,6 @@
       const story=storytellingGroups.get(key);if(story){story.scale.setScalar(1+Math.sin(age*5)*.025*pulse);story.rotation.y+=.002*pulse}
       if(pulse<=0){v.activation=0;v.reactionBoost=0;v.architecture.rotation.y=0}
     });
-  }
-
-  function showWorldBlueprint(key,nodes,title="SYSTEM BLUEPRINT"){
-    hideWorldBlueprint(false);const cfg=getDistrictConfig(key);if(!cfg||!nodes?.length)return;
-    worldBlueprintGroup=new THREE.Group();worldBlueprintGroup.position.set(cfg.x,10,cfg.z);scene.add(worldBlueprintGroup);
-    const accent=cfg.accent;const nodeMeshes=[];const spacing=Math.min(4.2,30/Math.max(1,nodes.length-1));const start=-(nodes.length-1)*spacing/2;
-    nodes.forEach((label,i)=>{
-      const x=start+i*spacing;const y=(i%2)*1.35;
-      const box=new THREE.Mesh(new THREE.BoxGeometry(2.1,.7,1.1),new THREE.MeshStandardMaterial({color:0x102238,emissive:accent,emissiveIntensity:.22,metalness:.3,roughness:.35,transparent:true,opacity:.92}));box.position.set(x,y,0);worldBlueprintGroup.add(box);nodeMeshes.push(box);
-      const sprite=makeTextSprite(label,accent,.45);sprite.position.set(x,y+1.15,0);worldBlueprintGroup.add(sprite);
-      if(i>0){const a=nodeMeshes[i-1].position,b=box.position;const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([a.clone(),b.clone()]),new THREE.LineBasicMaterial({color:accent,transparent:true,opacity:.8,depthTest:false}));worldBlueprintGroup.add(line)}
-    });
-    worldBlueprintGroup.userData.start=clock.elapsedTime;worldBlueprintGroup.scale.setScalar(.01);
-    if(worldBlueprintTitle)worldBlueprintTitle.textContent=title;if(worldBlueprintSubtitle)worldBlueprintSubtitle.textContent=`${nodes.length} nodes • projected above ${portfolioSections[key].cityName}`;
-    worldBlueprintHud?.classList.add("visible");worldBlueprintHud?.setAttribute("aria-hidden","false");
-    focusDistrict(key,1.18);triggerDistrictReaction(key);if(!scannerMode)toggleScanner(true);
-  }
-
-  function hideWorldBlueprint(clearReturn=true){
-    if(worldBlueprintGroup){scene?.remove(worldBlueprintGroup);worldBlueprintGroup.traverse(o=>{if(o.material?.map)o.material.map.dispose?.();o.material?.dispose?.();o.geometry?.dispose?.()});worldBlueprintGroup=null}
-    worldBlueprintHud?.classList.remove("visible");worldBlueprintHud?.setAttribute("aria-hidden","true");if(clearReturn)worldBlueprintReturnState=null;
-  }
-
-  function updateWorldBlueprint(elapsed){
-    if(!worldBlueprintGroup)return;const age=elapsed-(worldBlueprintGroup.userData.start||elapsed);const s=Math.min(1,age*2.2);worldBlueprintGroup.scale.setScalar(THREE.MathUtils.lerp(.01,1,s));worldBlueprintGroup.position.y=10+Math.sin(elapsed*1.4)*.18;worldBlueprintGroup.children.forEach((o,i)=>{if(o.isMesh&&o.geometry?.type==="BoxGeometry")o.rotation.y=Math.sin(elapsed*1.3+i)*.025})
   }
 
   function applyWorldFrame(p){
@@ -1409,7 +1285,6 @@
     createPublicSpaces();
     createEnvironmentDesign();
     createDistrictStorytelling();
-    createScannerLabels();
     createNightLighting();
     createAmbientEventRig();
     if(telemetryReadout) telemetryReadout.textContent=`${PERF.people} PEOPLE • ${PERF.movingCars + PERF.parkedCars} VEHICLES`;
@@ -2295,14 +2170,15 @@
     if(v.beaconHalo)v.beaconHalo.material.opacity=active?.72:0;
     v.targetLift=active?.32:0;
     v.targetScale=active?1.035:1;
-    if(active&&scannerMode)updateScannerReadout(key);
   }
 
-  function updateDistrictHoverMotion(){
+  function updateDistrictHoverMotion(delta){
     const pulse=(Math.sin(clock.elapsedTime*4)+1)/2;
+    const liftBlend=Runtime.frameBlend(13,delta);
+    const scaleBlend=Runtime.frameBlend(12,delta);
     districtVisuals.forEach(v=>{
-      v.root.position.y=THREE.MathUtils.lerp(v.root.position.y,v.targetLift,.18);
-      const nextScale=THREE.MathUtils.lerp(v.architecture.scale.x,v.targetScale+(v.reactionBoost||0),.16);
+      v.root.position.y=THREE.MathUtils.lerp(v.root.position.y,v.targetLift,liftBlend);
+      const nextScale=THREE.MathUtils.lerp(v.architecture.scale.x,v.targetScale+(v.reactionBoost||0),scaleBlend);
       v.architecture.scale.setScalar(nextScale);
       if(v.hoverRing.material.opacity>0){
         const ringScale=.94+pulse*.16;
@@ -2365,6 +2241,7 @@
   ========================================================= */
 
   function openSection(key){
+    markInteraction();
     const data=portfolioSections[key];if(!data)return;
     if(!warmedSections.has(key))warmSectionMarkup(key);
     
@@ -2387,7 +2264,7 @@
     sliderTotal.textContent=formatNumber(data.items.length);
     districtDirectory.classList.remove("open");
     districtDirectory.setAttribute("aria-hidden","true");
-    document.querySelectorAll(".section-sidebar-item,.mobile-section-item").forEach(el=>el.classList.toggle("is-active",el.dataset.openSection===key));
+    allSectionNavItems.forEach(el=>el.classList.toggle("is-active",el.dataset.openSection===key));
 
     try{
       renderCurrentItem();
@@ -2429,12 +2306,13 @@
     if(!sectionModal.classList.contains("open"))return;
     playCloseSound();duckMusic(false);
     sectionModal.classList.remove("open");sectionModal.setAttribute("aria-hidden","true");sectionModal.removeAttribute("data-section");document.body.classList.remove("modal-open");
-    document.querySelectorAll(".section-sidebar-item.is-active,.mobile-section-item.is-active").forEach(el=>el.classList.remove("is-active"));
+    allSectionNavItems.forEach(el=>el.classList.remove("is-active"));
     syncMinimap(null);
     if(!mobile&&finalePending&&!finaleShown){finalePending=false;setTimeout(showCompletionFinale,380);}
   }
 
   function navigateItem(direction){
+    markInteraction();
     if(!currentSectionKey)return;playClick();const data=portfolioSections[currentSectionKey];currentItemIndex=(currentItemIndex+direction+data.items.length)%data.items.length;sectionSlider.value=currentItemIndex;renderCurrentItem();
   }
 
@@ -2444,7 +2322,7 @@
 
   function buildShowcaseMarkup(item){
     const extras=getProjectExtras(item.title);
-    return `<div class="showcase-layout content-enter"><div class="showcase-media"><img src="${item.media}" alt="${item.mediaAlt}" loading="eager" decoding="async" fetchpriority="auto" onerror="this.hidden=true;this.closest('.showcase-media')?.classList.add('image-error')" /><div class="showcase-media-fallback" aria-hidden="true"><span>PROJECT VISUAL</span><strong>${item.title}</strong></div><div class="media-overlay"></div><span class="media-label">PROJECT VISUAL // MEDIA FEED</span><div class="media-tech-overlay"><span>LIVE CASE STUDY</span><strong>${extras.blueprint.length} SYSTEM NODES</strong></div></div><div class="showcase-copy"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}${renderTags(item.tags)}<div class="project-tool-actions"><button type="button" id="projectDemoButton">▶ RUN VISUAL DEMO</button><button type="button" id="projectReplayButton">↻ SYSTEM REPLAY</button><button type="button" id="projectBlueprintButton">⌘ BLUEPRINT</button><button type="button" id="projectWorldButton">◎ PROJECT INTO CITY</button><a class="archive-link" href="${item.link}" target="_blank" rel="noopener noreferrer">${item.linkLabel}</a></div>${renderEvidenceCards(extras)}</div></div>${renderVisualDemo(item,extras)}${renderReplay(extras)}${renderBlueprint(extras)}`;
+    return `<div class="showcase-layout content-enter"><div class="showcase-media"><img src="${item.media}" alt="${item.mediaAlt}" loading="eager" decoding="async" fetchpriority="auto" onerror="this.hidden=true;this.closest('.showcase-media')?.classList.add('image-error')" /><div class="showcase-media-fallback" aria-hidden="true"><span>PROJECT VISUAL</span><strong>${item.title}</strong></div><div class="media-overlay"></div><span class="media-label">PROJECT VISUAL // MEDIA FEED</span><div class="media-tech-overlay"><span>LIVE CASE STUDY</span><strong>${extras.blueprint.length} SYSTEM NODES</strong></div></div><div class="showcase-copy"><span class="content-kicker">${item.kicker}</span><h3>${item.title}</h3><p class="content-description">${item.description}</p>${renderMeta(item.meta)}${renderTags(item.tags)}<div class="project-tool-actions"><button type="button" id="projectDemoButton">▶ RUN VISUAL DEMO</button><button type="button" id="projectReplayButton">↻ SYSTEM REPLAY</button><button type="button" id="projectBlueprintButton">⌘ BLUEPRINT</button><a class="archive-link" href="${item.link}" target="_blank" rel="noopener noreferrer">${item.linkLabel}</a></div>${renderEvidenceCards(extras)}</div></div>${renderVisualDemo(item,extras)}${renderReplay(extras)}${renderBlueprint(extras)}`;
   }
 
   function buildExperienceMarkup(item){
@@ -2562,12 +2440,6 @@
     projectDemoStep=-1;run();projectDemoTimer=setInterval(run,900);
   }
 
-  function launchProjectWorldBlueprint(item,extras){
-    worldBlueprintReturnState={key:currentSectionKey,index:currentItemIndex};
-    const key=currentSectionKey||"projects";closeSection();
-    setTimeout(()=>showWorldBlueprint(key,extras.blueprint,item.title),160);
-  }
-
   function renderEvidenceCards(extras){
     return `<div class="project-evidence"><span class="project-subhead">TECHNICAL EVIDENCE</span><div class="evidence-grid">${extras.evidence.map(([icon,label,text])=>`<article class="evidence-card"><span>${icon}</span><div><small>${label}</small><strong>${text}</strong></div></article>`).join("")}</div></div>`;
   }
@@ -2600,7 +2472,7 @@
 
   function bindProjectTools(item){
     const extras=getProjectExtras(item.title);
-    const replayButton=$("projectReplayButton"),blueprintButton=$("projectBlueprintButton"),demoButton=$("projectDemoButton"),worldButton=$("projectWorldButton");
+    const replayButton=$("projectReplayButton"),blueprintButton=$("projectBlueprintButton"),demoButton=$("projectDemoButton");
     const replayPanel=$("projectReplayPanel"),blueprintPanel=$("projectBlueprintPanel"),demoPanel=$("projectDemoPanel");
     const hideOther=(keep)=>{
       [[replayPanel,replayButton,"replay"],[blueprintPanel,blueprintButton,"blueprint"],[demoPanel,demoButton,"demo"]].forEach(([panel,button,name])=>{if(name!==keep&&panel)panel.hidden=true;if(name!==keep)button?.classList.remove("is-active")});
@@ -2608,7 +2480,6 @@
     replayButton?.addEventListener("click",()=>{ensureAudio();stopProjectDemo();hideOther("replay");replayButton.classList.add("is-active");startProjectReplay(extras)});
     demoButton?.addEventListener("click",()=>{ensureAudio();hideOther("demo");demoButton.classList.add("is-active");startProjectDemo(item,extras)});
     blueprintButton?.addEventListener("click",()=>{stopProjectReplay();stopProjectDemo();hideOther("blueprint");const opening=blueprintPanel?.hidden!==false;if(blueprintPanel)blueprintPanel.hidden=!opening;blueprintButton.classList.toggle("is-active",opening);if(audioCtx?.state==="running")playOpenSound()});
-    worldButton?.addEventListener("click",()=>{stopProjectReplay();stopProjectDemo();launchProjectWorldBlueprint(item,extras)});
   }
 
   function renderMeta(meta=[]){return `<div class="content-meta">${meta.map(row=>`<div class="meta-row"><span>${row[0]}</span><strong>${row[1]}</strong></div>`).join("")}</div>`}
@@ -2619,8 +2490,9 @@
   ========================================================= */
 
   function screenToGround(clientX,clientY,target){
-    const p=new THREE.Vector2((clientX/window.innerWidth)*2-1,-(clientY/window.innerHeight)*2+1);
-    raycaster.setFromCamera(p,camera);return raycaster.ray.intersectPlane(dragPlane,target);
+    groundPointer.set((clientX/window.innerWidth)*2-1,-(clientY/window.innerHeight)*2+1);
+    raycaster.setFromCamera(groundPointer,camera);
+    return raycaster.ray.intersectPlane(dragPlane,target);
   }
 
   function resetCamera(){cameraPanTarget.set(0,0);cameraZoomTarget=1;clampPan()}
@@ -2650,14 +2522,18 @@
       }
     }
 
-    const pointerBlend=Runtime.frameBlend(18,delta);
-    const panBlend=Runtime.frameBlend(dragPointerId!==null?18:11.5,delta);
-    const zoomBlend=Runtime.frameBlend(12,delta);
+    const pointerBlend=Runtime.frameBlend(22,delta);
+    const panBlend=Runtime.frameBlend(dragPointerId!==null?24:15,delta);
+    const zoomBlend=Runtime.frameBlend(16,delta);
     pointer.x=THREE.MathUtils.lerp(pointer.x,pointerTarget.x,pointerBlend);
     pointer.y=THREE.MathUtils.lerp(pointer.y,pointerTarget.y,pointerBlend);
     cameraPan.lerp(cameraPanTarget,panBlend);
+    const previousZoom=cameraZoom;
     cameraZoom=THREE.MathUtils.lerp(cameraZoom,cameraZoomTarget,zoomBlend);
-    camera.zoom=cameraZoom;camera.updateProjectionMatrix();
+    if(Math.abs(cameraZoom-previousZoom)>.00015 || Math.abs(camera.zoom-cameraZoom)>.00015){
+      camera.zoom=cameraZoom;
+      camera.updateProjectionMatrix();
+    }
 
     // Very small parallax keeps the city feeling alive without fighting hover.
     const cinematicDrift=cinematicMode?Math.sin(clock.elapsedTime*.22)*.65:0;
@@ -2665,7 +2541,11 @@
     const parallaxZ=mobile?0:pointer.y*-.40+(cinematicMode?Math.cos(clock.elapsedTime*.18)*.45:0);
     camera.position.set(baseCamera.x+cameraPan.x+parallaxX,baseCamera.y,baseCamera.z+cameraPan.y+parallaxZ);
     camera.lookAt(cameraPan.x+parallaxX*.12,0,cameraPan.y+parallaxZ*.12);
-    cameraReadout.textContent=`${Math.round(cameraZoom*100)}%`;
+    const cameraPercent=Math.round(cameraZoom*100);
+    if(cameraReadout && cameraPercent!==lastCameraPercent){
+      lastCameraPercent=cameraPercent;
+      cameraReadout.textContent=`${cameraPercent}%`;
+    }
   }
 
   function resizeRenderer(){
@@ -2736,46 +2616,60 @@
     const mobileMenuOpen=!!mobileMenuPanel?.classList.contains("open");
     const commandIsOpen=!!commandPalette?.classList.contains("open");
     const finaleOpen=!!completionFinale?.classList.contains("open");
-    const portraitBlocked=false;
     const uiOverlayOpen=sectionOpen||recruiterOpen||mobileMenuOpen||commandIsOpen||finaleOpen;
 
-    // Opaque mobile pages do not need a live 3D scene behind them. Completely
-    // pausing WebGL here removes a major source of delayed/blank panel paints.
+    // Full-screen mobile pages are opaque. Skip the entire WebGL simulation
+    // while they are visible so taps/navigation remain app-fast.
     if(mobile && (mobileUiFreeze||sectionOpen||recruiterOpen||commandIsOpen||finaleOpen)){
       clock.getDelta();
       return;
     }
 
-    const effectiveFps=(mobile&&mobileMenuOpen)?12:PERF.targetFps;
+    const cameraSettling = cameraPan.distanceToSquared(cameraPanTarget)>.00035 || Math.abs(cameraZoom-cameraZoomTarget)>.00035;
+    const activelyInteracting = dragPointerId!==null || pinching || raycastDirty || !!activeHoverKey || !!worldTransition || cameraSettling || (now-lastInteractionAt)<900;
+    const effectiveFps = mobileMenuOpen ? 12 : (activelyInteracting ? PERF.targetFps : PERF.idleFps);
     const minFrameMs=1000/effectiveFps;
     if(now-lastRenderStamp<minFrameMs)return;
     lastRenderStamp=now;
 
-    const delta=Math.min(clock.getDelta(),.045);
+    const delta=Math.min(clock.getDelta(),.05);
     const elapsed=clock.elapsedTime;
 
     updateCamera(delta);
     updateWorldTransition(now);
-    updateNightTraffic(elapsed);
-    updateDistrictReactions(elapsed);
-    updateDistrictHoverMotion();
-    updateWorldBlueprint(elapsed);
+    updateDistrictHoverMotion(delta);
     if(!uiOverlayOpen)updateAmbientEvents(elapsed);
 
-    // Pause nonessential world simulation behind large mobile UI and recruiter overlays.
-    // The city remains rendered, but actors stop consuming CPU/GPU while obscured.
-    if(!portraitBlocked && !(mobile&&uiOverlayOpen) && !recruiterOpen){
-      updateTraffic(delta);
-      updatePedestrians(delta,elapsed);
-      updateAmbient(elapsed,delta);
+    // Cars, pedestrians and decorative actors do not need to update at display
+    // refresh rate. Updating their instance matrices at a fixed lower rate
+    // substantially reduces CPU work while looking identical at city scale.
+    actorAccumulator += delta;
+    ambientAccumulator += delta;
+    const actorStep=1/PERF.actorFps;
+    if(actorAccumulator>=actorStep){
+      const step=Math.min(actorAccumulator,.08);
+      actorAccumulator=0;
+      updateNightTraffic(elapsed);
+      updateDistrictReactions(elapsed);
+      if(!(mobile&&uiOverlayOpen) && !recruiterOpen){
+        updateTraffic(step);
+        updatePedestrians(step,elapsed);
+      }
     }
 
-    if(!portraitBlocked&&raycastDirty&&!dragMoved&&!pinching&&worldEntered&&!uiOverlayOpen){
+    const ambientStep=mobile?1/20:1/30;
+    if(ambientAccumulator>=ambientStep){
+      const step=Math.min(ambientAccumulator,.08);
+      ambientAccumulator=0;
+      if(!(mobile&&uiOverlayOpen) && !recruiterOpen)updateAmbient(elapsed,step);
+    }
+
+    if(raycastDirty&&!dragMoved&&!pinching&&worldEntered&&!uiOverlayOpen){
       raycastDirty=false;
       updateRaycast(latestPointerX,latestPointerY);
     }
 
-    if(!portraitBlocked&&!(mobile&&uiOverlayOpen)) adaptMobileQuality(now);
+    if(!(mobile&&uiOverlayOpen)) adaptMobileQuality(now);
     renderer.render(scene,camera);
   }
 
@@ -2805,11 +2699,11 @@
     // cached naturally as the staged image preloader fetches it.
     return [
       "./index.html",
-      "./assets/css/style.css?v=31",
-      "./assets/css/mobile.css?v=31",
-      "./assets/js/modules/runtime.js?v=31",
-      "./assets/js/modules/world-boundaries.js?v=31",
-      "./assets/js/main.js?v=31",
+      "./assets/css/style.css?v=33",
+      "./assets/css/mobile.css?v=33",
+      "./assets/js/modules/runtime.js?v=33",
+      "./assets/js/modules/world-boundaries.js?v=33",
+      "./assets/js/main.js?v=33",
       "./favicon.png"
     ];
   }
@@ -2879,7 +2773,7 @@
     ].filter(Boolean);
     const remainingImages=media.images.filter(url=>!firstImages.includes(url));
 
-    const delay=hosted ? (mobile?1450:1150) : 250;
+    const delay=hosted ? (mobile?2600:2100) : 500;
     setTimeout(async()=>{
       const registration=await Runtime.registerServiceWorker();
 
@@ -2892,15 +2786,15 @@
         }).catch(()=>{});
 
         await Runtime.preloadImages(remainingImages,{
-          batchSize:mobile?1:(hosted?2:4),
+          batchSize:mobile?1:(hosted?1:3),
           retain:!veryLowEnd,
           priority:"low",
-          idleTimeout:mobile?420:(hosted?260:90)
+          idleTimeout:mobile?650:(hosted?480:120)
         }).catch(()=>{});
       }
 
       if(registration && !networkConstrained){
-        setTimeout(()=>Runtime.warmServiceWorkerCache(collectLocalWarmUrls()).catch(()=>{}), hosted?2400:700);
+        setTimeout(()=>Runtime.warmServiceWorkerCache(collectLocalWarmUrls()).catch(()=>{}), hosted?3200:900);
       }
     },delay);
   }
@@ -2908,10 +2802,10 @@
   function schedulePortfolioWarmup(){
     // Hosted pages wait for the first interactive frames before doing background
     // cache work. Local-file testing can warm immediately.
-    const delay=hosted ? (mobile?850:650) : (mobile?300:220);
+    const delay=hosted ? (mobile?260:220) : (mobile?180:140);
     setTimeout(()=>{
       if("requestIdleCallback" in window){
-        requestIdleCallback(()=>startPortfolioWarmup(),{timeout:mobile?500:320});
+        requestIdleCallback(()=>startPortfolioWarmup(),{timeout:mobile?260:220});
       }else{
         startPortfolioWarmup();
       }
@@ -2957,6 +2851,7 @@
   ========================================================= */
 
   window.addEventListener("pointermove",event=>{
+    markInteraction();
     if(!mobile&&customCursor){
       customCursor.style.left=`${event.clientX}px`;
       customCursor.style.top=`${event.clientY}px`;
@@ -2993,7 +2888,7 @@
       return;
     }
 
-    pointerOverUi=!!event.target.closest(".game-hud,.district-directory,.section-sidebar,.mobile-menu-panel,.mobile-menu-toggle,.mobile-menu-backdrop,.mobile-tool-rail,.mobile-landscape-dock,.city-minimap,.section-modal,.command-palette,.completion-finale,.world-blueprint-hud,.scanner-hud,.explore-hint");
+    pointerOverUi=!!event.target.closest(".game-hud,.district-directory,.section-sidebar,.mobile-menu-panel,.mobile-menu-toggle,.mobile-menu-backdrop,.mobile-tool-rail,.mobile-landscape-dock,.city-minimap,.section-modal,.command-palette,.completion-finale,.explore-hint");
     if(!worldEntered||sectionModal.classList.contains("open"))return;
     if(pointerOverUi)return;
     raycastDirty=true;
@@ -3004,10 +2899,11 @@
   rendererEventSetup();
   function rendererEventSetup(){
     document.addEventListener("pointerdown",event=>{
+      markInteraction();
       if(worldEntered && audioEnabled) ensureAudio();
       if(mobile && event.target.closest("#threeContainer")) dismissMobileHint();
       if(!worldEntered||sectionModal.classList.contains("open"))return;
-      if(event.target.closest("button,a,.district-directory,.section-sidebar,.mobile-menu-panel,.mobile-menu-toggle,.mobile-menu-backdrop,.mobile-tool-rail,.mobile-landscape-dock,.city-minimap,.section-modal,.command-palette,.completion-finale,.world-blueprint-hud,.scanner-hud"))return;
+      if(event.target.closest("button,a,.district-directory,.section-sidebar,.mobile-menu-panel,.mobile-menu-toggle,.mobile-menu-backdrop,.mobile-tool-rail,.mobile-landscape-dock,.city-minimap,.section-modal,.command-palette,.completion-finale"))return;
       if(!event.target.closest("#threeContainer"))return;
 
       if(coarsePointer){
@@ -3103,6 +2999,7 @@
   }
 
   window.addEventListener("wheel",event=>{
+    markInteraction();
     if(!worldEntered||sectionModal.classList.contains("open"))return;
     cameraZoomTarget=THREE.MathUtils.clamp(cameraZoomTarget-event.deltaY*.0008,.78,1.34);
   },{passive:true});
@@ -3125,7 +3022,6 @@
     if(event.key==="Escape"){
       if(commandPalette?.classList.contains("open"))closeCommandPalette();
       else if(completionFinale?.classList.contains("open"))closeCompletionFinale();
-      else if(worldBlueprintGroup)hideWorldBlueprint();
       else if(recruiterModal?.classList.contains("open"))closeRecruiterView();
       else if(sectionModal.classList.contains("open"))closeSection();
       else if(mobileMenuPanel?.classList.contains("open"))setMobileMenu(false);
@@ -3151,16 +3047,12 @@
     });
   }
   if(timeModeButton)timeModeButton.addEventListener("click",event=>{event.stopPropagation();ensureAudio();cycleTimeMode()});
-  scannerButton?.addEventListener("click",event=>{event.stopPropagation();ensureAudio();toggleScanner()});
   commandButton?.addEventListener("click",event=>{event.stopPropagation();ensureAudio();openCommandPalette()});
-  mobileScannerButton?.addEventListener("click",event=>{event.stopPropagation();setMobileMenu(false,false);ensureAudio();toggleScanner()});
   mobileCommandButton?.addEventListener("click",event=>{event.stopPropagation();setMobileMenu(false,false);ensureAudio();openCommandPalette()});
   commandInput?.addEventListener("input",()=>renderCommandResults(commandInput.value));
   commandClose?.addEventListener("click",closeCommandPalette);commandBackToMap?.addEventListener("click",closeCommandPalette);commandBackdrop?.addEventListener("click",closeCommandPalette);
   document.querySelectorAll("[data-command-query]").forEach(button=>button.addEventListener("click",()=>{commandInput.value=button.dataset.commandQuery||"";renderCommandResults(commandInput.value);commandInput.focus()}));
   commandResults?.addEventListener("click",event=>{const button=event.target.closest("[data-command-section]");if(!button)return;openSearchResult(button.dataset.commandSection,Number(button.dataset.commandIndex||0))});
-  worldBlueprintClose?.addEventListener("click",()=>hideWorldBlueprint());
-  worldBlueprintReturn?.addEventListener("click",()=>{const state=worldBlueprintReturnState;hideWorldBlueprint(false);if(state){worldBlueprintReturnState=null;openSection(state.key);if(state.index>0){currentItemIndex=state.index;sectionSlider.value=state.index;renderCurrentItem()}}});
   completionClose?.addEventListener("click",closeCompletionFinale);completionBackdrop?.addEventListener("click",closeCompletionFinale);completionContinue?.addEventListener("click",closeCompletionFinale);
   recruiterViewButton?.addEventListener("click",event=>{event.stopPropagation();ensureAudio();openRecruiterView()});
   mobileRecruiterViewButton?.addEventListener("click",event=>{event.stopPropagation();ensureAudio();openRecruiterView()});
@@ -3202,7 +3094,7 @@
     syncMobileMenuUi();
   });
 
-  document.querySelectorAll(".section-sidebar-item").forEach(button=>{
+  desktopSidebarItems.forEach(button=>{
     button.addEventListener("mouseenter",()=>{
       if(sectionModal.classList.contains("open"))return;
       const key=button.dataset.openSection;

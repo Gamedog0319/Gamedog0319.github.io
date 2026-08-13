@@ -104,7 +104,7 @@
   }
 
   function addMountains({ THREE, scene, mobile, veryLowEnd }) {
-    const mountainCount = veryLowEnd ? 20 : mobile ? 28 : 46;
+    const mountainCount = veryLowEnd ? 18 : mobile ? 24 : 44;
     const geometry = new THREE.ConeGeometry(1, 1, 6, 1, false);
     const mountainMat = new THREE.MeshLambertMaterial({ color: 0x5d735c });
     const snowMat = new THREE.MeshLambertMaterial({ color: 0xdce3df });
@@ -155,14 +155,14 @@
     mountains.instanceMatrix.needsUpdate = true;
     caps.instanceMatrix.needsUpdate = true;
     mountains.receiveShadow = true;
-    mountains.frustumCulled = false;
-    caps.frustumCulled = false;
+    mountains.computeBoundingSphere?.();
+    caps.computeBoundingSphere?.();
     scene.add(mountains, caps);
 
     // Darker low foothills make the boundary feel continuous without more draw calls.
     const footGeom = new THREE.ConeGeometry(1, 1, 5, 1, false);
     const footMat = new THREE.MeshLambertMaterial({ color: 0x708268 });
-    const foothillCount = Math.max(12, Math.floor(mountainCount * .6));
+    const foothillCount = Math.max(10, Math.floor(mountainCount * .55));
     const foothills = new THREE.InstancedMesh(footGeom, footMat, foothillCount);
     for (let i = 0; i < foothillCount; i++) {
       const a = (i / foothillCount) * Math.PI * 2;
@@ -177,7 +177,7 @@
       foothills.setMatrixAt(i, dummy.matrix);
     }
     foothills.instanceMatrix.needsUpdate = true;
-    foothills.frustumCulled = false;
+    foothills.computeBoundingSphere?.();
     scene.add(foothills);
   }
 
