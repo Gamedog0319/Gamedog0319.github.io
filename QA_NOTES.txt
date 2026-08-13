@@ -1,15 +1,11 @@
-Rithvik City V30 — hosted performance + sensitivity + mobile media
+Rithvik Portfolio V31 — mobile direct Explore navigation
 
-- Hosted startup background work waits until the city is interactive.
-- Service worker no longer pre-downloads the full app during install.
-- Image warming is low-priority, small-batch and network-aware.
-- Videos are not service-worker cached.
-- Hosted desktop render density/ambient actor counts are modestly reduced.
-- Google Fonts request removed; system font stack used.
-- cdnjs DNS/preconnect added for the pinned Three.js script.
-- Desktop edge camera speed increased 25%: 34.0 -> 42.5.
-- Desktop drag sensitivity increased 25%: 1.16 -> 1.45.
-- Desktop pointer parallax increased 25%.
-- Mobile section media frames enlarged and use object-fit: contain.
-- Education/About/Recruiter images show full assets instead of crops.
-- All local cache/version references normalized to V30.
+Changes:
+- Mobile three-dot menu removed from the interface.
+- All eight portfolio sections are permanently accessible in a horizontal Explore dock.
+- Quick View and Resume moved to the mobile top bar.
+- Existing city tools remain in the left rail.
+- Mobile content pages still hide map navigation while open.
+- Visible branding changed from Rithvik City / Rithvik Portfolio City to Rithvik Portfolio.
+- Desktop layout remains unchanged apart from the branding text.
+- Cache and asset query versions bumped to V31.

@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
-  <meta name="description" content="Interactive portfolio city of Rithvik Mandya — gameplay programming, game AI, VR and simulation." />
+  <meta name="description" content="Interactive portfolio of Rithvik Mandya — gameplay programming, game AI, VR and simulation." />
   <meta name="theme-color" content="#101b2d" />
-  <title>Rithvik City | Interactive Portfolio</title>
+  <title>Rithvik Portfolio | Game AI • Gameplay • VR</title>
 
   <link rel="icon" href="./favicon.png" />
   <link rel="dns-prefetch" href="//cdnjs.cloudflare.com" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
-  <link rel="stylesheet" href="./assets/css/style.css?v=30" />
-  <link rel="stylesheet" href="./assets/css/mobile.css?v=30" />
+  <link rel="stylesheet" href="./assets/css/style.css?v=31" />
+  <link rel="stylesheet" href="./assets/css/mobile.css?v=31" />
 </head>
 <body>
-  <main id="cityWorld" aria-label="Interactive portfolio city">
+  <main id="cityWorld" aria-label="Interactive portfolio">
     <div id="threeContainer"></div>
     <div class="sky-wash"></div>
     <div class="sun-glare" aria-hidden="true"><span></span></div>
@@ -37,8 +37,8 @@
     <div class="hud-brand">
       <div class="hud-brand-mark">RM</div>
       <div>
-        <strong>RITHVIK PORTFOLIO CITY</strong>
-        <span>INTERACTIVE PORTFOLIO</span>
+        <strong>RITHVIK PORTFOLIO</strong>
+        <span>GAME AI • GAMEPLAY • VR</span>
       </div>
     </div>
 
@@ -74,55 +74,17 @@
          target="_blank" rel="noopener noreferrer">RESUME ↗</a>
     </div>
 
-    <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Open mobile menu" aria-controls="mobileMenuPanel" aria-expanded="false">
-      <span aria-hidden="true">⋮</span>
-    </button>
-  </header>
-
-  <div class="mobile-menu-backdrop" id="mobileMenuBackdrop" aria-hidden="true"></div>
-
-  <aside class="mobile-menu-panel" id="mobileMenuPanel" aria-hidden="true" aria-label="Portfolio menu" role="dialog" aria-modal="true">
-    <div class="mobile-menu-header">
-      <div class="mobile-menu-brand">
-        <span class="mobile-menu-brand-mark">RM</span>
-        <div>
-          <small>RITHVIK PORTFOLIO</small>
-          <strong>Explore</strong>
-        </div>
-      </div>
-      <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Back to city map"><span aria-hidden="true">←</span><strong>Map</strong></button>
-    </div>
-
-    <div class="mobile-menu-priority">
-      <button class="mobile-priority-card mobile-priority-quick" id="mobileRecruiterViewButton" type="button">
-        <span class="mobile-priority-icon">★</span>
-        <span><small>RECRUITER MODE</small><strong>Quick View</strong><em>30-second overview</em></span>
+    <div class="mobile-primary-actions" aria-label="Primary portfolio actions">
+      <button class="mobile-primary-action mobile-primary-quick" id="mobileDockQuickView" type="button" aria-label="Open recruiter quick view">
+        <span aria-hidden="true">★</span><strong>Quick</strong>
       </button>
-      <a class="mobile-priority-card mobile-priority-resume" aria-label="Open resume in a new tab" href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing" target="_blank" rel="noopener noreferrer">
-        <span class="mobile-priority-icon">↗</span>
-        <span><small>PDF</small><strong>Resume</strong><em>Open</em></span>
+      <a class="mobile-primary-action mobile-primary-resume"
+         href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing"
+         target="_blank" rel="noopener noreferrer" aria-label="Open resume in a new tab">
+        <span aria-hidden="true">↗</span><strong>Resume</strong>
       </a>
     </div>
-    <div class="mobile-menu-scroll">
-      <section class="mobile-menu-group" data-mobile-menu-view="explore">
-        <div class="mobile-menu-group-title"><span>CHOOSE A DESTINATION</span><strong>Portfolio sections</strong></div>
-        <nav class="mobile-menu-sections">
-          <button class="mobile-section-item" style="--district:#ff5f57" type="button" data-open-section="projects"><span class="mobile-section-icon">◈</span><span class="mobile-section-copy"><strong>Projects</strong><small>Games • AI • VR</small></span><span class="mobile-section-index">01</span></button>
-          <button class="mobile-section-item" style="--district:#ff7f7f" type="button" data-open-section="featured"><span class="mobile-section-icon">✦</span><span class="mobile-section-copy"><strong>Featured Work</strong><small>Selected case studies</small></span><span class="mobile-section-index">02</span></button>
-          <button class="mobile-section-item" style="--district:#57bde3" type="button" data-open-section="experience"><span class="mobile-section-icon">▥</span><span class="mobile-section-copy"><strong>Experience</strong><small>Career timeline</small></span><span class="mobile-section-index">03</span></button>
-          <button class="mobile-section-item" style="--district:#7fa5ff" type="button" data-open-section="education"><span class="mobile-section-icon">⌂</span><span class="mobile-section-copy"><strong>Education</strong><small>Academic record</small></span><span class="mobile-section-index">04</span></button>
-          <button class="mobile-section-item" style="--district:#50d5a4" type="button" data-open-section="skills"><span class="mobile-section-icon">⚙</span><span class="mobile-section-copy"><strong>Skills</strong><small>Engines • AI • Code</small></span><span class="mobile-section-index">05</span></button>
-          <button class="mobile-section-item" style="--district:#b38cff" type="button" data-open-section="research"><span class="mobile-section-icon">⌬</span><span class="mobile-section-copy"><strong>Research</strong><small>Game AI • RL</small></span><span class="mobile-section-index">06</span></button>
-          <button class="mobile-section-item" style="--district:#ff5f57" type="button" data-open-section="about"><span class="mobile-section-icon mobile-section-rm">RM</span><span class="mobile-section-copy"><strong>About</strong><small>Profile • Current work</small></span><span class="mobile-section-index">07</span></button>
-          <button class="mobile-section-item" style="--district:#ffa35f" type="button" data-open-section="contact"><span class="mobile-section-icon">◎</span><span class="mobile-section-copy"><strong>Contact</strong><small>Email • LinkedIn • GitHub</small></span><span class="mobile-section-index">08</span></button>
-        </nav>
-      </section>
-</div>
-
-    <div class="mobile-menu-footer">
-      <small>Tap a section to open it • use ← Map to return to the city</small>
-    </div>
-  </aside>
+  </header>
 
   <aside class="mobile-tool-rail" id="mobileToolRail" aria-label="City tools">
     <span class="mobile-tool-rail-title">TOOLS</span>
@@ -141,16 +103,23 @@
     <button class="mobile-tool-button" id="mobileScannerButton" type="button" aria-label="Toggle technical scanner">
       <span class="mobile-tool-icon">⌖</span><strong>Scan</strong><small id="mobileScannerState">Off</small>
     </button>
-    <button class="mobile-tool-button" id="mobileCommandButton" type="button" aria-label="Search portfolio city">
+    <button class="mobile-tool-button" id="mobileCommandButton" type="button" aria-label="Search portfolio">
       <span class="mobile-tool-icon">⌕</span><strong>Search</strong><small>Find</small>
     </button>
   </aside>
 
-  <nav class="mobile-landscape-dock" id="mobileLandscapeDock" aria-label="Quick portfolio navigation">
-    <button class="mobile-dock-item mobile-dock-quick" id="mobileDockQuickView" type="button" aria-label="Open recruiter quick view"><span>★</span><strong>Quick</strong></button>
-    <button class="mobile-dock-item" type="button" data-open-section="projects" aria-label="Open Projects"><span>◈</span><strong>Projects</strong></button>
-    <button class="mobile-dock-item" type="button" data-open-section="contact" aria-label="Open Contact"><span>◎</span><strong>Contact</strong></button>
-    <a class="mobile-dock-item mobile-dock-resume" href="https://drive.google.com/file/d/1Sr2o9YOB9zykX7TD470YEVzy2giZCKKL/view?usp=sharing" target="_blank" rel="noopener noreferrer" aria-label="Open resume in a new tab"><span>↗</span><strong>Resume</strong></a>
+  <nav class="mobile-landscape-dock mobile-explore-dock" id="mobileLandscapeDock" aria-label="Explore portfolio sections">
+    <div class="mobile-explore-heading" aria-hidden="true"><strong>EXPLORE</strong><span>SECTIONS</span></div>
+    <div class="mobile-explore-scroll">
+      <button class="mobile-explore-item" style="--district:#ff5f57" type="button" data-open-section="projects" aria-label="Open Projects"><span>◈</span><strong>Projects</strong></button>
+      <button class="mobile-explore-item" style="--district:#ff7f7f" type="button" data-open-section="featured" aria-label="Open Featured Work"><span>✦</span><strong>Featured</strong></button>
+      <button class="mobile-explore-item" style="--district:#57bde3" type="button" data-open-section="experience" aria-label="Open Experience"><span>▥</span><strong>Experience</strong></button>
+      <button class="mobile-explore-item" style="--district:#7fa5ff" type="button" data-open-section="education" aria-label="Open Education"><span>⌂</span><strong>Education</strong></button>
+      <button class="mobile-explore-item" style="--district:#50d5a4" type="button" data-open-section="skills" aria-label="Open Skills"><span>⚙</span><strong>Skills</strong></button>
+      <button class="mobile-explore-item" style="--district:#b38cff" type="button" data-open-section="research" aria-label="Open Research"><span>⌬</span><strong>Research</strong></button>
+      <button class="mobile-explore-item" style="--district:#ff5f57" type="button" data-open-section="about" aria-label="Open About"><span class="mobile-explore-rm">RM</span><strong>About</strong></button>
+      <button class="mobile-explore-item" style="--district:#ffa35f" type="button" data-open-section="contact" aria-label="Open Contact"><span>◎</span><strong>Contact</strong></button>
+    </div>
   </nav>
 
   <aside class="section-sidebar" id="sectionSidebar" aria-label="Portfolio sections" role="navigation">
@@ -257,7 +226,7 @@
   <section class="command-palette" id="commandPalette" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="commandPaletteTitle">
     <div class="command-backdrop" id="commandBackdrop"></div>
     <article class="command-panel">
-      <header><button class="mobile-back-map" id="commandBackToMap" type="button" aria-label="Back to city map">← <span>Map</span></button><div><span>CITY SEARCH</span><h2 id="commandPaletteTitle">Find anything</h2></div><button id="commandClose" type="button" aria-label="Close search">×</button></header>
+      <header><button class="mobile-back-map" id="commandBackToMap" type="button" aria-label="Back to city map">← <span>Map</span></button><div><span>PORTFOLIO SEARCH</span><h2 id="commandPaletteTitle">Find anything</h2></div><button id="commandClose" type="button" aria-label="Close search">×</button></header>
       <label class="command-search"><span>⌕</span><input id="commandInput" type="search" autocomplete="off" spellcheck="false" placeholder="Search DQN, Unreal, VR, C++, research..." aria-label="Search portfolio" /><kbd>ESC</kbd></label>
       <div class="command-suggestions"><button type="button" data-command-query="reinforcement learning">REINFORCEMENT LEARNING</button><button type="button" data-command-query="Unreal">UNREAL</button><button type="button" data-command-query="VR">VR</button><button type="button" data-command-query="C++">C++</button></div>
       <div class="command-results" id="commandResults" role="listbox" aria-label="Search results"></div>
@@ -415,8 +384,8 @@
   <noscript><div class="noscript">This interactive portfolio requires JavaScript.</div></noscript>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
-  <script src="./assets/js/modules/runtime.js?v=30"></script>
-  <script src="./assets/js/modules/world-boundaries.js?v=30"></script>
-  <script src="./assets/js/main.js?v=30"></script>
+  <script src="./assets/js/modules/runtime.js?v=31"></script>
+  <script src="./assets/js/modules/world-boundaries.js?v=31"></script>
+  <script src="./assets/js/main.js?v=31"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 /* V22: mobile section opens skip first-visit district discovery toast; desktop retains it. */
 /* =========================================================
-   RITHVIK CITY — Mobile Portrait V18
+   RITHVIK PORTFOLIO — Mobile Portrait V18
    Uses the global THREE object loaded in index.html.
 ========================================================= */
 
@@ -2805,11 +2805,11 @@
     // cached naturally as the staged image preloader fetches it.
     return [
       "./index.html",
-      "./assets/css/style.css?v=30",
-      "./assets/css/mobile.css?v=30",
-      "./assets/js/modules/runtime.js?v=30",
-      "./assets/js/modules/world-boundaries.js?v=30",
-      "./assets/js/main.js?v=30",
+      "./assets/css/style.css?v=31",
+      "./assets/css/mobile.css?v=31",
+      "./assets/js/modules/runtime.js?v=31",
+      "./assets/js/modules/world-boundaries.js?v=31",
+      "./assets/js/main.js?v=31",
       "./favicon.png"
     ];
   }

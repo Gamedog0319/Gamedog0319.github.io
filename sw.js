@@ -1,5 +1,5 @@
-/* Rithvik City service worker — V30 lean first-visit cache + fast repeats. */
-const CACHE_VERSION = "rithvik-city-v30";
+/* Rithvik Portfolio service worker — V31 lean first-visit cache + fast repeats. */
+const CACHE_VERSION = "rithvik-portfolio-v31";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 

@@ -1,4 +1,4 @@
-/* Rithvik City runtime helpers — preload, scheduling and frame utilities. */
+/* Rithvik Portfolio runtime helpers — preload, scheduling and frame utilities. */
 (() => {
   "use strict";
 
@@ -96,7 +96,7 @@
   async function registerServiceWorker() {
     if (!("serviceWorker" in navigator) || location.protocol === "file:") return null;
     try {
-      const registration = await navigator.serviceWorker.register("./sw.js?v=30", { scope: "./" });
+      const registration = await navigator.serviceWorker.register("./sw.js?v=31", { scope: "./" });
       return registration;
     } catch (error) {
       console.warn("Service worker registration skipped", error);

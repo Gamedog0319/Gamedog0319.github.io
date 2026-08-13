@@ -1,4 +1,4 @@
-/* Rithvik City natural world boundary.
+/* Rithvik Portfolio natural world boundary.
    Mountains are instanced for low draw-call cost; water uses lightweight static geometry. */
 (() => {
   "use strict";

@@ -5183,3 +5183,7 @@ body.time-night .visual-card-code{
 .showcase-media.image-error .showcase-media-fallback{display:grid}
 .demo-stage.image-error{background:linear-gradient(145deg,#e9f1f7,#dbe6ef)}
 body.time-night .showcase-media-fallback,body.time-night .demo-stage.image-error{background:linear-gradient(145deg,#13283b,#0d1e2f);color:#eef6ff}
+
+
+/* V31 mobile-only navigation hooks. Desktop remains unchanged. */
+.mobile-primary-actions{display:none;}
