@@ -1137,17 +1137,62 @@
   };
 
   function makeTextSprite(text,color=0xffffff,scale=1){
+    // Scanner labels are canvas textures. A 512×128 texture looked soft on
+    // high-density mobile screens once it was projected into the 3D world.
+    // Keep the desktop path lightweight, but rasterize a substantially larger
+    // texture on phones and prevent mipmap downsampling from blurring it.
+    const mobileLabel = mobile || window.matchMedia("(pointer: coarse)").matches;
+    const width = mobileLabel ? 1280 : 512;
+    const height = mobileLabel ? 320 : 128;
+    const px = width / 512;
+
     const canvas=document.createElement("canvas");
-    canvas.width=512;canvas.height=128;
-    const ctx=canvas.getContext("2d");
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle="rgba(8,18,30,.88)";ctx.strokeStyle=`#${new THREE.Color(color).getHexString()}`;ctx.lineWidth=4;
-    ctx.beginPath();ctx.roundRect?.(8,8,496,112,18);if(!ctx.roundRect)ctx.rect(8,8,496,112);ctx.fill();ctx.stroke();
-    ctx.fillStyle="#f4f8ff";ctx.font="700 38px Inter, Arial, sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";
-    const clipped=text.length>24?`${text.slice(0,23)}…`:text;ctx.fillText(clipped,256,64);
-    const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;texture.needsUpdate=true;
-    const material=new THREE.SpriteMaterial({map:texture,transparent:true,depthWrite:false,depthTest:false});
-    const sprite=new THREE.Sprite(material);sprite.scale.set(7.5*scale,1.875*scale,1);return sprite;
+    canvas.width=width;canvas.height=height;
+    const ctx=canvas.getContext("2d",{alpha:true});
+    ctx.clearRect(0,0,width,height);
+    ctx.imageSmoothingEnabled=true;
+    ctx.imageSmoothingQuality="high";
+
+    ctx.fillStyle="rgba(8,18,30,.94)";
+    ctx.strokeStyle=`#${new THREE.Color(color).getHexString()}`;
+    ctx.lineWidth=4*px;
+    ctx.beginPath();
+    const inset=8*px, radius=18*px;
+    if(ctx.roundRect)ctx.roundRect(inset,inset,width-inset*2,height-inset*2,radius);
+    else ctx.rect(inset,inset,width-inset*2,height-inset*2);
+    ctx.fill();ctx.stroke();
+
+    ctx.fillStyle="#ffffff";
+    const fontSize=mobileLabel ? 92 : 38;
+    const fontFamily=mobileLabel
+      ? '-apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif'
+      : 'Inter, Arial, sans-serif';
+    ctx.font=`800 ${fontSize}px ${fontFamily}`;
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    const clipped=text.length>24?`${text.slice(0,23)}…`:text;
+    ctx.fillText(clipped,width/2,height/2+1*px);
+
+    const texture=new THREE.CanvasTexture(canvas);
+    texture.colorSpace=THREE.SRGBColorSpace;
+    texture.generateMipmaps=false;
+    texture.minFilter=THREE.LinearFilter;
+    texture.magFilter=THREE.LinearFilter;
+    if(renderer?.capabilities?.getMaxAnisotropy){
+      texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+    }
+    texture.needsUpdate=true;
+
+    const material=new THREE.SpriteMaterial({
+      map:texture,
+      transparent:true,
+      depthWrite:false,
+      depthTest:false,
+      alphaTest:.012
+    });
+    const sprite=new THREE.Sprite(material);
+    const mobileSizeBoost=mobileLabel?1.22:1;
+    sprite.scale.set(7.5*scale*mobileSizeBoost,1.875*scale*mobileSizeBoost,1);
+    return sprite;
   }
 
   function createDistrictStorytelling(){

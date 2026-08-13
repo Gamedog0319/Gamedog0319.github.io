@@ -1,17 +1,10 @@
-V28 MOBILE FULL-SCREEN QA
-=========================
-- Desktop base layout/behavior retained from V26.
-- Mobile section modal explicitly fills 100vw x 100dvh/100vh.
-- Mobile section header, Back to Map, text, icons and Previous/Next controls enlarged.
-- Project/Featured media scales to screen width and is much taller.
-- Education/About images and Skills logo grids receive larger visual areas.
-- Experience/Research/Contact visual anchors enlarged.
-- Portrait uses a generous single-column layout.
-- Landscape phones/tablets use two-column media/text layouts where space allows.
-- Active section is exposed through sectionModal[data-section] for future targeted styling.
-- V28 query/cache version prevents stale V26 mobile.css from remaining active.
+V29 — Crisp Mobile Scanner Labels
 
-V28 PATCH
-- Removed the ASU image from Education > Academic Focus (Academic File 003).
-- Academic Focus now uses the existing infinity symbol fallback instead of a university image.
-- University of Utah and undergraduate education images are unchanged.
+Fixes:
+- Scanner text projected over buildings uses a 1280x320 canvas texture on mobile instead of 512x128.
+- Uses native mobile/system font rasterization for scanner textures.
+- Disables CanvasTexture mipmaps to prevent soft downsampling during orthographic zoom.
+- Uses linear min/mag filtering plus supported anisotropic filtering.
+- Slightly increases mobile scanner label world size for readability.
+- Desktop scanner path keeps the lightweight 512x128 texture and original sizing.
+- Cache/assets bumped to V29 so older V28 scanner textures are not reused.
