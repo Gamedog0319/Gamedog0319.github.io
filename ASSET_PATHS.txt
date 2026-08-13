@@ -20,11 +20,9 @@ images/
   education/
     utah games.jpg
     au.png
-    ASU.jpg
 
 Used by:
 - Projects / Featured: minecraft.png, vr-neck.png, shopsim.jpg, pompeii.jpg, Howzzatt.jpg, molecular-sim.jpg, unreal.png
-- Education: education/utah games.jpg, education/au.png, education/ASU.jpg
 - Skills Languages: cpp_logo.png, csharp.png, java.jpg
 - Skills Engines & Tools: unity.png, unreal.png, arduino.png
 - Skills Game AI / ML: minecraft.png, unreal.png

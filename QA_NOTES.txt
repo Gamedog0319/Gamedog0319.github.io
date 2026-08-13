@@ -1,4 +1,4 @@
-V27 MOBILE FULL-SCREEN QA
+V28 MOBILE FULL-SCREEN QA
 =========================
 - Desktop base layout/behavior retained from V26.
 - Mobile section modal explicitly fills 100vw x 100dvh/100vh.
@@ -9,4 +9,9 @@ V27 MOBILE FULL-SCREEN QA
 - Portrait uses a generous single-column layout.
 - Landscape phones/tablets use two-column media/text layouts where space allows.
 - Active section is exposed through sectionModal[data-section] for future targeted styling.
-- V27 query/cache version prevents stale V26 mobile.css from remaining active.
+- V28 query/cache version prevents stale V26 mobile.css from remaining active.
+
+V28 PATCH
+- Removed the ASU image from Education > Academic Focus (Academic File 003).
+- Academic Focus now uses the existing infinity symbol fallback instead of a university image.
+- University of Utah and undergraduate education images are unchanged.

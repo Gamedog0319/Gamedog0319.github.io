@@ -774,7 +774,6 @@
         },
         {
           code:"ACADEMIC FILE // 003", symbol:"∞", kicker:"CORE AREAS",
-          image:"./images/education/ASU.jpg", imageAlt:"Academic learning and education",
           title:"Academic Focus",
           description:"The areas connecting my academic work to the games and interactive systems I build.",
           meta:[["01","Game Engineering"],["02","Machine Learning"],["03","Interactive Systems"],["04","Simulation and AI"]]
@@ -2748,11 +2747,11 @@
     const media=collectPortfolioMedia();
     return [
       "./index.html",
-      "./assets/css/style.css?v=27",
-      "./assets/css/mobile.css?v=27",
-      "./assets/js/modules/runtime.js?v=27",
-      "./assets/js/modules/world-boundaries.js?v=27",
-      "./assets/js/main.js?v=27",
+      "./assets/css/style.css?v=28",
+      "./assets/css/mobile.css?v=28",
+      "./assets/js/modules/runtime.js?v=28",
+      "./assets/js/modules/world-boundaries.js?v=28",
+      "./assets/js/main.js?v=28",
       "./favicon.png",
       ...media.images,
       ...media.videos
