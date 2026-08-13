@@ -36,6 +36,7 @@
   const sectionModal = $("sectionModal");
   const sectionBackdrop = $("sectionBackdrop");
   const sectionClose = $("sectionClose");
+  const sectionBackToMap = $("sectionBackToMap");
   const modalSectionIndex = $("modalSectionIndex");
   const modalSectionTitle = $("modalSectionTitle");
   const modalSectionSubtitle = $("modalSectionSubtitle");
@@ -50,7 +51,6 @@
   const soundToggleLabel = $("soundToggleLabel");
   const volumeSlider = $("volumeSlider");
   const volumeValue = $("volumeValue");
-  const tourButton = $("tourButton");
   const exploredCount = $("exploredCount");
   const exploredFill = $("exploredFill");
   const cityStatus = $("cityStatus");
@@ -71,6 +71,7 @@
   const recruiterModal = $("recruiterModal");
   const recruiterBackdrop = $("recruiterBackdrop");
   const recruiterClose = $("recruiterClose");
+  const recruiterBackToMap = $("recruiterBackToMap");
   const cityMinimap = $("cityMinimap");
   const minimapLabel = $("minimapLabel");
   const mobileMenuToggle = $("mobileMenuToggle");
@@ -81,15 +82,11 @@
   const mobileSoundState = $("mobileSoundState");
   const mobileTimeModeButton = $("mobileTimeModeButton");
   const mobileTimeState = $("mobileTimeState");
-  const mobileTourButton = $("mobileTourButton");
-  const mobileTourState = $("mobileTourState");
   const mobileHomeViewButton = $("mobileHomeViewButton");
   const mobileCinematicButton = $("mobileCinematicButton");
   const mobileCinematicState = $("mobileCinematicState");
   const mobileExploredCount = $("mobileExploredCount");
   const mobileExploredFill = $("mobileExploredFill");
-  const rotateDeviceOverlay = $("rotateDeviceOverlay");
-  const rotateQuickViewButton = $("rotateQuickViewButton");
   const mobileDockQuickView = $("mobileDockQuickView");
   const mobileLandscapeDock = $("mobileLandscapeDock");
   const scannerButton = $("scannerButton");
@@ -104,12 +101,9 @@
   const commandPalette = $("commandPalette");
   const commandBackdrop = $("commandBackdrop");
   const commandClose = $("commandClose");
+  const commandBackToMap = $("commandBackToMap");
   const commandInput = $("commandInput");
   const commandResults = $("commandResults");
-  const tourCinematicCaption = $("tourCinematicCaption");
-  const tourCaptionKicker = $("tourCaptionKicker");
-  const tourCaptionTitle = $("tourCaptionTitle");
-  const tourCaptionText = $("tourCaptionText");
   const worldBlueprintHud = $("worldBlueprintHud");
   const worldBlueprintTitle = $("worldBlueprintTitle");
   const worldBlueprintSubtitle = $("worldBlueprintSubtitle");
@@ -141,10 +135,7 @@
   let masterVolume = .95;
 
   const visitedSections = new Set();
-  let tourActive = false;
-  let tourTimer = null;
-  let tourIndex = 0;
-  const tourOrder = ["about","featured","projects","experience","education","research","skills","contact"];
+  const sectionOrder = ["about","featured","projects","experience","education","research","skills","contact"];
   const districtGlyphs = {projects:"◈",featured:"✦",experience:"▥",education:"⌂",skills:"⚙",research:"⌬",about:"RM",contact:"◎"};
   const timeModes = ["day","night"];
   let timeModeIndex = 0;
@@ -209,7 +200,10 @@
     mobileMenuBackdrop?.setAttribute("aria-hidden",open?"false":"true");
     mobileMenuToggle.setAttribute("aria-expanded",open?"true":"false");
     document.body.classList.toggle("mobile-menu-open",open);
-    if(mobile&&typeof resetMobileInputState==="function")resetMobileInputState();
+    if(mobile){
+      mobileUiFreeze=open;
+      if(typeof resetMobileInputState==="function")resetMobileInputState();
+    }
     if(open&&typeof clearDistrictHover==="function")clearDistrictHover();
     if(open){
       window.setTimeout(()=>mobileMenuClose?.focus({preventScroll:true}),80);
@@ -223,11 +217,10 @@
   function syncMobileMenuUi(){
     if(mobileSoundState) mobileSoundState.textContent=audioEnabled?`On • ${Math.round(masterVolume*100)}%`:"Off";
     if(mobileTimeState) mobileTimeState.textContent=(timeModes[timeModeIndex]||"day").replace(/^./,c=>c.toUpperCase());
-    if(mobileTourState) mobileTourState.textContent=tourActive?"Running":"Start";
     if(mobileCinematicState) mobileCinematicState.textContent=cinematicMode?"On":"Off";
     if(mobileScannerState) mobileScannerState.textContent=scannerMode?"On":"Off";
-    if(mobileExploredCount) mobileExploredCount.textContent=`${visitedSections.size} / ${tourOrder.length}`;
-    if(mobileExploredFill) mobileExploredFill.style.width=`${(visitedSections.size/tourOrder.length)*100}%`;
+    if(mobileExploredCount) mobileExploredCount.textContent=`${visitedSections.size} / ${sectionOrder.length}`;
+    if(mobileExploredFill) mobileExploredFill.style.width=`${(visitedSections.size/sectionOrder.length)*100}%`;
   }
 
   function createAudioContext(){
@@ -279,7 +272,8 @@
     padFilter.Q.value=.3;
     padFilter.connect(bgmGain);
 
-    [82.41,110,164.81,220].forEach((freq,index)=>{
+    const padFrequencies = mobile ? [82.41,164.81] : [82.41,110,164.81,220];
+    padFrequencies.forEach((freq,index)=>{
       const osc=audioCtx.createOscillator();
       const gain=audioCtx.createGain();
       osc.type=index===1?"triangle":"sine";
@@ -302,7 +296,7 @@
     ambientNoiseSource.connect(noiseFilter);noiseFilter.connect(ambientNoiseGain);ambientNoiseGain.connect(bgmGain);ambientNoiseSource.start();
 
     scheduleMusicPhrase();
-    bgmTimer=window.setInterval(scheduleMusicPhrase,4200);
+    bgmTimer=window.setInterval(scheduleMusicPhrase,mobile?5600:4200);
   }
 
   function scheduleMusicPhrase(){
@@ -356,7 +350,7 @@
   }
   function playCloseSound(){ playTone(540,250,.1,.13,"triangle"); }
   function playHoverTick(){ playTone(930,790,.035,.052,"sine"); }
-  function playTourChime(){
+  function playNavChime(){
     playTone(520,780,.09,.09,"sine");
     window.setTimeout(()=>playTone(780,1040,.12,.07,"sine"),70);
   }
@@ -399,20 +393,20 @@
 
   function updateExploredUi(){
     const count=visitedSections.size;
-    const pct=(count/tourOrder.length)*100;
-    if(exploredCount) exploredCount.textContent=`${count} / ${tourOrder.length}`;
+    const pct=(count/sectionOrder.length)*100;
+    if(exploredCount) exploredCount.textContent=`${count} / ${sectionOrder.length}`;
     if(exploredFill) exploredFill.style.width=`${pct}%`;
     if(objectiveFill) objectiveFill.style.width=`${pct}%`;
     visitedSections.forEach(key=>{
       document.querySelectorAll(`[data-open-section="${key}"]`).forEach(el=>el.classList.add("is-visited"));
     });
     syncMobileMenuUi();
-    const next=tourOrder.find(key=>!visitedSections.has(key));
+    const next=sectionOrder.find(key=>!visitedSections.has(key));
     if(cityStatus){
-      cityStatus.textContent=count===tourOrder.length?"CITY COMPLETE // ALL DISTRICTS EXPLORED":`${count} / ${tourOrder.length} DISTRICTS EXPLORED`;
+      cityStatus.textContent=count===sectionOrder.length?"CITY COMPLETE // ALL DISTRICTS EXPLORED":`${count} / ${sectionOrder.length} DISTRICTS EXPLORED`;
     }
     if(objectiveTitle && objectiveText){
-      if(count===tourOrder.length){
+      if(count===sectionOrder.length){
         objectiveTitle.textContent="Profile analysis complete";
         objectiveText.textContent="Game AI + Gameplay + XR + Research profile mapped.";
         objectiveCard?.classList.add("is-complete");
@@ -420,13 +414,13 @@
       }else{
         objectiveCard?.classList.remove("is-complete");
         if(count<2){
-          objectiveTitle.textContent=`Mission: discover the portfolio • ${count}/${tourOrder.length}`;
+          objectiveTitle.textContent=`Mission: discover the portfolio • ${count}/${sectionOrder.length}`;
           objectiveText.textContent=next?`Next lead: ${portfolioSections[next].cityName}`:"Explore the city.";
         }else if(count<4){
-          objectiveTitle.textContent=`Mission: map technical strengths • ${count}/${tourOrder.length}`;
+          objectiveTitle.textContent=`Mission: map technical strengths • ${count}/${sectionOrder.length}`;
           objectiveText.textContent="Look for AI, gameplay and immersive-system evidence.";
         }else if(count<7){
-          objectiveTitle.textContent=`Profile signal detected • ${count}/${tourOrder.length}`;
+          objectiveTitle.textContent=`Profile signal detected • ${count}/${sectionOrder.length}`;
           objectiveText.textContent="Game AI + Gameplay + XR + Research. Continue analysis.";
         }else{
           objectiveTitle.textContent="Final district remaining";
@@ -446,7 +440,7 @@
     const toast=document.createElement("div");
     toast.className="discovery-toast";
     toast.style.setProperty("--toast-accent",`#${new THREE.Color(getDistrictConfig(key)?.accent||COLORS.accent).getHexString()}`);
-    toast.innerHTML=`<span class="discovery-glyph">${districtGlyphs[key]||"◈"}</span><div><small>DISTRICT DISCOVERED</small><strong>${data.cityName}</strong><span>${visitedSections.size} / ${tourOrder.length} explored</span></div>`;
+    toast.innerHTML=`<span class="discovery-glyph">${districtGlyphs[key]||"◈"}</span><div><small>DISTRICT DISCOVERED</small><strong>${data.cityName}</strong><span>${visitedSections.size} / ${sectionOrder.length} explored</span></div>`;
     toastStack.appendChild(toast);
     requestAnimationFrame(()=>toast.classList.add("show"));
     setTimeout(()=>{toast.classList.remove("show");setTimeout(()=>toast.remove(),360)},3200);
@@ -512,7 +506,8 @@
 
   function openCommandPalette(initialQuery=""){
     if(!commandPalette)return;
-    stopGuidedTour();setMobileMenu(false,false);
+    setMobileMenu(false,false);
+    if(mobile){mobileUiFreeze=true;resetMobileInputState();}
     commandOpen=true;commandPalette.classList.add("open");commandPalette.setAttribute("aria-hidden","false");document.body.classList.add("command-open");
     commandInput.value=initialQuery;renderCommandResults(initialQuery);
     setTimeout(()=>{commandInput?.focus();commandInput?.select()},40);
@@ -521,6 +516,7 @@
 
   function closeCommandPalette(){
     if(!commandPalette||!commandOpen)return;
+    if(mobile){mobileUiFreeze=false;resetMobileInputState();}
     commandOpen=false;commandPalette.classList.remove("open");commandPalette.setAttribute("aria-hidden","true");document.body.classList.remove("command-open");
     if(audioCtx?.state==="running")playCloseSound();
   }
@@ -532,33 +528,14 @@
     if(data&&index>0&&index<data.items.length){currentItemIndex=index;sectionSlider.value=index;renderCurrentItem()}
   }
 
-  function showTourCaption(key){
-    if(!tourCinematicCaption)return;
-    const copy={
-      about:["PERSONNEL PROFILE","RITHVIK MANDYA","Game AI • Gameplay • XR • Research"],
-      featured:["SELECTED WORK","INNOVATION CENTER","Three technical case studies to inspect first"],
-      projects:["BUILD SYSTEMS","PROJECT DISTRICT","Agents • Gameplay • VR • Simulation"],
-      experience:["INDUSTRY + RESEARCH","EXPERIENCE TOWERS","University of Utah • Zen Technologies • IIT Gandhinagar"],
-      education:["GAME ENGINEERING","UNIVERSITY CAMPUS","M.E.A.E. • University of Utah"],
-      research:["EXPERIMENT","RESEARCH COMPLEX","Reinforcement learning • adaptive systems • evaluation"],
-      skills:["TECH STACK","TECH FOUNDRY","C++ • C# • Python • Unity • Unreal"],
-      contact:["ESTABLISH LINK","COMMS ARRAY","Resume • GitHub • LinkedIn • Email"]
-    }[key]||["GUIDED TOUR",portfolioSections[key]?.cityName||"CITY","Portfolio district"];
-    tourCaptionKicker.textContent=copy[0];tourCaptionTitle.textContent=copy[1];tourCaptionText.textContent=copy[2];
-    tourCinematicCaption.classList.add("visible");tourCinematicCaption.setAttribute("aria-hidden","false");
-  }
-
-  function hideTourCaption(){
-    tourCinematicCaption?.classList.remove("visible");tourCinematicCaption?.setAttribute("aria-hidden","true");
-  }
 
   function showCompletionFinale(){
     if(finaleShown||!completionFinale)return;
-    finaleShown=true;finalePending=false;stopGuidedTour();clearDistrictHover();resetCamera();
+    finaleShown=true;finalePending=false;clearDistrictHover();resetCamera();
     districtVisuals.forEach(v=>{v.activation=1;});
     startAmbientEvent("signal",true);
     completionFinale.classList.add("open");completionFinale.setAttribute("aria-hidden","false");document.body.classList.add("finale-open");
-    if(audioCtx?.state==="running"){playTourChime();setTimeout(playOpenSound,220)}
+    if(audioCtx?.state==="running"){playNavChime();setTimeout(playOpenSound,220)}
   }
 
   function closeCompletionFinale(){
@@ -580,7 +557,7 @@
 
   function focusFromMinimap(key){
     if(!portfolioSections[key])return;
-    stopGuidedTour();
+    
     if(activeHoverKey && activeHoverKey!==key)highlightDistrict(activeHoverKey,false);
     activeHoverKey=key;
     focusDistrict(key,1.08);
@@ -591,53 +568,9 @@
       const x=Math.max(330,window.innerWidth-560),y=Math.max(120,window.innerHeight-270);
       showDistrictHover(key,x,y);
     }
-    if(audioCtx?.state==="running")playTourChime();
+    if(audioCtx?.state==="running")playNavChime();
   }
 
-
-  function stopGuidedTour(){
-    if(!tourActive)return;
-    tourActive=false;
-    if(tourTimer){clearInterval(tourTimer);tourTimer=null}
-    tourButton?.classList.remove("is-active");tourButton?.setAttribute("aria-pressed","false");
-    if(tourButton)tourButton.textContent="GUIDED TOUR";
-    hideTourCaption();
-    syncMobileMenuUi();
-  }
-
-  function tourStep(){
-    if(sectionModal.classList.contains("open")){stopGuidedTour();return}
-    if(tourIndex>=tourOrder.length){
-      showTourCaption("contact");
-      if(tourCaptionKicker)tourCaptionKicker.textContent="TOUR COMPLETE";
-      if(tourCaptionTitle)tourCaptionTitle.textContent="EXPLORE AT YOUR OWN PACE";
-      if(tourCaptionText)tourCaptionText.textContent="Open Quick View, search the city, or inspect any district.";
-      setTimeout(()=>{stopGuidedTour();resetCamera()},1800);return;
-    }
-    const key=tourOrder[tourIndex];tourIndex++;
-    clearDistrictHover();
-    focusDistrict(key,1.08);
-    syncMinimap(key);
-    highlightDistrict(key,true);activeHoverKey=key;
-    const data=portfolioSections[key];
-    showTourCaption(key);triggerDistrictReaction(key);
-    hoverIndex.textContent=data.cityIndex;if(hoverGlyph)hoverGlyph.textContent=districtGlyphs[key]||"◈";hoverTitle.textContent=data.cityName;hoverDescription.textContent=data.cityDescription;
-    districtHoverCard.style.setProperty("--hover-accent",`#${new THREE.Color(getDistrictConfig(key)?.accent||COLORS.accent).getHexString()}`);
-    districtHoverCard.style.left="50%";districtHoverCard.style.top="96px";districtHoverCard.style.transform="translateX(-50%)";
-    districtHoverCard.classList.add("visible");districtHoverCard.setAttribute("aria-hidden","false");
-    document.querySelector(`.section-sidebar-item[data-open-section="${key}"]`)?.classList.add("is-map-hover");
-    playTourChime();
-  }
-
-  async function startGuidedTour(){
-    if(tourActive){stopGuidedTour();return}
-    await ensureAudio();
-    tourActive=true;tourIndex=0;
-    tourButton?.classList.add("is-active");tourButton?.setAttribute("aria-pressed","true");
-    if(tourButton)tourButton.textContent="STOP TOUR";
-    syncMobileMenuUi();
-    tourStep();tourTimer=setInterval(tourStep,4200);
-  }
 
   const portfolioSections = {
     projects: {
@@ -1028,20 +961,12 @@
   document.body.classList.toggle("touch-mode", coarsePointer);
   document.body.classList.toggle("mobile-mode", mobile);
 
-  function isPhonePortrait(){
-    // V18 is portrait-first on mobile. Orientation never blocks the city.
-    return false;
-  }
 
   function syncMobileOrientation(){
     const isLandscape=mobile && window.innerWidth>window.innerHeight;
     document.body.classList.remove("portrait-mobile-blocked");
     document.body.classList.toggle("mobile-landscape",isLandscape);
     document.body.classList.toggle("mobile-portrait",mobile && !isLandscape);
-    if(rotateDeviceOverlay){
-      rotateDeviceOverlay.setAttribute("aria-hidden","true");
-      rotateDeviceOverlay.style.display="none";
-    }
     if(controlHintText && mobile){
       controlHintText.textContent="Drag to move • pinch to zoom • tap a building • use ⋮ for sections • city tools stay on the left.";
     }
@@ -1051,20 +976,20 @@
   syncMobileOrientation();
 
   const PERF = {
-    pixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? (veryLowEnd ? .66 : largeMobile ? .92 : .82) : lowCpu ? 1.16 : 1.35),
-    minPixelRatio: mobile ? (veryLowEnd ? .50 : .56) : .95,
+    pixelRatio: Math.min(window.devicePixelRatio || 1, mobile ? (veryLowEnd ? .60 : largeMobile ? .86 : .76) : lowCpu ? 1.16 : 1.35),
+    minPixelRatio: mobile ? (veryLowEnd ? .46 : .52) : .95,
     antialias: !mobile && !lowCpu,
     shadows: !mobile && !lowCpu,
     shadowMap: lowCpu ? 512 : 1024,
-    people: reducedMotion ? 4 : mobile ? (veryLowEnd ? 5 : largeMobile ? 10 : 8) : lowCpu ? 16 : 28,
-    movingCars: reducedMotion ? 3 : mobile ? (veryLowEnd ? 3 : largeMobile ? 6 : 5) : lowCpu ? 9 : 14,
-    parkedCars: mobile ? (largeMobile ? 6 : 5) : 12,
-    trees: mobile ? (veryLowEnd ? 18 : largeMobile ? 30 : 26) : lowCpu ? 44 : 62,
-    lamps: mobile ? (largeMobile ? 20 : 17) : 42,
-    benches: mobile ? 4 : 13,
+    people: reducedMotion ? 4 : mobile ? (veryLowEnd ? 4 : largeMobile ? 8 : 6) : lowCpu ? 16 : 28,
+    movingCars: reducedMotion ? 3 : mobile ? (veryLowEnd ? 2 : largeMobile ? 5 : 4) : lowCpu ? 9 : 14,
+    parkedCars: mobile ? (largeMobile ? 5 : 4) : 12,
+    trees: mobile ? (veryLowEnd ? 14 : largeMobile ? 25 : 21) : lowCpu ? 44 : 62,
+    lamps: mobile ? (largeMobile ? 17 : 14) : 42,
+    benches: mobile ? 3 : 13,
     birds: reducedMotion ? 0 : mobile ? 1 : 6,
     clouds: mobile ? 1 : lowCpu ? 3 : 5,
-    targetFps: mobile ? (veryLowEnd ? 30 : 40) : 60,
+    targetFps: mobile ? (veryLowEnd ? 28 : 36) : 60,
     animate: !reducedMotion
   };
 
@@ -2312,12 +2237,11 @@
 
   function openRecruiterView(){
     if(!recruiterModal)return;
-    stopGuidedTour();
     setMobileMenu(false,false);
+    if(mobile){mobileUiFreeze=true;resetMobileInputState();}
     recruiterModal.classList.add("open");
     recruiterModal.setAttribute("aria-hidden","false");
     document.body.classList.add("recruiter-open");
-    if(rotateDeviceOverlay)rotateDeviceOverlay.setAttribute("aria-hidden","true");
     if(bgmGain&&audioCtx){
       bgmGain.gain.cancelScheduledValues(audioCtx.currentTime);
       bgmGain.gain.linearRampToValueAtTime(.22,audioCtx.currentTime+.12);
@@ -2327,6 +2251,7 @@
 
   function closeRecruiterView(){
     if(!recruiterModal)return;
+    if(mobile){mobileUiFreeze=false;resetMobileInputState();}
     recruiterModal.classList.remove("open");
     recruiterModal.setAttribute("aria-hidden","true");
     document.body.classList.remove("recruiter-open");
@@ -2340,7 +2265,7 @@
 
   function openFromRecruiter(key){
     closeRecruiterView();
-    window.setTimeout(()=>openSection(key),120);
+    window.setTimeout(()=>openSection(key),mobile?0:120);
   }
 
   /* =========================================================
@@ -2349,7 +2274,7 @@
 
   function openSection(key){
     const data=portfolioSections[key];if(!data)return;
-    stopGuidedTour();
+    
     setMobileMenu(false,false);
     if(mobile){mobileUiFreeze=true;resetMobileInputState();}
 
@@ -2391,7 +2316,7 @@
       const firstVisit=!visitedSections.has(key);
       visitedSections.add(key);
       updateExploredUi();
-      if(firstVisit){showDiscoveryToast(key);playTourChime();}
+      if(firstVisit){showDiscoveryToast(key);playNavChime();}
       duckMusic(true);
     };
 
@@ -2525,7 +2450,7 @@
     raycaster.setFromCamera(p,camera);return raycaster.ray.intersectPlane(dragPlane,target);
   }
 
-  function resetCamera(){stopGuidedTour();cameraPanTarget.set(0,0);cameraZoomTarget=1;clampPan()}
+  function resetCamera(){cameraPanTarget.set(0,0);cameraZoomTarget=1;clampPan()}
 
   function updateCamera(delta){
     // Mouse-only navigation: moving the pointer into the outer edge zones
@@ -2687,8 +2612,20 @@
 
   function preloadPortfolioMedia(){
     const urls=[];
-    Object.values(portfolioSections).forEach(section=>section.items?.forEach(item=>{if(item.media)urls.push(item.media)}));
-    Runtime.preloadImages(urls).catch(()=>{});
+    if(mobile){
+      const priority=[
+        portfolioSections.projects?.items?.[0]?.media,
+        portfolioSections.projects?.items?.[1]?.media,
+        portfolioSections.featured?.items?.[0]?.media
+      ];
+      priority.filter(Boolean).forEach(url=>urls.push(url));
+    }else{
+      Object.values(portfolioSections).forEach(section=>section.items?.forEach(item=>{if(item.media)urls.push(item.media)}));
+    }
+    const run=()=>Runtime.preloadImages(urls).catch(()=>{});
+    if(mobile && "requestIdleCallback" in window){requestIdleCallback(run,{timeout:2400});}
+    else if(mobile){setTimeout(run,1400);}
+    else run();
   }
 
   /* =========================================================
@@ -2709,7 +2646,7 @@
         setTimeout(()=>{
           worldEntered=true;
           loadingScreen.classList.add("is-hidden");
-          setTimeout(preloadPortfolioMedia,220);
+          setTimeout(preloadPortfolioMedia,mobile?900:220);
           setTimeout(()=>{
             exploreHint.classList.remove("hidden");
             if(mobile){
@@ -2730,7 +2667,6 @@
   ========================================================= */
 
   window.addEventListener("pointermove",event=>{
-    if(tourActive && event.isTrusted) stopGuidedTour();
     if(customCursor){
       customCursor.style.left=`${event.clientX}px`;
       customCursor.style.top=`${event.clientY}px`;
@@ -2779,7 +2715,6 @@
   function rendererEventSetup(){
     document.addEventListener("pointerdown",event=>{
       if(worldEntered && audioEnabled) ensureAudio();
-      if(isPhonePortrait()&&!document.body.classList.contains("recruiter-open"))return;
       if(mobile && event.target.closest("#threeContainer")) dismissMobileHint();
       if(!worldEntered||sectionModal.classList.contains("open"))return;
       if(event.target.closest("button,a,.district-directory,.section-sidebar,.mobile-menu-panel,.mobile-menu-toggle,.mobile-menu-backdrop,.mobile-tool-rail,.mobile-landscape-dock,.city-minimap,.section-modal,.command-palette,.completion-finale,.world-blueprint-hud,.scanner-hud"))return;
@@ -2878,7 +2813,6 @@
   }
 
   window.addEventListener("wheel",event=>{
-    if(tourActive)stopGuidedTour();
     if(!worldEntered||sectionModal.classList.contains("open"))return;
     cameraZoomTarget=THREE.MathUtils.clamp(cameraZoomTarget-event.deltaY*.0008,.78,1.34);
   },{passive:true});
@@ -2909,7 +2843,7 @@
     }
   });
 
-  sectionClose.addEventListener("click",closeSection);sectionBackdrop.addEventListener("click",closeSection);
+  sectionClose.addEventListener("click",closeSection);sectionBackToMap?.addEventListener("click",closeSection);sectionBackdrop.addEventListener("click",closeSection);
   previousItem.addEventListener("click",()=>navigateItem(-1));nextItem.addEventListener("click",()=>navigateItem(1));
   sectionSlider.addEventListener("input",()=>{currentItemIndex=Number(sectionSlider.value);playClick();renderCurrentItem()});
 
@@ -2932,7 +2866,7 @@
   mobileScannerButton?.addEventListener("click",event=>{event.stopPropagation();setMobileMenu(false,false);ensureAudio();toggleScanner()});
   mobileCommandButton?.addEventListener("click",event=>{event.stopPropagation();setMobileMenu(false,false);ensureAudio();openCommandPalette()});
   commandInput?.addEventListener("input",()=>renderCommandResults(commandInput.value));
-  commandClose?.addEventListener("click",closeCommandPalette);commandBackdrop?.addEventListener("click",closeCommandPalette);
+  commandClose?.addEventListener("click",closeCommandPalette);commandBackToMap?.addEventListener("click",closeCommandPalette);commandBackdrop?.addEventListener("click",closeCommandPalette);
   document.querySelectorAll("[data-command-query]").forEach(button=>button.addEventListener("click",()=>{commandInput.value=button.dataset.commandQuery||"";renderCommandResults(commandInput.value);commandInput.focus()}));
   commandResults?.addEventListener("click",event=>{const button=event.target.closest("[data-command-section]");if(!button)return;openSearchResult(button.dataset.commandSection,Number(button.dataset.commandIndex||0))});
   worldBlueprintClose?.addEventListener("click",()=>hideWorldBlueprint());
@@ -2940,13 +2874,12 @@
   completionClose?.addEventListener("click",closeCompletionFinale);completionBackdrop?.addEventListener("click",closeCompletionFinale);completionContinue?.addEventListener("click",closeCompletionFinale);
   recruiterViewButton?.addEventListener("click",event=>{event.stopPropagation();ensureAudio();openRecruiterView()});
   mobileRecruiterViewButton?.addEventListener("click",event=>{event.stopPropagation();ensureAudio();openRecruiterView()});
-  rotateQuickViewButton?.addEventListener("click",event=>{event.stopPropagation();ensureAudio();openRecruiterView();});
   mobileDockQuickView?.addEventListener("click",event=>{event.stopPropagation();ensureAudio();openRecruiterView();});
   recruiterClose?.addEventListener("click",closeRecruiterView);
+  recruiterBackToMap?.addEventListener("click",closeRecruiterView);
   recruiterBackdrop?.addEventListener("click",closeRecruiterView);
   document.querySelectorAll("[data-recruiter-section]").forEach(button=>button.addEventListener("click",()=>openFromRecruiter(button.dataset.recruiterSection)));
   if(cinematicButton)cinematicButton.addEventListener("click",event=>{event.stopPropagation();toggleCinematic()});
-  if(tourButton)tourButton.addEventListener("click",event=>{event.stopPropagation();startGuidedTour()});
 
   mobileMenuToggle?.addEventListener("click",async event=>{
     event.stopPropagation();
@@ -2972,12 +2905,6 @@
     event.stopPropagation();
     await ensureAudio();
     cycleTimeMode();
-    syncMobileMenuUi();
-  });
-  mobileTourButton?.addEventListener("click",async event=>{
-    event.stopPropagation();
-    setMobileMenu(false,false);
-    await startGuidedTour();
     syncMobileMenuUi();
   });
   mobileHomeViewButton?.addEventListener("click",event=>{

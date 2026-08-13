@@ -1,5 +1,5 @@
 /* ==========================================================
-   V19 MOBILE APP LAYER
+   V20 MOBILE APP LAYER
    Loaded after style.css. Desktop is intentionally untouched.
 ========================================================== */
 body.mobile-mode{
@@ -308,3 +308,277 @@ body.mobile-mode .mobile-render-error{
 }
 body.mobile-mode .mobile-render-error strong{font-size:20px !important}
 body.mobile-mode .mobile-render-error p{font-size:16px !important;line-height:1.5 !important}
+
+/* ==========================================================
+   V20 — FULL-SCREEN MOBILE NAV + FAST APP PAGES
+   Desktop remains controlled by style.css. These rules only
+   apply when main.js marks the device as mobile-mode.
+========================================================== */
+body.mobile-mode{
+  --mobile-top:76px;
+  --mobile-bottom:82px;
+  --mobile-rail:92px;
+  --mobile-pad:14px;
+}
+
+/* Full-screen Explore menu. No desktop drawer squeezed onto a phone. */
+body.mobile-mode .mobile-menu-backdrop{display:none !important}
+body.mobile-mode .mobile-menu-panel{
+  position:fixed !important;
+  inset:0 !important;
+  width:100vw !important;
+  max-width:none !important;
+  height:100dvh !important;
+  max-height:none !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:#f6f9fc !important;
+  box-shadow:none !important;
+  transform:translateY(100%) !important;
+  transition:none !important;
+  display:grid !important;
+  grid-template-rows:auto auto minmax(0,1fr) auto !important;
+  overflow:hidden !important;
+  z-index:5000 !important;
+}
+body.mobile-mode .mobile-menu-panel.open{transform:none !important}
+body.mobile-mode .mobile-menu-header{
+  position:relative !important;
+  min-height:82px !important;
+  padding:calc(12px + env(safe-area-inset-top)) 16px 12px !important;
+  background:#fff !important;
+  border-bottom:1px solid #e3eaf1 !important;
+  box-shadow:none !important;
+}
+body.mobile-mode .mobile-menu-brand{gap:12px !important}
+body.mobile-mode .mobile-menu-brand-mark{
+  width:52px !important;height:52px !important;min-width:52px !important;
+  border-radius:16px !important;font-size:15px !important;
+}
+body.mobile-mode .mobile-menu-brand small{font-size:12px !important;color:#6a7b8d !important;letter-spacing:.07em !important}
+body.mobile-mode .mobile-menu-brand strong{font-size:26px !important;line-height:1.05 !important;letter-spacing:-.025em !important}
+body.mobile-mode .mobile-menu-close{
+  width:54px !important;height:54px !important;min-width:54px !important;
+  border-radius:16px !important;font-size:30px !important;
+  background:#eef3f7 !important;border:1px solid #dce5ed !important;box-shadow:none !important;
+}
+body.mobile-mode .mobile-menu-priority{
+  grid-template-columns:1fr 1fr !important;
+  gap:10px !important;
+  padding:12px 14px !important;
+  background:#f6f9fc !important;
+}
+body.mobile-mode .mobile-priority-card{
+  min-height:88px !important;
+  padding:12px !important;
+  border-radius:18px !important;
+  box-shadow:none !important;
+  border:1px solid #dce6ef !important;
+  grid-template-columns:38px minmax(0,1fr) !important;
+}
+body.mobile-mode .mobile-priority-icon{font-size:27px !important}
+body.mobile-mode .mobile-priority-card small{font-size:10px !important}
+body.mobile-mode .mobile-priority-card strong{font-size:17px !important;line-height:1.08 !important}
+body.mobile-mode .mobile-priority-card em{font-size:11px !important;line-height:1.2 !important}
+body.mobile-mode .mobile-menu-scroll{
+  min-height:0 !important;
+  overflow:auto !important;
+  padding:2px 14px 14px !important;
+  overscroll-behavior:contain !important;
+  -webkit-overflow-scrolling:touch !important;
+}
+body.mobile-mode .mobile-menu-group-title{
+  position:sticky !important;top:0 !important;z-index:2 !important;
+  display:flex !important;justify-content:space-between !important;align-items:end !important;
+  padding:11px 2px 9px !important;
+  background:#f6f9fc !important;
+}
+body.mobile-mode .mobile-menu-group-title span{font-size:11px !important;color:#718398 !important}
+body.mobile-mode .mobile-menu-group-title strong{font-size:15px !important;color:#17283a !important}
+body.mobile-mode .mobile-menu-sections{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+body.mobile-mode .mobile-section-item{
+  position:relative !important;
+  min-height:100px !important;
+  padding:12px 10px !important;
+  border-radius:18px !important;
+  background:#fff !important;
+  border:1px solid #dfe7ee !important;
+  box-shadow:none !important;
+  display:grid !important;
+  grid-template-columns:50px minmax(0,1fr) !important;
+  grid-template-rows:auto !important;
+  gap:10px !important;
+  align-items:center !important;
+  text-align:left !important;
+}
+body.mobile-mode .mobile-section-item:active{background:#edf4fa !important;transform:none !important}
+body.mobile-mode .mobile-section-icon{
+  width:50px !important;height:50px !important;
+  border-radius:15px !important;font-size:25px !important;
+}
+body.mobile-mode .mobile-section-rm{font-size:14px !important}
+body.mobile-mode .mobile-section-copy strong{font-size:16px !important;line-height:1.1 !important}
+body.mobile-mode .mobile-section-copy small{
+  display:block !important;margin-top:5px !important;
+  font-size:12px !important;line-height:1.25 !important;
+  overflow:hidden !important;display:-webkit-box !important;-webkit-line-clamp:2 !important;-webkit-box-orient:vertical !important;
+}
+body.mobile-mode .mobile-section-index{
+  position:absolute !important;right:10px !important;top:8px !important;
+  font-size:10px !important;opacity:.58 !important;
+}
+body.mobile-mode .mobile-menu-footer{
+  padding:10px 16px calc(11px + env(safe-area-inset-bottom)) !important;
+  background:#fff !important;
+  border-top:1px solid #e1e8ef !important;
+  box-shadow:none !important;
+}
+body.mobile-mode .mobile-menu-footer>small{font-size:12px !important;line-height:1.25 !important;margin-top:5px !important}
+
+/* Native-app style Back to Map control for every full-screen page. */
+body.mobile-mode .mobile-back-map{
+  display:inline-flex !important;
+  align-items:center !important;justify-content:center !important;gap:6px !important;
+  min-width:76px !important;height:50px !important;padding:0 12px !important;
+  border:1px solid #dce5ed !important;border-radius:15px !important;
+  background:#edf3f7 !important;color:#183149 !important;
+  font-size:16px !important;font-weight:800 !important;letter-spacing:0 !important;
+  box-shadow:none !important;flex:none !important;
+}
+body.mobile-mode .mobile-back-map span{font-size:14px !important;font-weight:800 !important}
+body.mobile-mode .mobile-back-map:active{background:#dfeaf2 !important}
+
+/* Section pages: fast, solid, and readable. */
+body.mobile-mode .section-modal,
+body.mobile-mode .recruiter-modal,
+body.mobile-mode .command-palette{
+  inset:0 !important;
+  padding:0 !important;
+  background:#fff !important;
+  transition:none !important;
+  animation:none !important;
+}
+body.mobile-mode .section-panel,
+body.mobile-mode .recruiter-panel,
+body.mobile-mode .command-panel{
+  width:100vw !important;height:100dvh !important;max-width:none !important;max-height:none !important;
+  border:0 !important;border-radius:0 !important;box-shadow:none !important;
+  transform:none !important;transition:none !important;animation:none !important;
+  background:#fff !important;
+}
+body.mobile-mode .section-panel-header{
+  display:grid !important;
+  grid-template-columns:auto minmax(0,1fr) !important;
+  gap:12px !important;
+  align-items:center !important;
+  min-height:82px !important;
+  padding:calc(10px + env(safe-area-inset-top)) 14px 10px !important;
+  box-shadow:none !important;
+}
+body.mobile-mode .section-panel-header>div{min-width:0 !important}
+body.mobile-mode .section-close{display:none !important}
+body.mobile-mode .section-panel-header h2{font-size:24px !important;max-width:none !important;white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important}
+body.mobile-mode .section-panel-header p{font-size:13px !important;max-width:none !important}
+body.mobile-mode .section-content{
+  padding:14px 16px 24px !important;
+  contain:layout paint style !important;
+}
+body.mobile-mode .showcase-media,
+body.mobile-mode .visual-card,
+body.mobile-mode .project-tool-panel,
+body.mobile-mode .evidence-card,
+body.mobile-mode .research-citation{
+  box-shadow:none !important;
+}
+body.mobile-mode .showcase-media{background:#eaf1f6 !important}
+body.mobile-mode .showcase-media img{background:#eaf1f6 !important}
+body.mobile-mode .section-navigation{
+  box-shadow:none !important;
+  border-top:1px solid #e2e9ef !important;
+}
+
+/* Recruiter view */
+body.mobile-mode .recruiter-header{
+  display:grid !important;
+  grid-template-columns:auto minmax(0,1fr) !important;
+  gap:12px !important;align-items:center !important;
+  min-height:86px !important;
+  padding:calc(10px + env(safe-area-inset-top)) 14px 10px !important;
+  box-shadow:none !important;
+}
+body.mobile-mode .recruiter-header>div{min-width:0 !important}
+body.mobile-mode .recruiter-close{display:none !important}
+body.mobile-mode .recruiter-header h2{font-size:25px !important;white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important}
+body.mobile-mode .recruiter-scroll{padding:16px !important;contain:layout style !important}
+body.mobile-mode .recruiter-project-card,
+body.mobile-mode .recruiter-value-grid article,
+body.mobile-mode .recruiter-snapshot,
+body.mobile-mode .recruiter-block{box-shadow:none !important}
+body.mobile-mode .recruiter-project-card,
+body.mobile-mode .recruiter-value-grid article{content-visibility:auto !important;contain-intrinsic-size:240px !important}
+
+/* Search view */
+body.mobile-mode .command-panel{display:grid !important;grid-template-rows:auto auto auto minmax(0,1fr) !important}
+body.mobile-mode .command-panel header{
+  display:grid !important;
+  grid-template-columns:auto minmax(0,1fr) !important;
+  gap:12px !important;align-items:center !important;
+  min-height:84px !important;
+  padding:calc(10px + env(safe-area-inset-top)) 14px 10px !important;
+  box-shadow:none !important;
+}
+body.mobile-mode .command-panel header>div{min-width:0 !important}
+body.mobile-mode .command-panel header>button:last-child{display:none !important}
+body.mobile-mode .command-search{box-shadow:none !important}
+body.mobile-mode .command-results{overscroll-behavior:contain !important}
+body.mobile-mode .command-result{box-shadow:none !important;content-visibility:auto !important;contain-intrinsic-size:88px !important}
+
+/* Strip costly visual effects on opaque mobile pages. */
+body.mobile-mode .mobile-menu-panel *,
+body.mobile-mode .section-panel *,
+body.mobile-mode .recruiter-panel *,
+body.mobile-mode .command-panel *{
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  animation-duration:.001ms !important;
+}
+body.mobile-mode .mobile-menu-panel,
+body.mobile-mode .section-panel,
+body.mobile-mode .recruiter-panel,
+body.mobile-mode .command-panel{filter:none !important}
+
+/* Keep the city tool rail simple and lightweight. */
+body.mobile-mode .mobile-tool-rail{gap:6px !important;padding:8px 6px !important}
+body.mobile-mode .mobile-tool-button{min-height:70px !important;box-shadow:none !important}
+body.mobile-mode .mobile-tool-icon{font-size:29px !important}
+
+body.mobile-mode.time-night .mobile-menu-panel,
+body.mobile-mode.time-night .mobile-menu-header,
+body.mobile-mode.time-night .mobile-menu-footer,
+body.mobile-mode.time-night .mobile-menu-group-title{background:#0f2031 !important}
+body.mobile-mode.time-night .mobile-section-item,
+body.mobile-mode.time-night .mobile-priority-card{background:#162b3f !important;border-color:#263e54 !important;color:#edf6ff !important}
+body.mobile-mode.time-night .mobile-back-map{background:#193249 !important;color:#eef7ff !important;border-color:#2a455e !important}
+
+@media (max-width:359px){
+  body.mobile-mode .mobile-menu-sections{grid-template-columns:1fr !important}
+  body.mobile-mode .mobile-section-item{min-height:82px !important}
+  body.mobile-mode .mobile-menu-priority{grid-template-columns:1fr !important}
+}
+
+@media (orientation:landscape) and (max-height:520px){
+  body.mobile-mode .mobile-menu-panel{grid-template-rows:auto minmax(0,1fr) auto !important}
+  body.mobile-mode .mobile-menu-priority{display:none !important}
+  body.mobile-mode .mobile-menu-sections{grid-template-columns:repeat(4,minmax(0,1fr)) !important}
+  body.mobile-mode .mobile-section-item{min-height:92px !important}
+}
+body.mobile-mode .mobile-menu-close{
+  width:auto !important;min-width:82px !important;padding:0 13px !important;
+  display:inline-flex !important;align-items:center !important;justify-content:center !important;gap:6px !important;
+  font-size:20px !important;
+}
+body.mobile-mode .mobile-menu-close strong{font-size:14px !important;line-height:1 !important}

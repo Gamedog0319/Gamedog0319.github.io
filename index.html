@@ -10,7 +10,7 @@
   <link rel="icon" href="./favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="(min-width: 821px)" />
   <link rel="stylesheet" href="./assets/css/style.css" />
   <link rel="stylesheet" href="./assets/css/mobile.css" />
 </head>
@@ -65,7 +65,6 @@
       </div>
       <button class="hud-button world-button" id="timeModeButton" type="button" title="Switch between Day and Night modes">MODE: DAY</button>
       <button class="hud-button cinematic-button" id="cinematicButton" type="button" aria-pressed="false" title="Hide nonessential HUD">CINEMATIC</button>
-      <button class="hud-button tour-button" id="tourButton" type="button" aria-pressed="false" title="Start a guided city tour">GUIDED TOUR</button>
       <button class="hud-button" id="homeViewButton" type="button" title="Reset camera">HOME VIEW</button>
       <button class="hud-button hidden-directory-toggle" id="directoryToggle" type="button" aria-hidden="true" tabindex="-1">DISTRICTS</button>
       <button class="hud-button scanner-button" id="scannerButton" type="button" aria-pressed="false" title="Toggle technical scanner mode">SCAN</button>
@@ -88,11 +87,11 @@
       <div class="mobile-menu-brand">
         <span class="mobile-menu-brand-mark">RM</span>
         <div>
-          <small>PORTFOLIO CITY</small>
-          <strong>EXPLORE</strong>
+          <small>RITHVIK PORTFOLIO</small>
+          <strong>Explore</strong>
         </div>
       </div>
-      <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Close mobile menu">×</button>
+      <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Back to city map"><span aria-hidden="true">←</span><strong>Map</strong></button>
     </div>
 
     <div class="mobile-menu-priority">
@@ -107,7 +106,7 @@
     </div>
     <div class="mobile-menu-scroll">
       <section class="mobile-menu-group" data-mobile-menu-view="explore">
-        <div class="mobile-menu-group-title"><span>EXPLORE</span><strong>SECTIONS</strong></div>
+        <div class="mobile-menu-group-title"><span>CHOOSE A DESTINATION</span><strong>Portfolio sections</strong></div>
         <nav class="mobile-menu-sections">
           <button class="mobile-section-item" style="--district:#ff5f57" type="button" data-open-section="projects"><span class="mobile-section-icon">◈</span><span class="mobile-section-copy"><strong>Projects</strong><small>Games • AI • VR</small></span><span class="mobile-section-index">01</span></button>
           <button class="mobile-section-item" style="--district:#ff7f7f" type="button" data-open-section="featured"><span class="mobile-section-icon">✦</span><span class="mobile-section-copy"><strong>Featured Work</strong><small>Selected case studies</small></span><span class="mobile-section-index">02</span></button>
@@ -124,7 +123,7 @@
     <div class="mobile-menu-footer">
       <div><span>EXPLORED</span><strong id="mobileExploredCount">0 / 8</strong></div>
       <div class="mobile-explored-track"><span id="mobileExploredFill"></span></div>
-      <small>Drag to move • pinch to zoom • tap buildings • tools stay on the left</small>
+      <small>Tap a section to open it • close this screen to return to the city</small>
     </div>
   </aside>
 
@@ -135,9 +134,6 @@
     </button>
     <button class="mobile-tool-button" id="mobileTimeModeButton" type="button" aria-label="Switch day and night mode">
       <span class="mobile-tool-icon">☀</span><strong>Mode</strong><small id="mobileTimeState">Day</small>
-    </button>
-    <button class="mobile-tool-button" id="mobileTourButton" type="button" aria-label="Start guided tour">
-      <span class="mobile-tool-icon">▶</span><strong>Tour</strong><small id="mobileTourState">Start</small>
     </button>
     <button class="mobile-tool-button" id="mobileHomeViewButton" type="button" aria-label="Reset city camera">
       <span class="mobile-tool-icon">⌂</span><strong>Home</strong><small>Reset</small>
@@ -255,11 +251,6 @@
     </div>
   </aside>
 
-  <div class="tour-cinematic-caption" id="tourCinematicCaption" aria-live="polite" aria-hidden="true">
-    <span id="tourCaptionKicker">GUIDED TOUR</span>
-    <strong id="tourCaptionTitle">RITHVIK PORTFOLIO CITY</strong>
-    <p id="tourCaptionText">Game AI • Gameplay • XR • Research</p>
-  </div>
 
   <aside class="world-blueprint-hud" id="worldBlueprintHud" aria-hidden="true">
     <div><span>3D SYSTEM BLUEPRINT</span><strong id="worldBlueprintTitle">SYSTEM</strong><p id="worldBlueprintSubtitle">Technical architecture projected into the city.</p></div>
@@ -269,7 +260,7 @@
   <section class="command-palette" id="commandPalette" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="commandPaletteTitle">
     <div class="command-backdrop" id="commandBackdrop"></div>
     <article class="command-panel">
-      <header><div><span>CITY SEARCH</span><h2 id="commandPaletteTitle">Find anything</h2></div><button id="commandClose" type="button" aria-label="Close search">×</button></header>
+      <header><button class="mobile-back-map" id="commandBackToMap" type="button" aria-label="Back to city map">← <span>Map</span></button><div><span>CITY SEARCH</span><h2 id="commandPaletteTitle">Find anything</h2></div><button id="commandClose" type="button" aria-label="Close search">×</button></header>
       <label class="command-search"><span>⌕</span><input id="commandInput" type="search" autocomplete="off" spellcheck="false" placeholder="Search DQN, Unreal, VR, C++, research..." aria-label="Search portfolio" /><kbd>ESC</kbd></label>
       <div class="command-suggestions"><button type="button" data-command-query="reinforcement learning">REINFORCEMENT LEARNING</button><button type="button" data-command-query="Unreal">UNREAL</button><button type="button" data-command-query="VR">VR</button><button type="button" data-command-query="C++">C++</button></div>
       <div class="command-results" id="commandResults" role="listbox" aria-label="Search results"></div>
@@ -295,6 +286,7 @@
     <div class="recruiter-backdrop" id="recruiterBackdrop"></div>
     <article class="recruiter-panel">
       <header class="recruiter-header">
+        <button class="mobile-back-map" id="recruiterBackToMap" type="button" aria-label="Back to city map">← <span>Map</span></button>
         <div>
           <span class="recruiter-eyebrow">30-SECOND OVERVIEW</span>
           <h2 id="recruiterTitle">Rithvik Mandya</h2>
@@ -390,6 +382,7 @@
     <div class="section-backdrop" id="sectionBackdrop"></div>
     <article class="section-panel">
       <header class="section-panel-header">
+        <button class="mobile-back-map" id="sectionBackToMap" type="button" aria-label="Back to city map">← <span>Map</span></button>
         <div>
           <span class="section-panel-index" id="modalSectionIndex">DISTRICT 01</span>
           <h2 id="modalSectionTitle">PROJECT ARCHIVE</h2>
